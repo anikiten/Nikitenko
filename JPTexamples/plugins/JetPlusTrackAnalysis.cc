@@ -1,7 +1,7 @@
-#include "UserCode/Nikitenko/JPTexamples/plugins/JetPlusTrackAnalysis.h"
+#include "Nikitenko/JPTexamples/plugins/JetPlusTrackAnalysis.h"
 
 #include <vector>
-
+// include vector
 #include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -291,7 +291,7 @@ void JetPlusTrackAnalysis::analyze(
               double deta1 = JetRecoEtaCaloTower[iii]-JetGenEta[jjj];
               double dr1 = sqrt(dphi1*dphi1+deta1*deta1);
               if(dr1 < 0.3) {JetRecoGenRecType[iii] = jjj;JetRecoGenPartonType[iii] = JetGenCode[jjj]; 
-              cout<<" Associated jet "<< iii<<" "<<JetRecoGenRecType[iii]<<" "<<JetRecoGenPartonType[iii]<<endl;
+              cout<<" ==> Associated jet "<< iii<<" "<<JetRecoGenRecType[iii]<<" "<<JetRecoGenPartonType[iii]<<endl;
               cout<<" Etcalo "<<JetRecoEtCaloTower[iii]<<" ETgen "<<JetGenEt[jjj]<<endl;
               } 
          } 
@@ -317,7 +317,7 @@ void JetPlusTrackAnalysis::analyze(
      //  reco::CaloJetCollection::const_iterator jet = jets->begin ();
        reco::JPTJetCollection::const_iterator jet = jets->begin ();
 
-       cout<<" Size of jets "<<jets->size()<<endl;
+       cout<<" ==> Size of jets "<<jets->size()<<endl;
        if(jets->size() > 0 )
 	 {
 	   for (; jet != jets->end (); jet++)

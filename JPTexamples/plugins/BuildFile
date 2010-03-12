@@ -1,4 +1,4 @@
-<library name=UserCodeNikitenkoJPTexamples file=JetPlusTrackAnalysis.cc>
+<library name=UserCodeNikitenkoJPTexamplesPlugins file=JetPlusTrackAnalysis.cc>
   <use name=DataFormats/CaloTowers>
   <use name=DataFormats/Candidate>
   <use name=DataFormats/Common>
