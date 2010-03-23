@@ -390,9 +390,11 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
 	RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+	reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
 	TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
 	TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
-
+	double mN90      = rawcalojet->n90();
+	double mEmf      = rawcalojet->emEnergyFraction(); 	
 	cout <<" jpt jet pT = " << jptjet->pt()
 	     <<" jpt eta = " << jptjet->eta() 
 	     <<" jpt phi = " << jptjet->phi() 
