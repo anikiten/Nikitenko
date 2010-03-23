@@ -24,6 +24,9 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 process.load("RecoJets.Configuration.RecoJPTJets_cff")
 
+# process.load("JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_ReReco332_cff")
+
+# process.prefer("L2L3JetCorrectorAK5Calo") 
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10)
@@ -31,22 +34,17 @@ process.maxEvents = cms.untracked.PSet(
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
-'/store/relval/CMSSW_3_5_0/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_3XY_V21-v1/0012/16F61E92-3513-DF11-97DB-00248C0BE013.root')
+#'/store/relval/CMSSW_3_5_0/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_3XY_V21-v1/0012/16F61E92-3513-DF11-97DB-00248C0BE013.root')
+ '/store/relval/CMSSW_3_6_0_pre2/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_3XY_V24-v1/0001/22D67382-A427-DF11-975F-00261894397E.root')
 )
 
 
 process.myjetplustrack = cms.EDFilter("JetPlusTrackAnalysis",
     HistOutFile = cms.untracked.string('JetAnalysis.root'),
-    src2 = cms.InputTag("ak5GenJets"),
-    src3 = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
-    src4 = cms.InputTag("ZSPJetCorJetAntiKt5"),
-    src1 = cms.InputTag("ak5CaloJets"),
-    Cone = cms.double(0.5),
-    ecalInputs = cms.VInputTag(cms.InputTag("ecalRecHit","EcalRecHitsEB"), cms.InputTag("ecalRecHit","EcalRecHitsEE")),
-    HFRecHitCollectionLabel = cms.InputTag("hfreco"),
-    HORecHitCollectionLabel = cms.InputTag("horeco"),
-    HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
-    inputTrackLabel = cms.untracked.string('generalTracks')
+#    src2 = cms.InputTag("ak5GenJets"),
+    jetsID  = cms.InputTag("ak5JetID"),
+    JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
+    TriggerResults = cms.InputTag("TriggerResults","","HLT")	
 )
 
 
@@ -54,4 +52,4 @@ process.dump = cms.EDFilter("EventContentAnalyzer")
 
 # process.p1 = cms.Path(process.recoJPTJets)
 
-process.p1 = cms.Path(process.recoJPTJets*process.dump*process.myjetplustrack)
+process.p1 = cms.Path(process.recoJPTJets*process.myjetplustrack)

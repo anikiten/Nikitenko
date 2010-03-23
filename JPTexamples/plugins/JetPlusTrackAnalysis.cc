@@ -1,459 +1,583 @@
-#include "Nikitenko/JPTexamples/plugins/JetPlusTrackAnalysis.h"
-
+// system include files
+// http://cmslxr.fnal.gov/lxr/source/RecoJets/JetAlgorithms/src/JetIDHelper.cc?v=CMSSW_3_3_6
+#include <memory>
+#include <string>
+#include <iostream>
+#include <fstream>
 #include <vector>
-// include vector
+// /CMSSW/Calibration/HcalAlCaRecoProducers/src/AlCaIsoTracksProducer.cc  track propagator
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
 #include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/Handle.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ParameterSet/interface/InputTag.h"
+//
+// HLT/L1 and Trigger data formats
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapFwd.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMap.h"
+#include "FWCore/Framework/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenuFwd.h"
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 
-#include "Geometry/Records/interface/CaloGeometryRecord.h"
-
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+// MC info
+#include "CLHEP/Vector/LorentzVector.h"
+#include "CLHEP/Units/GlobalPhysicalConstants.h"
+#include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+//#include "CLHEP/HepPDT/DefaultConfig.hh"
+//
+#include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/Math/interface/Vector3D.h"
+#include "Math/GenVector/VectorUtil.h"
+#include "Math/GenVector/PxPyPzE4D.h"
+#include "DataFormats/Math/interface/deltaR.h"
+//double dR = deltaR( c1, c2 );
+//
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+#include "Geometry/Records/interface/IdealGeometryRecord.h"
+#include "Geometry/CaloGeometry/interface/CaloCellGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+//jets
 #include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/JPTJetCollection.h"
 #include "DataFormats/JetReco/interface/JPTJet.h"
-#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
-#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
-#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
-#include "DataFormats/Provenance/interface/Provenance.h"
+// #include "JetMETCorrections/Objects/interface/JetCorrector.h"
+// #include "JetMETCorrections/Algorithms/interface/JetPlusTrackCorrector.h"
+#include "DataFormats/JetReco/interface/JetExtendedAssociation.h"
+#include "DataFormats/JetReco/interface/JetID.h"
+
+#include "DataFormats/JetReco/interface/PFJet.h"
+
+// taus
+#include "DataFormats/TauReco/interface/CaloTau.h"
+#include "RecoTauTag/TauTagTools/interface/CaloTauElementsOperators.h"
+//
+// muons and tracks
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/HitPattern.h"
+// ecal
+//#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
+#include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
+#include "DataFormats/EgammaReco/interface/ClusterShapeFwd.h"
+#include "DataFormats/EgammaReco/interface/BasicClusterShapeAssociation.h"
+#include "DataFormats/EcalDetId/interface/EcalSubdetector.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+// candidates
+#include "DataFormats/Candidate/interface/LeafCandidate.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+//
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1.h"
+#include "TH2.h"
+//
+#include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/Math/interface/Vector3D.h"
+#include "Math/GenVector/VectorUtil.h"
+#include "Math/GenVector/PxPyPzE4D.h"
 
 using namespace std;
-namespace cms
-{
+using namespace reco;
 
-JetPlusTrackAnalysis::JetPlusTrackAnalysis(const edm::ParameterSet& iConfig)
-{
-   cout<<" Start JetPlusTrackAnalysis now"<<endl;
-   mCone = iConfig.getParameter<double>("Cone");
-   
-   mInputJetsCaloTower = iConfig.getParameter<edm::InputTag>("src1");
-   
-   mInputJetsGen = iConfig.getParameter<edm::InputTag>("src2");	
-   
-   mInputJetsCorrected = iConfig.getParameter<edm::InputTag>("src3");
+//
+// class decleration
+//
 
-   hbhelabel_ = iConfig.getParameter<edm::InputTag>("HBHERecHitCollectionLabel");
-   
-   holabel_ = iConfig.getParameter<edm::InputTag>("HORecHitCollectionLabel");
-   
-   ecalLabels_=iConfig.getParameter<std::vector<edm::InputTag> >("ecalInputs");
-   
-   fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
-  
-   allowMissingInputs_=iConfig.getUntrackedParameter<bool>("AllowMissingInputs",false);
-   cout<<" JetPlusTrackAnalysis constructor "<<endl;			  
+class JetPlusTrackAnalysis : public edm::EDAnalyzer {
+public:
+  explicit JetPlusTrackAnalysis(const edm::ParameterSet&);
+  ~JetPlusTrackAnalysis();
+
+
+private:
+  //      virtual void beginJob(const edm::EventSetup&) ;
+  virtual void beginJob() ;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+
+  // ----------member data ---------------------------
+  // output root file
+  string fOutputFileName ;
+  // names of modules, producing object collections
+  // raw calo jet ID map
+  InputTag jetsIDSrc;
+  // JPT jets
+  InputTag JPTjetsSrc;
+  // MC jet corrections
+  //  string JetCorrectionMC;
+  // PF jet corrections
+  //  string JetCorrectionPF;
+  // HLT result
+  InputTag srcTriggerResults_;
+
+  // variables to store in ntpl
+  int     jjpt;
+  int     run, event;
+  double  PVx, PVy, PVz;
+  // eta/phi/pt of raw calo jet from JPT
+  std::vector<double> *EtaRaw;
+  std::vector<double> *PhiRaw;
+  std::vector<double> *EtRaw;
+  // eta/phi/pt of JPT jets
+  std::vector<double> *EtaJPT;
+  std::vector<double> *PhiJPT;
+  std::vector<double> *EtJPT;
+  // N in-vertex-cone tracks
+  std::vector<int>    *Ntrk;
+  // number of Pxl and silicon inner and outer layers used for trk. measurement
+  std::vector<int>    *NPxlMaxPtTrk;  
+  std::vector<int>    *NSiIMaxPtTrk;  
+  std::vector<int>    *NSiOMaxPtTrk;  
+  // output root file and tree
+  TFile*      hOutputFile ;
+  TTree*      t1;
+};
+
+//
+// constants, enums and typedefs
+//
+
+//
+// static data member definitions
+//
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+//JetPlusTrackAnalysis::beginJob(const edm::EventSetup&)
+JetPlusTrackAnalysis::beginJob()
+{
+  using namespace edm;
+
+  EtaRaw       = new std::vector<double>();
+  PhiRaw       = new std::vector<double>();
+  EtRaw        = new std::vector<double>();
+  EtaJPT       = new std::vector<double>();
+  PhiJPT       = new std::vector<double>();
+  EtJPT        = new std::vector<double>();
+  Ntrk         = new std::vector<int>();
+  NPxlMaxPtTrk = new std::vector<int>();
+  NSiIMaxPtTrk = new std::vector<int>();
+  NSiOMaxPtTrk = new std::vector<int>();
+
+  // creating a simple tree
+
+  hOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
+
+  t1 = new TTree("t1","analysis tree");
+
+  t1->Branch("jjpt",&jjpt,"jjpt/I");
+  t1->Branch("run",&run,"run/I");
+  t1->Branch("event",&event,"event/I");
+
+  t1->Branch("PVx",&PVx,"PVx/D");
+  t1->Branch("PVy",&PVy,"PVy/D");
+  t1->Branch("PVz",&PVz,"PVz/D");
+
+  t1->Branch("EtaRaw","vector<double>",&EtaRaw);
+  t1->Branch("PhiRaw","vector<double>",&PhiRaw);
+  t1->Branch("EtRaw" ,"vector<double>",&EtRaw);
+  t1->Branch("EtaJPT","vector<double>",&EtaJPT);
+  t1->Branch("PhiJPT","vector<double>",&PhiJPT);
+  t1->Branch("EtJPT" ,"vector<double>",&EtJPT);
+  t1->Branch("Ntrk","vector<int>",&Ntrk);
+  t1->Branch("NPxlMaxPtTrk","vector<int>",&NPxlMaxPtTrk);
+  t1->Branch("NSiIMaxPtTrk","vector<int>",&NSiIMaxPtTrk);
+  t1->Branch("NSiOMaxPtTrk","vector<int>",&NSiOMaxPtTrk);
+
+  return ;
 }
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+JetPlusTrackAnalysis::endJob() {
+
+  hOutputFile->Write() ;
+  hOutputFile->Close() ;
+  
+  return ;
+}
+
+//
+// constructors and destructor
+//
+JetPlusTrackAnalysis::JetPlusTrackAnalysis(const edm::ParameterSet& iConfig)
+
+{
+   //now do what ever initialization is needed
+  using namespace edm;
+  // 
+  // get name of output file with histogramms
+  fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
+  //
+  // get names of input object collections
+  // raw calo jets
+  jetsIDSrc        = iConfig.getParameter<edm::InputTag> ("jetsID");
+  // JPT jets
+  JPTjetsSrc       = iConfig.getParameter<edm::InputTag>("JPTjets");
+  // MC corrections
+  //  JetCorrectionMC  = iConfig.getParameter< std::string > ("JetCorrectionMC");
+  // PF corrections
+  //  JetCorrectionPF  = iConfig.getParameter< std::string > ("JetCorrectionPF");
+  // HLT results
+  srcTriggerResults_ = iConfig.getParameter<edm::InputTag> ("TriggerResults");
+}
+
 
 JetPlusTrackAnalysis::~JetPlusTrackAnalysis()
 {
-    cout<<" JetPlusTrack destructor "<<endl;
+ 
+   // do anything here that needs to be done at desctruction time
+   // (e.g. close files, deallocate resources etc.)
+
 }
 
-void JetPlusTrackAnalysis::beginJob()
-{
 
-   cout<<" Begin job "<<endl;
-
-   hOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
-   myTree = new TTree("JetPlusTrack","JetPlusTrack Tree");
-   myTree->Branch("run",  &run, "run/I");
-   myTree->Branch("event",  &event, "event/I");
-
-   NumRecoJetsCaloTower = 0;
-   NumRecoJetsJPTCorrected = 0;
-   NumRecoJetsRecHit = 0;
-   NumGenJets = 0;
-   NumPart = 0;
-
-// Jet Reco CaloTower
-   myTree->Branch("NumRecoJetsCaloTower", &NumRecoJetsCaloTower, "NumRecoJetsCaloTower/I");
-   myTree->Branch("JetRecoEtCaloTower",  JetRecoEtCaloTower, "JetRecoEtCaloTower[10]/F");
-   myTree->Branch("JetRecoEtaCaloTower",  JetRecoEtaCaloTower, "JetRecoEtaCaloTower[10]/F");
-   myTree->Branch("JetRecoPhiCaloTower",  JetRecoPhiCaloTower, "JetRecoPhiCaloTower[10]/F");
-   myTree->Branch("JetRecoEtRecHit",  JetRecoEtRecHit, "JetRecoEtRecHit[10]/F");
-   myTree->Branch("JetRecoGenRecType", JetRecoGenRecType, "JetRecoGenRecType[10]/F");
-   myTree->Branch("JetRecoGenPartonType", JetRecoGenPartonType , "JetRecoGenPartonType[10]/F");
-   myTree->Branch("EcalEmpty", EcalEmpty , "EcalEmpty[10]/F");
-   myTree->Branch("HcalEmpty", HcalEmpty , "HcalEmpty[10]/F");
 //
-   myTree->Branch("NumRecoJetsJPTCorrected", &NumRecoJetsJPTCorrected, "NumRecoJetsJPTCorrected/I");
-   myTree->Branch("JetRecoEtJPTCorrected",  JetRecoEtJPTCorrected, "JetRecoEtJPTCorrected[10]/F");
-   myTree->Branch("JetRecoEtZSPCorrected", JetRecoEtZSPCorrected, "JetRecoEtZSPCorrected[10]/F");
-   myTree->Branch("JetRecoEtAACorrected", JetRecoEtAACorrected, "JetRecoEtAACorrected[10]/F");
-   myTree->Branch("JetRecoEtCaloJetInit",JetRecoEtCaloJetInit , "JetRecoEtCaloJetInit[10]/F");
-   myTree->Branch("JetRecoEtaCaloJetInit",JetRecoEtaCaloJetInit , "JetRecoEtaCaloJetInit[10]/F");
-   myTree->Branch("JetRecoPhiCaloJetInit",JetRecoPhiCaloJetInit , "JetRecoPhiCaloJetInit[10]/F");
-   myTree->Branch("JetRecoEtaJPTCorrected",  JetRecoEtaJPTCorrected, "JetRecoEtaJPTCorrected[10]/F");
-   myTree->Branch("JetRecoPhiJPTCorrected",  JetRecoPhiJPTCorrected, "JetRecoPhiJPTCorrected[10]/F");
+// member functions
+//
+
+// ------------ method called to for each event  ------------
+void
+JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  using namespace edm;
+
+  /*
+  // L1
+   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
+   iEvent.getByLabel("gtDigis",l1GtRR);
    
-// GenJet block
-   myTree->Branch("NumGenJets", &NumGenJets, "NumGenJets/I");
-   myTree->Branch("JetGenEt",  JetGenEt, "JetGenEt[10]/F");
-   myTree->Branch("JetGenEta",  JetGenEta, "JetGenEta[10]/F");
-   myTree->Branch("JetGenPhi",  JetGenPhi, "JetGenPhi[10]/F");
-   myTree->Branch("JetGenCode",  JetGenCode, "JetGenCode[10]/I");
-// Particle block
-   myTree->Branch("NumPart", &NumPart, "NumPart/I");
-   myTree->Branch("Code",  Code, "Code[2]/I");
-   myTree->Branch("Charge",  Charge, "Charge[2]/I");
-   myTree->Branch("partpx",  partpx, "partpx[2]/F");
-   myTree->Branch("partpy",  partpy, "partpy[2]/F");
-   myTree->Branch("partpz",  partpz, "partpz[2]/F");
-   myTree->Branch("parte",  parte, "parte[2]/F");
-   myTree->Branch("partm",  partm, "partm[2]/F");  
-
-}
-
-void JetPlusTrackAnalysis::beginRun(edm::Run const&, edm::EventSetup const& iSetup) 
-{
-// Calo Geometry
-}
-
-void JetPlusTrackAnalysis::endJob()
-{
-
-   cout << "===== Start writing user histograms =====" << endl;
-   hOutputFile->SetCompressionLevel(2);
-   hOutputFile->cd();
-   myTree->Write();
-   hOutputFile->Close() ;
-   cout << "===== End writing user histograms =======" << endl;
+   edm::Handle<L1GlobalTriggerObjectMapRecord> l1GtOMRec;
+   iEvent.getByLabel("hltL1GtObjectMap",l1GtOMRec);
    
-}
+   edm::ESHandle<L1GtTriggerMenu> menuRcd;
+   iSetup.get<L1GtTriggerMenuRcd>().get(menuRcd) ;
+   const L1GtTriggerMenu* menu = menuRcd.product();
 
-void JetPlusTrackAnalysis::analyze(
-                                         const edm::Event& iEvent,
-                                         const edm::EventSetup& theEventSetup)  
-{
-    cout<<" JetPlusTrack analyze "<<endl;
-//  std::vector<edm::Provenance const*> theProvenance;
-//  iEvent.getAllProvenance(theProvenance);
-//  for( std::vector<edm::Provenance const*>::const_iterator ip = theProvenance.begin();
-//                                                      ip != theProvenance.end(); ip++)
-//  {
-//     cout<<" Print all module/label names "<<(**ip).moduleName()<<" "<<(**ip).moduleLabel()<<
-//     " "<<(**ip).productInstanceName()<<endl;
-//  }
+   if(l1GtRR.isValid()) {
 
-   edm::ESHandle<CaloGeometry> pG;
-   theEventSetup.get<CaloGeometryRecord>().get(pG);
-   geo = pG.product();
+     L1GlobalTriggerReadoutRecord L1GTRR = *l1GtRR.product();
+     const TechnicalTriggerWord&  technicalTriggerWordBeforeMask =  L1GTRR.technicalTriggerWord();
+     DecisionWord gtDecisionWord = L1GTRR.decisionWord();
 
-
-   run = iEvent.id().run();
-   event = iEvent.id().event();
-//
-//  Rememeber parton
-//
-  float pt[2],eta[2],phi[2];
-  int parton[2];
-  //  int tagparton;
-  cout<<" Try to take HepMCProduct "<<endl;
-  edm::Handle< edm::HepMCProduct >  EvtHandles ;
-  iEvent.getByType( EvtHandles ) ;
-
-//NR==================================================
-
-  if (!EvtHandles.isValid()) {
-    // can't find it!
-    if (!allowMissingInputs_) {cout<<" GenParticles are missed "<<endl;}
-    *EvtHandles;  // will throw the proper exception
-  } else {
-         const HepMC::GenEvent* Evt = EvtHandles->GetEvent() ;
-
-        int ihep = 0; 
-         
-         for (HepMC::GenEvent::particle_const_iterator
-            Part = Evt->particles_begin() ; Part!=Evt->particles_end(); Part++ )
-         {
-             if(ihep == 6 || ihep == 7)
-             {
-                cout<<" parton "<<(*Part)->pdg_id()<<" "<<(*Part)->status()<<" "<<((*Part)->momentum()).perp()<<endl;
-                pt[ihep-6] = ((*Part)->momentum()).perp();
-                eta[ihep-6] = ((*Part)->momentum()).eta();
-                phi[ihep-6] = ((*Part)->momentum()).phi();
-                parton[ihep-6] = (*Part)->pdg_id();
-             } 
-//             Code[ihep] = (*Part)->pdg_id();
-//             partpx[ihep] = (*Part)->momentum().px();
-//             partpy[ihep] = (*Part)->momentum().py();
-//             partpz[ihep] = (*Part)->momentum().pz();
-//             parte[ihep] = (*Part)->momentum().e();
-//             partm[ihep] = (*Part)->momentum().m();
-             ihep++;
-//             NumPart = ihep;
-         }
-  }
-  NumPart = 2;
-  
-//  Generated jet
-   NumGenJets = 0;
-   int icode = -1;
-   {
-   edm::Handle<reco::GenJetCollection> jets;
-   iEvent.getByLabel(mInputJetsGen, jets);
-   if (!jets.isValid()) {
-     // can't find it!
-     if (!allowMissingInputs_) {
-       *jets;  // will throw the proper exception
+     for (CItAlgo algo = menu->gtAlgorithmMap().begin(); algo != menu->gtAlgorithmMap().end(); ++algo) {
+       int algBitNumber = ( algo->second).algoBitNumber();
+       //algo
+       //if(algBitNumber == 124) 
+       std::cout << " algo bits " << algBitNumber << " " 
+		 << (algo->second).algoName() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
      }
-   } else {
-     reco::GenJetCollection::const_iterator jet = jets->begin ();
-     if(jets->size() > 0 )
-       {
-         for (; jet != jets->end (); jet++)
-	   {
-	     if( NumGenJets < 10 )
-	       {
-		 // Find the parton and associated jet
-		 double dphi1 = fabs((*jet).phi()-phi[0]);
-		 if(dphi1 > 4.*atan(1.)) dphi1 = 8.*atan(1.) - dphi1;
-		 double dphi2 = fabs((*jet).phi()-phi[1]);
-		 if(dphi2 > 4.*atan(1.)) dphi2 = 8.*atan(1.) - dphi2;
-		 double deta1 = (*jet).eta()-eta[0];
-		 double deta2 = (*jet).eta()-eta[1];
-		 double dr1 = sqrt(dphi1*dphi1+deta1*deta1);
-		 double dr2 = sqrt(dphi2*dphi2+deta2*deta2); 
-		 icode = -1;
-		 if(dr1 < 0.5 || dr2 < 0.5) {
-		   cout<<" Associated jet: Phi, eta gen "<< JetGenPhi[NumGenJets]<<" "<< JetGenEta[NumGenJets]<<endl;
-		   if(dr1 < 0.5) icode = 0;
-		   if(dr2 < 0.5) icode = 1;
-		   cout<<" Gen jet "<<NumGenJets<<" "<<JetGenEt[NumGenJets]<<" "<<JetGenEta[NumGenJets]<<" "<<JetGenPhi[NumGenJets]<<" "<<JetGenCode[NumGenJets]<<endl;
-		 } 
-		   JetGenEt[NumGenJets] = (*jet).et();
-		   JetGenEta[NumGenJets] = (*jet).eta();
-		   JetGenPhi[NumGenJets] = (*jet).phi();
-		   JetGenCode[NumGenJets] = icode;
-		   NumGenJets++;
-	       }
-	   }
-       }
-   }
+
+     for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
+       int techBitNumber = ( techTrig->second).algoBitNumber();
+       //technical
+       //       if(techBitNumber ==40) 
+       std::cout << " tech bits " 
+		 << techBitNumber << " "
+		 << (techTrig->second).algoName() 
+		 << " " << technicalTriggerWordBeforeMask.at(techBitNumber) << std::endl;
+     }
    }
 
-// CaloJets
+   //int printVerbosity = 0;
+   //menu->print(std::cout, printVerbosity);
+   
+   // HLT
+   edm::Handle<TriggerResults> triggerResults;
+   iEvent.getByLabel(srcTriggerResults_,triggerResults);
 
-    NumRecoJetsCaloTower = 0;
+   edm::TriggerNames triggerNames;
+   triggerNames.init(*triggerResults);
+
+   unsigned index = triggerNames.triggerIndex("HLT_PhysicsDeclared");
+   bool physdecl= (index<triggerNames.size()&&triggerResults->accept(index)) ? 1 : 0;
+
+   for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
+     std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
+	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+   }
+*/
+
+  jjpt = 0;
+  run = iEvent.id().run();
+  event = iEvent.id().event();
+  PVx = -1000.; 
+  PVy = -1000.; 
+  PVz = -1000.;
+  EtaRaw->clear();
+  PhiRaw->clear();
+  EtJPT->clear();
+  EtaJPT->clear();
+  PhiJPT->clear();
+  EtJPT->clear();
+  Ntrk->clear();
+  NPxlMaxPtTrk->clear();
+  NSiIMaxPtTrk->clear();
+  NSiOMaxPtTrk->clear();
+
+  // initialize vector containing four highest Et gen jets > 20 GeV
+  //   vector<CLHEP::HepLorentzVector> gjets;
+  //   gjets.clear();
+  
+  // get jet ID map
+  edm::Handle<ValueMap<reco::JetID> > jetsID;
+  iEvent.getByLabel(jetsIDSrc,jetsID);
+
+   // pf jets
+  edm::Handle<PFJetCollection> pfjetsakt5;
+  iEvent.getByLabel("ak5PFJets", pfjetsakt5);
+   
+  // JPT jets
+  edm::Handle<reco::JPTJetCollection> jptjets;
+  iEvent.getByLabel(JPTjetsSrc, jptjets);
+  
+   // get vertex
+  edm::Handle<reco::VertexCollection> recVtxs;
+  iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
+
+  int nvtx = 0;
+  unsigned ntrkV = 0;
+  
+  
+  for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
     {
-    edm::Handle<reco::CaloJetCollection> jets;
-
-    iEvent.getByLabel(mInputJetsCaloTower, jets);
-    if (!jets.isValid()) {
-      // can't find it!
-      if (!allowMissingInputs_) {cout<<"CaloTowers are missed "<<endl; 
-	*jets;  // will throw the proper exception
-      }
-    } else {
-      reco::CaloJetCollection::const_iterator jet = jets->begin ();
-      
-      cout<<" Size of jets "<<jets->size()<<endl;
-      
-      if(jets->size() > 0 )
+      if (!((*recVtxs)[ind].isFake())) 
 	{
-	  for (; jet != jets->end (); jet++)
-	    {
-	      
-	      if( NumRecoJetsCaloTower < 10 )
-		{
-		  
-		  // Association with gen jet
-		  
-		  JetRecoEtCaloTower[NumRecoJetsCaloTower] = (*jet).et();
-		  JetRecoEtaCaloTower[NumRecoJetsCaloTower] = (*jet).eta();
-		  JetRecoPhiCaloTower[NumRecoJetsCaloTower] = (*jet).phi();
-//		  cout<<" Phi, eta gen "<< JetRecoPhiCaloTower[NumRecoJetsCaloTower]<<" "<< JetRecoEtaCaloTower[NumRecoJetsCaloTower]<<endl;
-		  JetRecoGenRecType[NumRecoJetsCaloTower] = -1;
-		  JetRecoGenPartonType[NumRecoJetsCaloTower] = -1;
-		  NumRecoJetsCaloTower++;
-		  
-		}
+	  nvtx = nvtx + 1;
+	  if(nvtx == 1) {
+	    PVx  = (*recVtxs)[ind].x();
+	    PVy  = (*recVtxs)[ind].y();
+	    PVz  = (*recVtxs)[ind].z();
+	    //      ndof(PV)>=5.0
+	    //	     ntrkV = (*recVtxs)[ind].tracksSize();
+	    reco::Vertex::trackRef_iterator ittrk;
+	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
+	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++; 
 	    }
 	}
     }
-    }
+  
+  if( (nvtx == 1) && (ntrkV > 3) && (ntrkV < 100) ) {
 
-     if( NumRecoJetsCaloTower > 0 && NumGenJets > 0 )
-     {
-       for(int iii=0; iii<NumRecoJetsCaloTower; iii++)
-       {  
-         for(int jjj=0; jjj<NumGenJets; jjj++)
-         {
-              double dphi1 = fabs(JetRecoPhiCaloTower[iii]-JetGenPhi[jjj]);
-              if(dphi1 > 4.*atan(1.)) dphi1 = 8.*atan(1.) - dphi1;
-              double deta1 = JetRecoEtaCaloTower[iii]-JetGenEta[jjj];
-              double dr1 = sqrt(dphi1*dphi1+deta1*deta1);
-              if(dr1 < 0.3) {JetRecoGenRecType[iii] = jjj;JetRecoGenPartonType[iii] = JetGenCode[jjj]; 
-              cout<<" ==> Associated jet "<< iii<<" "<<JetRecoGenRecType[iii]<<" "<<JetRecoGenPartonType[iii]<<endl;
-              cout<<" Etcalo "<<JetRecoEtCaloTower[iii]<<" ETgen "<<JetGenEt[jjj]<<endl;
-              } 
-         } 
-     }
-    } 
+     // PF jet energy corrections
+    //    const JetCorrector* correctorPF = JetCorrector::getJetCorrector (JetCorrectionPF, iSetup);
+    
+    // MC jet energy corrections
+    //    const JetCorrector* correctorMC = JetCorrector::getJetCorrector (JetCorrectionMC, iSetup);
+     
+    if(jptjets->size() != 0) {
 
-     if(NumGenJets == 0) return;
-     if(NumRecoJetsCaloTower == 0) return;
-
-// JetPlusTrack correction
-     NumRecoJetsJPTCorrected = 0;
-     {
-//     edm::Handle<reco::CaloJetCollection> jets;
-     edm::Handle<reco::JPTJetCollection> jets;
-
-     iEvent.getByLabel(mInputJetsCorrected, jets);
-     if (!jets.isValid()) {
-       // can't find it!
-       if (!allowMissingInputs_) {cout<<"JetPlusTrack CaloTowers are missed "<<endl; 
-	 *jets;  // will throw the proper exception
-       }
-     } else {
-     //  reco::CaloJetCollection::const_iterator jet = jets->begin ();
-       reco::JPTJetCollection::const_iterator jet = jets->begin ();
-
-       cout<<" ==> Size of jets "<<jets->size()<<endl;
-       if(jets->size() > 0 )
-	 {
-	   for (; jet != jets->end (); jet++)
-	     {
-	       if( NumRecoJetsJPTCorrected < 10 )
-		 {
-		   JetRecoEtJPTCorrected[NumRecoJetsJPTCorrected] = (*jet).et();
-		   JetRecoEtaJPTCorrected[NumRecoJetsJPTCorrected] = (*jet).eta();
-		   JetRecoPhiJPTCorrected[NumRecoJetsJPTCorrected] = (*jet).phi();
-// Look to the CaloJet initiated		   
-		   JetRecoEtCaloJetInit[NumRecoJetsJPTCorrected] = (*jet).getCaloJetRef()->et();
-		   JetRecoEtaCaloJetInit[NumRecoJetsJPTCorrected] = (*jet).getCaloJetRef()->eta();
-		   JetRecoPhiCaloJetInit[NumRecoJetsJPTCorrected] = (*jet).getCaloJetRef()->phi();
-// ZSP corrected jet		   
-		   JetRecoEtZSPCorrected[NumRecoJetsJPTCorrected] = (*jet).getCaloJetRef()->et()*(*jet).getZSPCor();
-		   
-// Print JPT jet
-         std::cout<<">>>>>>>> Jet number "<<NumRecoJetsJPTCorrected<<std::endl;
-         std::cout<<" CaloJet::Et "<<(*jet).getCaloJetRef()->et()<<" Eta: "<<(*jet).getCaloJetRef()->eta()<<" Phi:: "<<
-	                             (*jet).getCaloJetRef()->phi()<<" Number of charged "<<(*jet).chargedMultiplicity ()<<std::endl;
-         std::cout<<" JPTJet::Et "<<(*jet).et()<<" Eta: "<<(*jet).eta()<<" Phi:: "<<
-	                             (*jet).phi()<<" ZSP Et:: "<<JetRecoEtZSPCorrected[NumRecoJetsJPTCorrected]<<std::endl;
-				     
-		   
-		   NumRecoJetsJPTCorrected++;
-		 }
-	     }
-	 }
-     }
-     }
-
-
-// CaloTowers from RecHits
-// Load EcalRecHits
-
-    std::vector<edm::InputTag>::const_iterator i;
-    int iecal = 0;
-    double empty_jet_energy_ecal = 0.; 
-
-
-   for(int jjj=0; jjj<NumRecoJetsCaloTower; jjj++)
-   {
-    JetRecoEtRecHit[jjj] = 0.;
-
-    for (i=ecalLabels_.begin(); i!=ecalLabels_.end(); i++) {
-      {
-      edm::Handle<EcalRecHitCollection> ec;
-      iEvent.getByLabel(*i,ec);
-      if (!ec.isValid()) {
-	// can't find it!
-	if (!allowMissingInputs_) {cout<<" Ecal rechits are missed "<<endl; 
-	  *ec;  // will throw the proper exception
-	}
-      } else {
-	// EcalBarrel = 1, EcalEndcap = 2
-	for(EcalRecHitCollection::const_iterator recHit = (*ec).begin();
-	    recHit != (*ec).end(); ++recHit)
-	  {
-	    
-	    GlobalPoint pos = geo->getPosition(recHit->detid());
-	    double deta = pos.eta() - JetRecoEtaCaloTower[jjj];
-	    double dphi = fabs(pos.phi() - JetRecoPhiCaloTower[jjj]); 
-	    if(dphi > 4.*atan(1.)) dphi = 8.*atan(1.) - dphi;
-	    double dr = sqrt(dphi*dphi + deta*deta);
-	    double dphi_empty = fabs(pos.phi()+4.*atan(1.) - JetRecoPhiCaloTower[jjj]);
-	    if(dphi_empty > 4.*atan(1.)) dphi_empty = 8.*atan(1.) - dphi_empty;
-	    double dr_empty = sqrt(dphi_empty*dphi_empty + deta*deta);
-	    
-	    
-	    if(dr<mCone)
-	      {
-		//       cout<<" Ecal digis "<<jjj<<" "<<JetRecoEtCaloTower[jjj]<<" "<<JetRecoEtaCaloTower[jjj]<<" "<<JetRecoPhiCaloTower[jjj]<<" "<<(*recHit).energy()<<endl;
-		//       cout<<" Ecal detid "<<pos.eta()<<" "<<pos.phi()<<" "<<dr<<" JetRecoEtRecHit[jjj]  "<<JetRecoEtRecHit[jjj]<<endl;
-            JetRecoEtRecHit[jjj] = JetRecoEtRecHit[jjj] + (*recHit).energy();
-	    //            cout<<" New Ecal energy "<<(*recHit).energy()<<endl;
-	      }
-	    if(dr_empty<mCone)
-	      {
-		empty_jet_energy_ecal = empty_jet_energy_ecal + (*recHit).energy();         
-	      }
-	  }
+      for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
+	cout <<" jet pT = " << jptjet->pt()
+	     <<" eta = " << jptjet->eta() 
+	     <<" phi = " << jptjet->phi() << endl; 
       }
-      }
-      iecal++;
     }
-//        cout<<" Additional ECAL "<<jjj<<" "<<JetRecoEtRecHit[jjj]<<" Eta "<<JetRecoEtaCaloTower[jjj]<<endl;
-   }
-// Hcal Barrel and endcap for isolation
-   double empty_jet_energy_hcal = 0.;
-   {
-   edm::Handle<HBHERecHitCollection> hbhe;
-   iEvent.getByLabel(hbhelabel_,hbhe);
-   if (!hbhe.isValid()) {
-     // can't find it!
-     cout<<" Exception in hbhe "<<endl;
-     if (!allowMissingInputs_) {
-       *hbhe;  // will throw the proper exception
-     }
-   } else {
-     for(int jjj=0; jjj<NumRecoJetsCaloTower; jjj++)
-       {	 
-	 for(HBHERecHitCollection::const_iterator hbheItr = (*hbhe).begin();
-	     hbheItr != (*hbhe).end(); ++hbheItr)
-	   {
-	     DetId id = (hbheItr)->detid();
-	     GlobalPoint pos = geo->getPosition(hbheItr->detid());
-	     double deta = pos.eta() - JetRecoEtaCaloTower[jjj];
-	     double dphi = fabs(pos.phi() - JetRecoPhiCaloTower[jjj]);
-	     if(dphi > 4.*atan(1.)) dphi = 8.*atan(1.) - dphi;
-	     double dr = sqrt(dphi*dphi + deta*deta);
-	     double dphi_empty = fabs(pos.phi()+4.*atan(1.) - JetRecoPhiCaloTower[jjj]);
-	     if(dphi_empty > 4.*atan(1.)) dphi_empty = 8.*atan(1.) - dphi_empty;
-	     double dr_empty = sqrt(dphi_empty*dphi_empty + deta*deta);
+  }
+
+   /*
+     //start from here
+     // raw jet selection 
+	 RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+	 double mN90      = (*calojets)[jc].n90();
+	 double mEmf      = (*calojets)[jc].emEnergyFraction(); 	
+	 double mN90Hits  = (*jetsID)[jetRef].n90Hits;
+	 double mfHPD     = (*jetsID)[jetRef].fHPD;
+	 double mfRBX     = (*jetsID)[jetRef].fRBX; 
+	 
+	 jc++;
+	 
+	 // good jet selections
+	 // loose selections (in // part of tight for inclusive jets: need to add sigma_eta, sigma_phi
+
+	 if(mEmf < 0.01) continue;
+	 if(mfHPD>0.98) continue;
+	 if(mN90Hits < 2) continue;
+	 if(fabs(cjet->eta()) > 2.0) continue;
+     */
+
+	 //
+     //	 CLHEP::HepLorentzVector cjetc(cjet->px(), cjet->py(), cjet->pz(), cjet->energy());
+
+     // MC correction
+     //     double scaleMC = correctorMC->correction(cjet->p4());
+     
+     /*
+     if(jjpt <= 2) {
+
+	     // track info
+	     jpt::MatchedTracks pions;
+	     jpt::MatchedTracks muons;
+	     jpt::MatchedTracks electrons;
+	     const bool particlesOK = true;
+	     jptCorrector_ = dynamic_cast<const JetPlusTrackCorrector*>(correctorJPT);
+	     jptCorrector_->matchTracks((*zspjet),iEvent,iSetup,pions,muons,electrons);
+	     int NtrkJPT = pions.inVertexOutOfCalo_.size() + pions.inVertexInCalo_.size();
 	     
-	     if(dr<mCone)
-	       {
-		 //           cout<<" HCAL JetRecoEtRecHit[jjj]  "<<JetRecoEtRecHit[jjj]<<endl;
-		 JetRecoEtRecHit[jjj] = JetRecoEtRecHit[jjj] + (*hbheItr).energy();
-	       }
-	     if(dr_empty<mCone)
-	       {
-		 empty_jet_energy_hcal = empty_jet_energy_hcal + (*hbheItr).energy();
-	       }
-	   }
-//	 cout<<" Additional HCAL energy "<<jjj<<" "<<JetRecoEtRecHit[jjj]<<" "<<JetRecoEtaCaloTower[jjj]<<" "<<JetRecoEtaCaloTower[jjj]<<endl;
-       }
-   }
-   }
+	     double pTtrkMax = 0.;
+	     double pTMax = 0.;
+	     int NLayersMaxPtTrk = 0;
+	     int NPxlMaxPtTrk = 0;
 
+	     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pions.inVertexOutOfCalo_.begin(); 
+		  iInConeVtxTrk != pions.inVertexOutOfCalo_.end(); ++iInConeVtxTrk) {
 
-   myTree->Fill();
+	       const double pt  = (*iInConeVtxTrk)->pt();
+	       if(pt > pTMax) {
+		 pTtrkMax = pt;
+		 pTMax = pTtrkMax;
+		 NPxlMaxPtTrk    = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+		 NLayersMaxPtTrk = (*iInConeVtxTrk)->hitPattern().trackerLayersWithMeasurement();
+	       }
+	
+	       int nNLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	       
+	       int nNLayersStI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement() +
+		                 (*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+
+	       int nNLayersStO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement() +
+		                 (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+
+	       NLayersPxl[nNLayersPxl] += 1; 
+	       NLayersStI[nNLayersStI] += 1; 
+	       NLayersStO[nNLayersStO] += 1;
+ 
+	     }
+	   
+	     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pions.inVertexInCalo_.begin(); 
+		  iInConeVtxTrk != pions.inVertexInCalo_.end(); ++iInConeVtxTrk) {
+
+	       const double pt  = (*iInConeVtxTrk)->pt();
+	       if(pt > pTMax) {
+		 pTtrkMax = pt;
+		 pTMax = pTtrkMax;
+		 NPxlMaxPtTrk    = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+		 NLayersMaxPtTrk = (*iInConeVtxTrk)->hitPattern().trackerLayersWithMeasurement();
+	       }
+
+	       int nNLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	       
+	       int nNLayersStI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement() +
+		                 (*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+
+	       int nNLayersStO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement() +
+		                 (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+
+	       NLayersPxl[nNLayersPxl] += 1; 
+	       NLayersStI[nNLayersStI] += 1; 
+	       NLayersStO[nNLayersStO] += 1;
+ 
+	     }
+
+	     double EtPFJ  = 0.;
+	     double EtaPFJ = 0.;
+	     double PhiPFJ = 0.;
+	     double DRMAX  = 1000.;
+	     double DRPFJ  = 1000.;
+	     double scalePFJ = 0.;
+	     // match with JPT jets. find closest pf jet in eta/phi
+	     for (PFJetCollection::const_iterator itpfj = pfjetsakt5->begin();
+		  itpfj != pfjetsakt5->end(); ++itpfj) {	     
+	       double pT  = itpfj->pt();
+	       double eta = itpfj->eta();
+	       double phi = itpfj->phi();
+	       double DR = deltaR(cjet->eta(),cjet->phi(),eta,phi);
+	       // PF correction
+	       double scalePF = correctorPF->correction(itpfj->p4());
+	       if(DR < DRMAX) {
+		 DRMAX  = DR;
+		 DRPFJ  = DR;
+		 EtPFJ  = pT;
+		 EtaPFJ = eta;
+		 PhiPFJ = phi;
+		 scalePFJ = scalePF;
+	       }
+	     }
+
+	     if(jjpt == 1) {
+	       
+	       DRPFJ1    = DRPFJ;
+	       EtPFJCor1 = EtPFJ*scalePFJ;
+	       EtPFJ1    = EtPFJ;
+	       EtaPFJ1   = EtaPFJ;
+	       PhiPFJ1   = PhiPFJ;
+	       EtaRaw1 = cjet->eta(); 
+	       PhiRaw1 = cjet->phi();
+	       EtRaw1  = cjet->pt();
+	       EtMCJ1  = cjet->pt() * scaleMC;
+	       EtZSP1  = zspjet->pt(); 
+	       EtaJPT1 = cjetJPT.eta();
+	       PhiJPT1 = cjetJPT.phi();
+	       EtJPT1  = cjetJPT.pt();
+	       Ntrk1   = NtrkJPT;  
+	       pTtrkMax1 = pTtrkMax;	   
+	       NPxlMaxPtTrk1 = NPxlMaxPtTrk; 
+	       NLayersMaxPtTrk1 = NLayersMaxPtTrk; 
    
-}
-} // namespace cms
 
-// define this class as a plugin
-#include "FWCore/Framework/interface/MakerMacros.h"
-using namespace cms;
+	     }
+	     if(jjpt == 2) {
+
+	       DRPFJ2    = DRPFJ;
+	       EtPFJCor2 = EtPFJ*scalePFJ;
+	       EtPFJ2    = EtPFJ;
+	       EtaPFJ2   = EtaPFJ;
+	       PhiPFJ2   = PhiPFJ;
+	       EtaRaw2 = cjet->eta(); 
+	       PhiRaw2 = cjet->phi();
+	       EtRaw2  = cjet->pt();
+	       EtMCJ2  = cjet->pt() * scaleMC;
+	       EtZSP2  = zspjet->pt(); 
+	       EtaJPT2 = cjetJPT.eta();
+	       PhiJPT2 = cjetJPT.phi();
+	       EtJPT2  = cjetJPT.pt(); 
+	       Ntrk2   = NtrkJPT;  
+	       pTtrkMax2 = pTtrkMax;	   
+	       NPxlMaxPtTrk2 = NPxlMaxPtTrk; 
+	       NLayersMaxPtTrk2 = NLayersMaxPtTrk; 
+	     }
+	   }
+	 }
+       }
+       if(jjpt >= 1) t1->Fill();
+     }
+   }
+     */
+
+
+     /*
+       cout <<" best match to 1st gen get = " << DRMAXgjet1
+       <<" raw jet pt = " << EtRaw1 <<" eta = " << EtaRaw1 <<" phi " << PhiRaw1 
+       <<" mcj pt = " << EtMCJ1 << " zsp pt = " << EtZSP1 <<" jpt = " << EtJPT1 << endl; 
+       if(gjets.size() == 2) {
+       cout <<" best match to 2st gen get = " << DRMAXgjet2
+       <<" raw jet pt = " << EtRaw2 <<" eta = " << EtaRaw2 <<" phi " << PhiRaw2 
+       <<" mcj pt = " << EtMCJ2 << " zsp pt = " << EtZSP2 <<" jpt = " << EtJPT2 << endl; 
+       }
+     */
+   // fill tree
+}
+
+//define this as a plug-in
 DEFINE_FWK_MODULE(JetPlusTrackAnalysis);
