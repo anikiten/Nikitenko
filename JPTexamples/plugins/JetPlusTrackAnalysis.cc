@@ -389,9 +389,18 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if(jptjets->size() != 0) {
 
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
-	cout <<" jet pT = " << jptjet->pt()
-	     <<" eta = " << jptjet->eta() 
-	     <<" phi = " << jptjet->phi() << endl; 
+	RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+	TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
+	TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
+
+	cout <<" jpt jet pT = " << jptjet->pt()
+	     <<" jpt eta = " << jptjet->eta() 
+	     <<" jpt phi = " << jptjet->phi() 
+	     <<" raw pt = " << jptjetRef->pt()
+	     <<" raw eta = " << jptjetRef->eta()
+	     <<" raw phi = " << jptjetRef->phi() 
+	     <<" Ntrk1 = " << pionsInVertexInCalo.size()
+	     <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
       }
     }
   }
