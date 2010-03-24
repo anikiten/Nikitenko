@@ -122,6 +122,8 @@ private:
   // names of modules, producing object collections
   // raw calo jet ID map
   InputTag jetsIDSrc;
+  // calo jets
+  InputTag calojetsSrc; 
   // JPT jets
   InputTag JPTjetsSrc;
   // MC jet corrections
@@ -145,6 +147,8 @@ private:
   std::vector<double> *EtJPT;
   // N in-vertex-cone tracks
   std::vector<int>    *Ntrk;
+  // in-cone-in vertex track with max pT
+  std::vector<double> *pTtrkMax;
   // number of Pxl and silicon inner and outer layers used for trk. measurement
   std::vector<int>    *NPxlMaxPtTrk;  
   std::vector<int>    *NSiIMaxPtTrk;  
@@ -176,6 +180,7 @@ JetPlusTrackAnalysis::beginJob()
   PhiJPT       = new std::vector<double>();
   EtJPT        = new std::vector<double>();
   Ntrk         = new std::vector<int>();
+  pTtrkMax     = new std::vector<double>();
   NPxlMaxPtTrk = new std::vector<int>();
   NSiIMaxPtTrk = new std::vector<int>();
   NSiOMaxPtTrk = new std::vector<int>();
@@ -200,6 +205,7 @@ JetPlusTrackAnalysis::beginJob()
   t1->Branch("EtaJPT","vector<double>",&EtaJPT);
   t1->Branch("PhiJPT","vector<double>",&PhiJPT);
   t1->Branch("EtJPT" ,"vector<double>",&EtJPT);
+  t1->Branch("pTtrkMax" ,"vector<double>",&pTtrkMax);
   t1->Branch("Ntrk","vector<int>",&Ntrk);
   t1->Branch("NPxlMaxPtTrk","vector<int>",&NPxlMaxPtTrk);
   t1->Branch("NSiIMaxPtTrk","vector<int>",&NSiIMaxPtTrk);
@@ -232,9 +238,11 @@ JetPlusTrackAnalysis::JetPlusTrackAnalysis(const edm::ParameterSet& iConfig)
   //
   // get names of input object collections
   // raw calo jets
-  jetsIDSrc        = iConfig.getParameter<edm::InputTag> ("jetsID");
+  jetsIDSrc        = iConfig.getParameter<edm::InputTag>("jetsID");
   // JPT jets
   JPTjetsSrc       = iConfig.getParameter<edm::InputTag>("JPTjets");
+  // calo jets
+  calojetsSrc      = iConfig.getParameter<edm::InputTag>("calojets");
   // MC corrections
   //  JetCorrectionMC  = iConfig.getParameter< std::string > ("JetCorrectionMC");
   // PF corrections
@@ -331,6 +339,7 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   EtaJPT->clear();
   PhiJPT->clear();
   EtJPT->clear();
+  pTtrkMax->clear(); 
   Ntrk->clear();
   NPxlMaxPtTrk->clear();
   NSiIMaxPtTrk->clear();
@@ -352,7 +361,11 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<reco::JPTJetCollection> jptjets;
   iEvent.getByLabel(JPTjetsSrc, jptjets);
   
-   // get vertex
+  // Calo jets
+  edm::Handle<CaloJetCollection> calojets;
+  iEvent.getByLabel(calojetsSrc, calojets);
+
+  // get vertex
   edm::Handle<reco::VertexCollection> recVtxs;
   iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
 
@@ -388,13 +401,66 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      
     if(jptjets->size() != 0) {
 
+      int jc = 0;
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
+	// access to calo jets
+	RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+	double mN90Hits  = (*jetsID)[jetRef].n90Hits;
+	double mfHPD     = (*jetsID)[jetRef].fHPD;
+	double mfRBX     = (*jetsID)[jetRef].fRBX; 
 	RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
 	reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
-	TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
-	TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
 	double mN90      = rawcalojet->n90();
 	double mEmf      = rawcalojet->emEnergyFraction(); 	
+
+	// access tracks used in JPT
+	TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
+	TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
+	int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
+	// find track with max pT and number of layers it crosses
+	double pTMax = 0.;
+	int NLayersPxl = 0;
+	int NLayersSiI = 0;
+	int NLayersSiO = 0;
+	// loop over in-vertex-in calo tracks
+	for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
+	     iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
+	  const double pt  = (*iInConeVtxTrk)->pt();
+	  if(pt > pTMax) {
+	    pTMax = pt;
+	    NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	    NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+	    NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+	  }
+	}
+
+	// loop over in-vertex-out of calo tracks
+	for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
+	     iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
+	  const double pt  = (*iInConeVtxTrk)->pt();
+	  if(pt > pTMax) {
+	    pTMax = pt;
+	    NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	    NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+	    NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+	  }
+	}
+
+	EtaRaw->push_back(jptjetRef->eta());
+	PhiRaw->push_back(jptjetRef->phi());
+	EtJPT->push_back(jptjetRef->pt());
+	EtaJPT->push_back(jptjet->eta());
+	PhiJPT->push_back(jptjet->phi());
+	EtJPT->push_back(jptjet->pt());
+	pTtrkMax->push_back(pTMax);
+	Ntrk->push_back(npions);
+	NPxlMaxPtTrk->push_back(NLayersPxl);
+	NSiIMaxPtTrk->push_back(NLayersSiI);
+	NSiOMaxPtTrk->push_back(NLayersSiO);
+
+	//	sort(EtJPT->begin(), EtJPT->end());
+        sort(EtJPT->begin(), EtJPT->end(), greater<double>());
+
 	cout <<" jpt jet pT = " << jptjet->pt()
 	     <<" jpt eta = " << jptjet->eta() 
 	     <<" jpt phi = " << jptjet->phi() 
@@ -403,6 +469,7 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	     <<" raw phi = " << jptjetRef->phi() 
 	     <<" Ntrk1 = " << pionsInVertexInCalo.size()
 	     <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
+	jc++;
       }
     }
   }
@@ -451,55 +518,6 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	     int NLayersMaxPtTrk = 0;
 	     int NPxlMaxPtTrk = 0;
 
-	     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pions.inVertexOutOfCalo_.begin(); 
-		  iInConeVtxTrk != pions.inVertexOutOfCalo_.end(); ++iInConeVtxTrk) {
-
-	       const double pt  = (*iInConeVtxTrk)->pt();
-	       if(pt > pTMax) {
-		 pTtrkMax = pt;
-		 pTMax = pTtrkMax;
-		 NPxlMaxPtTrk    = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-		 NLayersMaxPtTrk = (*iInConeVtxTrk)->hitPattern().trackerLayersWithMeasurement();
-	       }
-	
-	       int nNLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	       
-	       int nNLayersStI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement() +
-		                 (*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-
-	       int nNLayersStO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement() +
-		                 (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-
-	       NLayersPxl[nNLayersPxl] += 1; 
-	       NLayersStI[nNLayersStI] += 1; 
-	       NLayersStO[nNLayersStO] += 1;
- 
-	     }
-	   
-	     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pions.inVertexInCalo_.begin(); 
-		  iInConeVtxTrk != pions.inVertexInCalo_.end(); ++iInConeVtxTrk) {
-
-	       const double pt  = (*iInConeVtxTrk)->pt();
-	       if(pt > pTMax) {
-		 pTtrkMax = pt;
-		 pTMax = pTtrkMax;
-		 NPxlMaxPtTrk    = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-		 NLayersMaxPtTrk = (*iInConeVtxTrk)->hitPattern().trackerLayersWithMeasurement();
-	       }
-
-	       int nNLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	       
-	       int nNLayersStI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement() +
-		                 (*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-
-	       int nNLayersStO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement() +
-		                 (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-
-	       NLayersPxl[nNLayersPxl] += 1; 
-	       NLayersStI[nNLayersStI] += 1; 
-	       NLayersStO[nNLayersStO] += 1;
- 
-	     }
 
 	     double EtPFJ  = 0.;
 	     double EtaPFJ = 0.;
