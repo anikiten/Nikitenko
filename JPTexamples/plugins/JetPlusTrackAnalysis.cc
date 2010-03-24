@@ -138,6 +138,7 @@ private:
   int     run, event;
   double  PVx, PVy, PVz;
   // eta/phi/pt of raw calo jet from JPT
+
   std::vector<double> *EtaRaw;
   std::vector<double> *PhiRaw;
   std::vector<double> *EtRaw;
@@ -327,6 +328,8 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
 */
 
+  std::map<double,int> pTjptIndex;
+
   jjpt = 0;
   run = iEvent.id().run();
   event = iEvent.id().event();
@@ -446,6 +449,8 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	  }
 	}
 
+	pTjptIndex[jptjet->pt()] = jc;
+
 	EtaRaw->push_back(jptjetRef->eta());
 	PhiRaw->push_back(jptjetRef->phi());
 	EtJPT->push_back(jptjetRef->pt());
@@ -458,9 +463,6 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	NSiIMaxPtTrk->push_back(NLayersSiI);
 	NSiOMaxPtTrk->push_back(NLayersSiO);
 
-	//	sort(EtJPT->begin(), EtJPT->end());
-        sort(EtJPT->begin(), EtJPT->end(), greater<double>());
-
 	cout <<" jpt jet pT = " << jptjet->pt()
 	     <<" jpt eta = " << jptjet->eta() 
 	     <<" jpt phi = " << jptjet->phi() 
@@ -471,6 +473,19 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	     <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
 	jc++;
       }
+      int j = 0;
+      //      for(map<double,int>::reverse_iterator it = pTjptIndex.end(); it != pTjptIndex.begin(); ++it) {
+      map<double,int>::reverse_iterator rfirst(pTjptIndex.end());
+      map<double,int>::reverse_iterator rlast(pTjptIndex.begin());
+      while (rfirst != rlast) {
+	cout <<" j = " << j <<" energy = " << (*rfirst).first <<" index = " << (*rfirst).second << endl;
+	rfirst++;
+	++j; 
+      }
+
+      //	sort(EtJPT->begin(), EtJPT->end());
+      //      sort(pTjptIndex.begin(), pTjptIndex.end(), greater<double>());
+      //      sort(pTjptIndex.begin(), pTjptIndex.end());
     }
   }
 
