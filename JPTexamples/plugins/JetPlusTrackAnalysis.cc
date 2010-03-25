@@ -407,7 +407,9 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if(jptjets->size() != 0) {
 
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
-	pTjptIndex[jptjet->pt()] = &(*jptjet);
+	if(jptjet->pt() > 10.) {
+	  pTjptIndex[jptjet->pt()] = &(*jptjet);
+	}
       }
     }
   }
@@ -487,140 +489,8 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     jc++;
     rfirst++;
   }
-
-
-   /*
-     //start from here
-     // raw jet selection 
-	 RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-	 double mN90      = (*calojets)[jc].n90();
-	 double mEmf      = (*calojets)[jc].emEnergyFraction(); 	
-	 double mN90Hits  = (*jetsID)[jetRef].n90Hits;
-	 double mfHPD     = (*jetsID)[jetRef].fHPD;
-	 double mfRBX     = (*jetsID)[jetRef].fRBX; 
-	 
-	 jc++;
-	 
-	 // good jet selections
-	 // loose selections (in // part of tight for inclusive jets: need to add sigma_eta, sigma_phi
-
-	 if(mEmf < 0.01) continue;
-	 if(mfHPD>0.98) continue;
-	 if(mN90Hits < 2) continue;
-	 if(fabs(cjet->eta()) > 2.0) continue;
-     */
-
-	 //
-     //	 CLHEP::HepLorentzVector cjetc(cjet->px(), cjet->py(), cjet->pz(), cjet->energy());
-
-     // MC correction
-     //     double scaleMC = correctorMC->correction(cjet->p4());
-     
-     /*
-     if(jjpt <= 2) {
-
-	     // track info
-	     jpt::MatchedTracks pions;
-	     jpt::MatchedTracks muons;
-	     jpt::MatchedTracks electrons;
-	     const bool particlesOK = true;
-	     jptCorrector_ = dynamic_cast<const JetPlusTrackCorrector*>(correctorJPT);
-	     jptCorrector_->matchTracks((*zspjet),iEvent,iSetup,pions,muons,electrons);
-	     int NtrkJPT = pions.inVertexOutOfCalo_.size() + pions.inVertexInCalo_.size();
-	     
-	     double pTtrkMax = 0.;
-	     double pTMax = 0.;
-	     int NLayersMaxPtTrk = 0;
-	     int NPxlMaxPtTrk = 0;
-
-
-	     double EtPFJ  = 0.;
-	     double EtaPFJ = 0.;
-	     double PhiPFJ = 0.;
-	     double DRMAX  = 1000.;
-	     double DRPFJ  = 1000.;
-	     double scalePFJ = 0.;
-	     // match with JPT jets. find closest pf jet in eta/phi
-	     for (PFJetCollection::const_iterator itpfj = pfjetsakt5->begin();
-		  itpfj != pfjetsakt5->end(); ++itpfj) {	     
-	       double pT  = itpfj->pt();
-	       double eta = itpfj->eta();
-	       double phi = itpfj->phi();
-	       double DR = deltaR(cjet->eta(),cjet->phi(),eta,phi);
-	       // PF correction
-	       double scalePF = correctorPF->correction(itpfj->p4());
-	       if(DR < DRMAX) {
-		 DRMAX  = DR;
-		 DRPFJ  = DR;
-		 EtPFJ  = pT;
-		 EtaPFJ = eta;
-		 PhiPFJ = phi;
-		 scalePFJ = scalePF;
-	       }
-	     }
-
-	     if(jjpt == 1) {
-	       
-	       DRPFJ1    = DRPFJ;
-	       EtPFJCor1 = EtPFJ*scalePFJ;
-	       EtPFJ1    = EtPFJ;
-	       EtaPFJ1   = EtaPFJ;
-	       PhiPFJ1   = PhiPFJ;
-	       EtaRaw1 = cjet->eta(); 
-	       PhiRaw1 = cjet->phi();
-	       EtRaw1  = cjet->pt();
-	       EtMCJ1  = cjet->pt() * scaleMC;
-	       EtZSP1  = zspjet->pt(); 
-	       EtaJPT1 = cjetJPT.eta();
-	       PhiJPT1 = cjetJPT.phi();
-	       EtJPT1  = cjetJPT.pt();
-	       Ntrk1   = NtrkJPT;  
-	       pTtrkMax1 = pTtrkMax;	   
-	       NPxlMaxPtTrk1 = NPxlMaxPtTrk; 
-	       NLayersMaxPtTrk1 = NLayersMaxPtTrk; 
-   
-
-	     }
-	     if(jjpt == 2) {
-
-	       DRPFJ2    = DRPFJ;
-	       EtPFJCor2 = EtPFJ*scalePFJ;
-	       EtPFJ2    = EtPFJ;
-	       EtaPFJ2   = EtaPFJ;
-	       PhiPFJ2   = PhiPFJ;
-	       EtaRaw2 = cjet->eta(); 
-	       PhiRaw2 = cjet->phi();
-	       EtRaw2  = cjet->pt();
-	       EtMCJ2  = cjet->pt() * scaleMC;
-	       EtZSP2  = zspjet->pt(); 
-	       EtaJPT2 = cjetJPT.eta();
-	       PhiJPT2 = cjetJPT.phi();
-	       EtJPT2  = cjetJPT.pt(); 
-	       Ntrk2   = NtrkJPT;  
-	       pTtrkMax2 = pTtrkMax;	   
-	       NPxlMaxPtTrk2 = NPxlMaxPtTrk; 
-	       NLayersMaxPtTrk2 = NLayersMaxPtTrk; 
-	     }
-	   }
-	 }
-       }
-       if(jjpt >= 1) t1->Fill();
-     }
-   }
-     */
-
-
-     /*
-       cout <<" best match to 1st gen get = " << DRMAXgjet1
-       <<" raw jet pt = " << EtRaw1 <<" eta = " << EtaRaw1 <<" phi " << PhiRaw1 
-       <<" mcj pt = " << EtMCJ1 << " zsp pt = " << EtZSP1 <<" jpt = " << EtJPT1 << endl; 
-       if(gjets.size() == 2) {
-       cout <<" best match to 2st gen get = " << DRMAXgjet2
-       <<" raw jet pt = " << EtRaw2 <<" eta = " << EtaRaw2 <<" phi " << PhiRaw2 
-       <<" mcj pt = " << EtMCJ2 << " zsp pt = " << EtZSP2 <<" jpt = " << EtJPT2 << endl; 
-       }
-     */
-   // fill tree
+  // fill tree
+  if(pTjptIndex.size() != 0) t1->Fill();
 }
 
 //define this as a plug-in
