@@ -406,90 +406,88 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      
     if(jptjets->size() != 0) {
 
-      int jc = 0;
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
-
 	pTjptIndex[jptjet->pt()] = &(*jptjet);
-
-	// access to calo jets
-	RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-	double mN90Hits  = (*jetsID)[jetRef].n90Hits;
-	double mfHPD     = (*jetsID)[jetRef].fHPD;
-	double mfRBX     = (*jetsID)[jetRef].fRBX; 
-	RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-	reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
-	double mN90      = rawcalojet->n90();
-	double mEmf      = rawcalojet->emEnergyFraction(); 	
-
-	// access tracks used in JPT
-	TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
-	TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
-	int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
-	// find track with max pT and number of layers it crosses
-	double pTMax = 0.;
-	int NLayersPxl = 0;
-	int NLayersSiI = 0;
-	int NLayersSiO = 0;
-	// loop over in-vertex-in calo tracks
-	for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
-	     iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
-	  const double pt  = (*iInConeVtxTrk)->pt();
-	  if(pt > pTMax) {
-	    pTMax = pt;
-	    NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	    NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	    NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-	  }
-	}
-
-	// loop over in-vertex-out of calo tracks
-	for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
-	     iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
-	  const double pt  = (*iInConeVtxTrk)->pt();
-	  if(pt > pTMax) {
-	    pTMax = pt;
-	    NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	    NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	    NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-	  }
-	}
-
-	EtaRaw->push_back(jptjetRef->eta());
-	PhiRaw->push_back(jptjetRef->phi());
-	EtJPT->push_back(jptjetRef->pt());
-	EtaJPT->push_back(jptjet->eta());
-	PhiJPT->push_back(jptjet->phi());
-	EtJPT->push_back(jptjet->pt());
-	pTtrkMax->push_back(pTMax);
-	Ntrk->push_back(npions);
-	NPxlMaxPtTrk->push_back(NLayersPxl);
-	NSiIMaxPtTrk->push_back(NLayersSiI);
-	NSiOMaxPtTrk->push_back(NLayersSiO);
-
-	cout <<" jpt jet pT = " << jptjet->pt()
-	     <<" jpt eta = " << jptjet->eta() 
-	     <<" jpt phi = " << jptjet->phi() 
-	     <<" raw pt = " << jptjetRef->pt()
-	     <<" raw eta = " << jptjetRef->eta()
-	     <<" raw phi = " << jptjetRef->phi() 
-	     <<" Ntrk1 = " << pionsInVertexInCalo.size()
-	     <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
-	jc++;
       }
-      int j = 0;
-
-      //      for(map<double,int>::reverse_iterator it = pTjptIndex.end(); it != pTjptIndex.begin(); ++it) {
-      map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
-      map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
-      while (rfirst != rlast) {
-	cout <<" j = " << j <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
-	rfirst++;
-	++j; 
-      }
-
-      //      sort(pTjptIndex.begin(), pTjptIndex.end(), greater<double>());
     }
   }
+
+  int jc = 0;
+  //      for(map<double,int>::reverse_iterator it = pTjptIndex.end(); it != pTjptIndex.begin(); ++it) {
+  map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
+  map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
+  while (rfirst != rlast) {
+
+    cout <<" jc = " << jc <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
+
+    const JPTJet* jptjet = (*rfirst).second;
+
+    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+    double mN90Hits  = (*jetsID)[jetRef].n90Hits;
+    double mfHPD     = (*jetsID)[jetRef].fHPD;
+    double mfRBX     = (*jetsID)[jetRef].fRBX; 
+    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+    double mN90      = rawcalojet->n90();
+    double mEmf      = rawcalojet->emEnergyFraction(); 	
+    
+    // access tracks used in JPT
+    TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
+    TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
+    int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
+    // find track with max pT and number of layers it crosses
+    double pTMax = 0.;
+    int NLayersPxl = 0;
+    int NLayersSiI = 0;
+    int NLayersSiO = 0;
+    // loop over in-vertex-in calo tracks
+    for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
+	 iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
+      const double pt  = (*iInConeVtxTrk)->pt();
+      if(pt > pTMax) {
+	pTMax = pt;
+	NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+      }
+    }
+    
+    // loop over in-vertex-out of calo tracks
+    for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
+	 iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
+      const double pt  = (*iInConeVtxTrk)->pt();
+      if(pt > pTMax) {
+	pTMax = pt;
+	NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+      }
+    }
+    
+    EtaRaw->push_back(jptjetRef->eta());
+    PhiRaw->push_back(jptjetRef->phi());
+    EtJPT->push_back(jptjetRef->pt());
+    EtaJPT->push_back(jptjet->eta());
+    PhiJPT->push_back(jptjet->phi());
+    EtJPT->push_back(jptjet->pt());
+    pTtrkMax->push_back(pTMax);
+    Ntrk->push_back(npions);
+    NPxlMaxPtTrk->push_back(NLayersPxl);
+    NSiIMaxPtTrk->push_back(NLayersSiI);
+    NSiOMaxPtTrk->push_back(NLayersSiO);
+    
+    cout <<" jpt jet pT = " << jptjet->pt()
+	 <<" jpt eta = " << jptjet->eta() 
+	 <<" jpt phi = " << jptjet->phi() 
+	 <<" raw pt = " << jptjetRef->pt()
+	 <<" raw eta = " << jptjetRef->eta()
+	 <<" raw phi = " << jptjetRef->phi() 
+	 <<" Ntrk1 = " << pionsInVertexInCalo.size()
+	 <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
+    jc++;
+    rfirst++;
+  }
+
 
    /*
      //start from here
