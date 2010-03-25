@@ -328,7 +328,9 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    }
 */
 
-  std::map<double,int> pTjptIndex;
+  //  std::map<double,int> pTjptIndex;
+
+  std::map<double,const JPTJet*> pTjptIndex;
 
   jjpt = 0;
   run = iEvent.id().run();
@@ -406,6 +408,9 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
       int jc = 0;
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
+
+	pTjptIndex[jptjet->pt()] = &(*jptjet);
+
 	// access to calo jets
 	RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
 	double mN90Hits  = (*jetsID)[jetRef].n90Hits;
@@ -449,8 +454,6 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	  }
 	}
 
-	pTjptIndex[jptjet->pt()] = jc;
-
 	EtaRaw->push_back(jptjetRef->eta());
 	PhiRaw->push_back(jptjetRef->phi());
 	EtJPT->push_back(jptjetRef->pt());
@@ -474,18 +477,17 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	jc++;
       }
       int j = 0;
+
       //      for(map<double,int>::reverse_iterator it = pTjptIndex.end(); it != pTjptIndex.begin(); ++it) {
-      map<double,int>::reverse_iterator rfirst(pTjptIndex.end());
-      map<double,int>::reverse_iterator rlast(pTjptIndex.begin());
+      map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
+      map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
       while (rfirst != rlast) {
-	cout <<" j = " << j <<" energy = " << (*rfirst).first <<" index = " << (*rfirst).second << endl;
+	cout <<" j = " << j <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
 	rfirst++;
 	++j; 
       }
 
-      //	sort(EtJPT->begin(), EtJPT->end());
       //      sort(pTjptIndex.begin(), pTjptIndex.end(), greater<double>());
-      //      sort(pTjptIndex.begin(), pTjptIndex.end());
     }
   }
 
