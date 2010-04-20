@@ -41,7 +41,7 @@ fileNames = cms.untracked.vstring(
 
 process.myjetplustrack = cms.EDFilter("JetPlusTrackAnalysis",
     HistOutFile = cms.untracked.string('JetAnalysis.root'),
-#    src2 = cms.InputTag("ak5GenJets"),
+    calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
     TriggerResults = cms.InputTag("TriggerResults","","HLT")	
