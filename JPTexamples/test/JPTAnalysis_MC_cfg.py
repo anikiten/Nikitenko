@@ -38,8 +38,8 @@ fileNames = cms.untracked.vstring(
 )
 
 
-process.myjetplustrack = cms.EDFilter("JetPlusTrackAnalysis",
-    HistOutFile = cms.untracked.string('JPTAnalysis.root'),
+process.myjetplustrack = cms.EDFilter("JetPlusTrackAnalysis_Data",
+    HistOutFile = cms.untracked.string('JPTAnalysis_MC.root'),
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
