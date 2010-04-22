@@ -97,6 +97,7 @@
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/GenVector/PxPyPzE4D.h"
 
+//
 using namespace std;
 using namespace reco;
 
@@ -425,11 +426,18 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
     const JPTJet* jptjet = (*rfirst).second;
 
     RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+
+    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+
+    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+
+    double mN90Hits_jpt  = (*jetsID)[jptjetRef].n90Hits;
+    double mfHPD_jpt     = (*jetsID)[jptjetRef].fHPD;
+    double mfRBX_jpt     = (*jetsID)[jptjetRef].fRBX;
+
     double mN90Hits  = (*jetsID)[jetRef].n90Hits;
     double mfHPD     = (*jetsID)[jetRef].fHPD;
     double mfRBX     = (*jetsID)[jetRef].fRBX; 
-    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
     double mN90      = rawcalojet->n90();
     double mEmf      = rawcalojet->emEnergyFraction(); 	
     

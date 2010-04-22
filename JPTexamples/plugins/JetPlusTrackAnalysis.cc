@@ -357,6 +357,7 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // get jet ID map
   edm::Handle<ValueMap<reco::JetID> > jetsID;
   iEvent.getByLabel(jetsIDSrc,jetsID);
+  // 'ak5JetID'
 
    // pf jets
   edm::Handle<PFJetCollection> pfjetsakt5;
@@ -420,16 +421,34 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
   while (rfirst != rlast) {
 
-    cout <<" jc = " << jc <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
-
     const JPTJet* jptjet = (*rfirst).second;
 
     RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+
+    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+
+    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+
+    cout <<" ====>  jc = " << jc
+	 <<" jet energy = " << ((*rfirst).second)->pt() 
+	 <<"  raw pT = " << rawcalojet->pt() << endl;
+
+    double mN90Hits_jpt  = (*jetsID)[jptjetRef].n90Hits;
+    double mfHPD_jpt     = (*jetsID)[jptjetRef].fHPD;
+    double mfRBX_jpt     = (*jetsID)[jptjetRef].fRBX;
+
     double mN90Hits  = (*jetsID)[jetRef].n90Hits;
     double mfHPD     = (*jetsID)[jetRef].fHPD;
-    double mfRBX     = (*jetsID)[jetRef].fRBX; 
-    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+    double mfRBX     = (*jetsID)[jetRef].fRBX;
+ 
+    cout <<" jc = " << jc
+	 <<" mN90Hits_jpt = " << mN90Hits_jpt
+	 <<" mfHPD_jpt = " << mfHPD_jpt
+	 <<" mfRBX_jpt = " << mfRBX_jpt
+	 <<" mN90Hits = " << mN90Hits
+	 <<" mfHPD = " << mfHPD
+	 <<" mfRBX = " << mfRBX << endl;
+
     double mN90      = rawcalojet->n90();
     double mEmf      = rawcalojet->emEnergyFraction(); 	
     
