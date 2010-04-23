@@ -421,23 +421,18 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
   while (rfirst != rlast) {
 
-    cout <<" jc = " << jc <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
+    //    cout <<" jc = " << jc <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
 
     const JPTJet* jptjet = (*rfirst).second;
-
-    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-
     RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-
     reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+
+    //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
 
     double mN90Hits_jpt  = (*jetsID)[jptjetRef].n90Hits;
     double mfHPD_jpt     = (*jetsID)[jptjetRef].fHPD;
     double mfRBX_jpt     = (*jetsID)[jptjetRef].fRBX;
 
-    double mN90Hits  = (*jetsID)[jetRef].n90Hits;
-    double mfHPD     = (*jetsID)[jetRef].fHPD;
-    double mfRBX     = (*jetsID)[jetRef].fRBX; 
     double mN90      = rawcalojet->n90();
     double mEmf      = rawcalojet->emEnergyFraction(); 	
     
