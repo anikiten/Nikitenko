@@ -57,4 +57,5 @@ process.dump = cms.EDFilter("EventContentAnalyzer")
 process.p1 = cms.Path(process.myjetplustrack)
 
 # for 360: apply L2L3 corrections and get JPT L2L3 corrected collection, JPTjetsL2L3 
+# one need set of tags will be provided be JES
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
