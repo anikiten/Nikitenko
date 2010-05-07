@@ -50,12 +50,12 @@ process.myjetplustrack = cms.EDFilter("JetPlusTrackAnalysis",
 
 process.dump = cms.EDFilter("EventContentAnalyzer")
 
-#  to be used with 35X datasets
+# for 360 to be used with 35X datasets. It create JPT not L2L3 corrected jet collecion: JetPlusTrackZSPCorJetAntiKt5
 # process.p1 = cms.Path(process.recoJPTJets*process.myjetplustrack)
 
-# for 360: access to not L2L3 corrected JPT jets: JetPlusTrackZSPCorJetAntiKt5
+# for 360: access to not L2L3 corrected JPT jet collection: JetPlusTrackZSPCorJetAntiKt5
 process.p1 = cms.Path(process.myjetplustrack)
 
-# for 360: apply L2L3 corrections and get JPT L2L3 corrected collection, JPTjetsL2L3 
+# for 360: create colection of L2L3 corrected JPT jets: ak5JPTJetsL2L3  
 # one need set of tags will be provided be JES
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
