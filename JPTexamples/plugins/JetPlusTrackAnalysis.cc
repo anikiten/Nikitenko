@@ -316,8 +316,7 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
    edm::Handle<TriggerResults> triggerResults;
    iEvent.getByLabel(srcTriggerResults_,triggerResults);
 
-   edm::TriggerNames triggerNames;
-   triggerNames.init(*triggerResults);
+   const edm::TriggerNames & triggerNames = iEvent.triggerNames(*triggerResults);
 
    unsigned index = triggerNames.triggerIndex("HLT_PhysicsDeclared");
    bool physdecl= (index<triggerNames.size()&&triggerResults->accept(index)) ? 1 : 0;
@@ -326,7 +325,7 @@ JetPlusTrackAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& i
      std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
 	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
    }
-*/
+  */
 
   //  std::map<double,int> pTjptIndex;
 

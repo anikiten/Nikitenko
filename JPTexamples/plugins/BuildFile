@@ -38,6 +38,9 @@
   <use name=TrackingTools/TrackAssociator>
   <use name=TrackingTools/TrajectoryState>
   <use name=RecoJets/JetPlusTracks>
+  <use name=DataFormats/L1Trigger>
+  <use name=CondFormats/L1TObjects>
+  <use name=CondFormats/DataRecord>
   <use name=clhep>
   <use name=root>
   <flags EDM_PLUGIN=1>
