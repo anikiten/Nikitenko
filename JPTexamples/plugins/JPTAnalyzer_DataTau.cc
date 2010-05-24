@@ -419,6 +419,11 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	     theCaloTau = *iTau;
 	     DRMAX = DR;
 	     CaloTauRef  theCaloTauRef(theCaloTauHandle,iTauInd);
+            
+	     CaloJetRef RawCaloJet = (*iTau).rawJetRef();
+	     double PtRawCaloJet = RawCaloJet->pt();
+	     double mN90Hits = (*jetsID)[RawCaloJet].n90Hits;
+	     
 	     iTauInd++;
 	     DiscriminatorByLeadingTrackFinding = (*theCaloTauDiscriminatorByLeadingTrackFinding)[theCaloTauRef];
 	     DiscriminatorByLeadingTrackPtCut   = (*theCaloTauDiscriminatorByLeadingTrackPtCut)[theCaloTauRef];
