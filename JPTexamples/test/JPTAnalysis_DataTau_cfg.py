@@ -79,7 +79,7 @@ process.source = cms.Source("PoolSource",
 # Analyzer module
 process.myanalysis = cms.EDFilter(
    "JPTAnalyzer_DataTau",
-    HistOutFile      = cms.untracked.string('analysisMCTau.root'),
+    HistOutFile      = cms.untracked.string('analysisDataTau.root'),
     calojets         = cms.string('ak5CaloJets'),
     jetsID           = cms.string('ak5JetID'),
     jetExtender      = cms.string('ak5JetExtender')
