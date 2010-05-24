@@ -123,6 +123,11 @@ class JPTAnalyzer_DataTau : public edm::EDAnalyzer {
   std::vector<double> *PhiRaw;
   std::vector<double> *EtRaw;
 
+  // tcTau
+  std::vector<double> *tcEta;
+  std::vector<double> *tcPhi;
+  std::vector<double> *tcEt;
+
   // there is track within cone 0.5 around jet direction
   std::vector<int> *ltrexists;
 
@@ -175,6 +180,11 @@ JPTAnalyzer_DataTau::beginJob()
   EtaRaw    = new std::vector<double>();
   PhiRaw    = new std::vector<double>();
   EtRaw     = new std::vector<double>();
+
+  tcEta     = new std::vector<double>();
+  tcPhi     = new std::vector<double>();
+  tcEt      = new std::vector<double>();
+
   ltrexists = new std::vector<int>();
 
   d0ltr     = new std::vector<double>();
@@ -207,6 +217,10 @@ JPTAnalyzer_DataTau::beginJob()
   t1->Branch("EtaRaw","vector<double>",&EtaRaw);
   t1->Branch("PhiRaw","vector<double>",&PhiRaw);
   t1->Branch("EtRaw" ,"vector<double>",&EtRaw);
+
+  t1->Branch("tcEta","vector<double>",&tcEta);
+  t1->Branch("tcPhi","vector<double>",&tcPhi);
+  t1->Branch("tcEt" ,"vector<double>",&tcEt);
 
   t1->Branch("ltrexists" ,"vector<int>",&ltrexists);
 
@@ -290,6 +304,10 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    EtaRaw->clear();
    PhiRaw->clear();
    EtRaw->clear();
+
+   tcEta->clear();
+   tcPhi->clear();
+   tcEt->clear();
  
    ltrexists->clear();
  
@@ -394,6 +412,10 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
        EtaRaw->push_back(RawCaloJet->eta());
        PhiRaw->push_back(RawCaloJet->phi());
        EtRaw ->push_back(RawCaloJet->pt());
+
+       tcEta->push_back(iTau->eta());
+       tcPhi->push_back(iTau->phi());
+       tcEt->push_back(iTau->pt());
        
        double mN90     = RawCaloJet->n90();
        double mEmf     = RawCaloJet->emEnergyFraction(); 	
