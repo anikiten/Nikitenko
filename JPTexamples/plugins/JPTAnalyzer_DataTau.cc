@@ -370,162 +370,141 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    
    if( (nvtx == 1) && (ntrkV > 3) && (ntrkV < 100) ) {
 
-     if( calojets->size() > 0 ) {
+     CaloTauCollection::const_iterator iTau;
 
-       int jc = 0;
-       for( CaloJetCollection::const_iterator cjet = calojets->begin(); 
-	    cjet != calojets->end(); ++cjet ){ 
+     float DiscriminatorByLeadingTrackFinding = 0.;
+     float DiscriminatorByLeadingTrackPtCut   = 0;
+     float DiscriminatorByIsolation           = 0;
+     float DiscriminatorAgainstElectron       = 0;
+
+     int iTauInd = 0;
+     CaloTau theCaloTau;
+
+     for(iTau = caloTaus.begin(); iTau != caloTaus.end(); iTau++) {
+
+       theCaloTau = *iTau;
+
+       CaloTauRef  theCaloTauRef(theCaloTauHandle,iTauInd);
+       iTauInd++;
+ 
+       CaloJetRef RawCaloJet = (*iTau).rawJetRef();
 	 
-	 // raw jet selection 
-	 RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-	 double mN90  = (*calojets)[jc].n90();
-	 double mEmf  = (*calojets)[jc].emEnergyFraction(); 	
-	 double mN90Hits = (*jetsID)[jetRef].n90Hits;
-	 double mfHPD    = (*jetsID)[jetRef].fHPD;
-	 double mfRBX    = (*jetsID)[jetRef].fRBX; 
+       if( RawCaloJet->pt() < 10.0 ) continue;
+       
+       EtaRaw->push_back(RawCaloJet->eta());
+       PhiRaw->push_back(RawCaloJet->phi());
+       EtRaw ->push_back(RawCaloJet->pt());
+       
+       double mN90     = RawCaloJet->n90();
+       double mEmf     = RawCaloJet->emEnergyFraction(); 	
+       double mfHPD    = (*jetsID)[RawCaloJet].fHPD;
+       double mfRBX    = (*jetsID)[RawCaloJet].fRBX; 
+       double mN90Hits = (*jetsID)[RawCaloJet].n90Hits;
 	 
-	 jc++;
+       /*
+       if(mEmf < 0.01) continue;
+       if(mfHPD>0.98) continue;
+       if(mN90Hits < 2) continue;
+       if(fabs(cjet->eta()) > 2.5) continue;
+       */
+  
+       DiscriminatorByLeadingTrackFinding = (*theCaloTauDiscriminatorByLeadingTrackFinding)[theCaloTauRef];
+       DiscriminatorByLeadingTrackPtCut   = (*theCaloTauDiscriminatorByLeadingTrackPtCut)[theCaloTauRef];
+       DiscriminatorByIsolation           = (*theCaloTauDiscriminatorByIsolation)[theCaloTauRef];
+       DiscriminatorAgainstElectron       = (*theCaloTauDiscriminatorAgainstElectron)[theCaloTauRef];
 
-	 // jet ID selections
 
-	 if(mEmf < 0.01) continue;
-	 if(mfHPD>0.98) continue;
-	 if(mN90Hits < 2) continue;
-	 if(fabs(cjet->eta()) > 2.5) continue;
+       // e.m. isolation
+       float pisol = 1000.;
+       if(DiscriminatorByLeadingTrackPtCut == 1.) { pisol = (*iTau).isolationECALhitsEtSum();}
+       
+       emisolat->push_back(pisol);
+       dByLeadingTrackFinding->push_back(DiscriminatorByLeadingTrackFinding);
+       dByLeadingTrackPtCut->push_back(DiscriminatorByLeadingTrackPtCut);
+       dByIsolation->push_back(DiscriminatorByIsolation);
+       dAgainstElectron->push_back(DiscriminatorAgainstElectron);
+       
+       // settings for tau isolation
+       double matchingConeSize  = 0.10;
+       double signalConeSize    = 0.07;
+       double isolationConeSize = 0.5;
+       //	 double isolationConeSize = 0.4;
+       double ptLeadingTrackMin = 0.;
+       double ptOtherTracksMin  = 0.;
+       //	 double ptLeadingTrackMin = 6.;
+       //	 double ptOtherTracksMin  = 1.;
+       string metric = "DR"; // can be DR,angle,area
+       unsigned int isolationAnnulus_Tracksmaxn = 0;
+       
+       CaloTauElementsOperators op(theCaloTau);
+       double d_trackIsolation = 
+	 op.discriminatorByIsolTracksN(metric,
+				       matchingConeSize,
+				       ptLeadingTrackMin,
+				       ptOtherTracksMin,
+				       metric,
+				       signalConeSize,
+				       metric,
+				       isolationConeSize,
+				       isolationAnnulus_Tracksmaxn);
+	   
+       // leading track in cone 0.5 around jet axis
+       const TrackRef leadingTrack =op.leadTk(metric,isolationConeSize,ptLeadingTrackMin);
+       
+       int ltr= 1;
 
-	 // consider only jets with raw ET > 4 GeV.
-
-	 if( cjet->pt() < 4.0 ) continue;
-
-	 EtaRaw->push_back(cjet->eta());
-	 PhiRaw->push_back(cjet->phi());
-	 EtRaw ->push_back(cjet->pt());
+       if(leadingTrack.isNull()) ltr = 0;
+       
+       ltrexists->push_back(ltr);
+       
+       if(ltr == 1) {
 	 
-	 // match calo tau with calo jet
-	 double DRMAX = 1000.;
-	 CaloTau theCaloTau;
-
-	 CaloTauCollection::const_iterator iTau;
-	 int iTauInd = 0;
-
-	 float DiscriminatorByLeadingTrackFinding = 0.;
-	 float DiscriminatorByLeadingTrackPtCut   = 0;
-	 float DiscriminatorByIsolation           = 0;
-	 float DiscriminatorAgainstElectron       = 0;
-
-	 for(iTau = caloTaus.begin(); iTau != caloTaus.end(); iTau++) {
-	   double DR = deltaR(cjet->eta(),cjet->phi(),iTau->eta(),iTau->phi());
-	   if(DR < DRMAX) {
-	     theCaloTau = *iTau;
-	     DRMAX = DR;
-	     CaloTauRef  theCaloTauRef(theCaloTauHandle,iTauInd);
-            
-	     CaloJetRef RawCaloJet = (*iTau).rawJetRef();
-	     double PtRawCaloJet = RawCaloJet->pt();
-	     double mN90Hits = (*jetsID)[RawCaloJet].n90Hits;
-	     
-	     iTauInd++;
-	     DiscriminatorByLeadingTrackFinding = (*theCaloTauDiscriminatorByLeadingTrackFinding)[theCaloTauRef];
-	     DiscriminatorByLeadingTrackPtCut   = (*theCaloTauDiscriminatorByLeadingTrackPtCut)[theCaloTauRef];
-	     DiscriminatorByIsolation           = (*theCaloTauDiscriminatorByIsolation)[theCaloTauRef];
-	     DiscriminatorAgainstElectron       = (*theCaloTauDiscriminatorAgainstElectron)[theCaloTauRef];
+	 double ip = fabs(leadingTrack->dxy((*recVtxs)[0].position()));
+	 d0ltr->push_back(ip);
+	 //	   d0ltr->push_back(leadingTrack->d0());
+	 ptltr->push_back(leadingTrack->pt());
+	 double DRltrjet = deltaR(leadingTrack->eta(),leadingTrack->phi(),RawCaloJet->eta(),RawCaloJet->phi()); 
+	 drltrjet->push_back(DRltrjet);
+	 
+	 // tracks in signal cone
+	 const TrackRefVector signalTracks = op.tracksInCone(leadingTrack->momentum(),metric,signalConeSize,ptOtherTracksMin);
+	 ntrsign->push_back(signalTracks.size());
+	 double pTtrkMin = 1000.;
+	 double pTmin = 1000.;
+	 for (reco::TrackRefVector::const_iterator it = signalTracks.begin(); it != signalTracks.end(); ++it) {
+	   const double pt  = (*it)->pt();
+	   if(pt < pTmin) {
+	     pTmin = pt;
+	     pTtrkMin = pt;;
 	   }
 	 }
-
-	 // e.m. isolation
-	 float pisol = 1000.;
-	 if(DiscriminatorByLeadingTrackPtCut == 1.) { pisol = theCaloTau.isolationECALhitsEtSum();}
-
-	 emisolat->push_back(pisol);
-	 dByLeadingTrackFinding->push_back(DiscriminatorByLeadingTrackFinding);
-	 dByLeadingTrackPtCut->push_back(DiscriminatorByLeadingTrackPtCut);
-	 dByIsolation->push_back(DiscriminatorByIsolation);
-	 dAgainstElectron->push_back(DiscriminatorAgainstElectron);
-
-	 // settings for tau isolation
-	 double matchingConeSize  = 0.10;
-	 double signalConeSize    = 0.07;
-	 double isolationConeSize = 0.5;
-	 //	 double isolationConeSize = 0.4;
-	 double ptLeadingTrackMin = 0.;
-	 double ptOtherTracksMin  = 0.;
-	 //	 double ptLeadingTrackMin = 6.;
-	 //	 double ptOtherTracksMin  = 1.;
-	 string metric = "DR"; // can be DR,angle,area
-	 unsigned int isolationAnnulus_Tracksmaxn = 0;
-
-	 CaloTauElementsOperators op(theCaloTau);
-	 double d_trackIsolation = 
-	   op.discriminatorByIsolTracksN(metric,
-					 matchingConeSize,
-					 ptLeadingTrackMin,
-					 ptOtherTracksMin,
-					 metric,
-					 signalConeSize,
-					 metric,
-					 isolationConeSize,
-					 isolationAnnulus_Tracksmaxn);
-	   
-	 // leading track in cone 0.5 around jet axis
-	 const TrackRef leadingTrack =op.leadTk(metric,isolationConeSize,ptLeadingTrackMin);
-	   
-	 int ltr= 1;
-	 if(leadingTrack.isNull()) ltr = 0;
-
-	 ltrexists->push_back(ltr);
-      
-	 if(ltr == 1) {
-
-	   double ip = fabs(leadingTrack->dxy((*recVtxs)[0].position()));
-	   d0ltr->push_back(ip);
-	   //	   d0ltr->push_back(leadingTrack->d0());
-	   ptltr->push_back(leadingTrack->pt());
-	   double DRltrjet = deltaR(leadingTrack->eta(),leadingTrack->phi(),cjet->eta(),cjet->phi()); 
-	   drltrjet->push_back(DRltrjet);
-
-	   // tracks in signal cone
-	   const TrackRefVector signalTracks = op.tracksInCone(leadingTrack->momentum(),metric,signalConeSize,ptOtherTracksMin);
-	   ntrsign->push_back(signalTracks.size());
-	   double pTtrkMin = 1000.;
-	   double pTmin = 1000.;
-	   for (reco::TrackRefVector::const_iterator it = signalTracks.begin(); it != signalTracks.end(); ++it) {
-	     const double pt  = (*it)->pt();
-	     if(pt < pTmin) {
-	       pTmin = pt;
-	       pTtrkMin = pt;;
-	     }
-	   }
-	   ptminsign->push_back(pTtrkMin);
-
-	   // tracks in isolation cone
-	   // const double tracktorefpoint_maxDZ,const double refpoint_Z)const;
-	   const TrackRefVector isolatTracks = op.tracksInCone(leadingTrack->momentum(),metric,isolationConeSize,ptOtherTracksMin);
-	   ntrisol->push_back(isolatTracks.size());
-	   pTtrkMin = 1000.;
-	   pTmin = 1000.;
-	   double dzMax = 0.;
-	   for (reco::TrackRefVector::const_iterator it = isolatTracks.begin(); it != isolatTracks.end(); ++it) {
-	     const double pt  = (*it)->pt();
-	     //	     double dz = fabs(leadingTrack->dz()-(*it)->dz());
-	     double dz = fabs(leadingTrack->vz()-(*it)->vz());
-	     if(dz > dzMax) {
-	       dzMax = dz;
-	     }
-	     if(pt < pTmin) {
-	       pTmin = pt;
-	       pTtrkMin = pt;
-	     }
-	   }
-	   ptminisol->push_back(pTtrkMin);
-	   dzmaxltr->push_back(dzMax);
-	 }
+	 ptminsign->push_back(pTtrkMin);
 	 
-	 jtau = jtau + 1;
-	   
+	 // tracks in isolation cone
+	 // const double tracktorefpoint_maxDZ,const double refpoint_Z)const;
+	 const TrackRefVector isolatTracks = op.tracksInCone(leadingTrack->momentum(),metric,isolationConeSize,ptOtherTracksMin);
+	 ntrisol->push_back(isolatTracks.size());
+	 pTtrkMin = 1000.;
+	 pTmin = 1000.;
+	 double dzMax = 0.;
+	 for (reco::TrackRefVector::const_iterator it = isolatTracks.begin(); it != isolatTracks.end(); ++it) {
+	   const double pt  = (*it)->pt();
+	   //	     double dz = fabs(leadingTrack->dz()-(*it)->dz());
+	   double dz = fabs(leadingTrack->vz()-(*it)->vz());
+	   if(dz > dzMax) {
+	     dzMax = dz;
+	   }
+	   if(pt < pTmin) {
+	     pTmin = pt;
+	     pTtrkMin = pt;
+	   }
+	 }
+	 ptminisol->push_back(pTtrkMin);
+	 dzmaxltr->push_back(dzMax);
        }
-
-       if(jtau >= 1) t1->Fill();
+       jtau = jtau + 1;
      }
+     if(jtau >= 1) t1->Fill();
    }
 }
 
