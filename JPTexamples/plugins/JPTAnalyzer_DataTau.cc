@@ -485,7 +485,8 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	 d0ltr->push_back(ip);
 	 //	   d0ltr->push_back(leadingTrack->d0());
 	 ptltr->push_back(leadingTrack->pt());
-	 double DRltrjet = deltaR(leadingTrack->eta(),leadingTrack->phi(),RawCaloJet->eta(),RawCaloJet->phi()); 
+	 //	 double DRltrjet = deltaR(leadingTrack->eta(),leadingTrack->phi(),RawCaloJet->eta(),RawCaloJet->phi()); 
+	 double DRltrjet = deltaR(leadingTrack->eta(),leadingTrack->phi(),iTau->eta(),iTau->phi()); 
 	 drltrjet->push_back(DRltrjet);
 	 
 	 // tracks in signal cone
