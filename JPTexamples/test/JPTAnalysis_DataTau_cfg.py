@@ -90,7 +90,7 @@ process.dump = cms.EDFilter("EventContentAnalyzer")
 # Path
 process.p1 = cms.Path(
    process.hltLevel1GTSeed *
-   process.hltHighLevel *	
+#   process.hltHighLevel *	
    process.monster *
 #   process.recoJPTJets *
    process.TCTau *
