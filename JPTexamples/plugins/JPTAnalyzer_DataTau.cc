@@ -127,6 +127,11 @@ class JPTAnalyzer_DataTau : public edm::EDAnalyzer {
   std::vector<double> *tcEta;
   std::vector<double> *tcPhi;
   std::vector<double> *tcEt;
+  std::vector<double> *mass;
+
+  std::vector<double> *vmEmf;
+  std::vector<double> *vmfHPD;
+  std::vector<double> *vmN90Hits;
 
   // there is track within cone 0.5 around jet direction
   std::vector<int> *ltrexists;
@@ -184,6 +189,11 @@ JPTAnalyzer_DataTau::beginJob()
   tcEta     = new std::vector<double>();
   tcPhi     = new std::vector<double>();
   tcEt      = new std::vector<double>();
+  mass      = new std::vector<double>();
+
+  vmEmf    = new std::vector<double>();
+  vmfHPD   = new std::vector<double>();
+  vmN90Hits= new std::vector<double>();
 
   ltrexists = new std::vector<int>();
 
@@ -221,6 +231,11 @@ JPTAnalyzer_DataTau::beginJob()
   t1->Branch("tcEta","vector<double>",&tcEta);
   t1->Branch("tcPhi","vector<double>",&tcPhi);
   t1->Branch("tcEt" ,"vector<double>",&tcEt);
+  t1->Branch("mass" ,"vector<double>",&mass);
+
+  t1->Branch("mEmf","vector<double>",&vmEmf);
+  t1->Branch("mfHPD","vector<double>",&vmfHPD);
+  t1->Branch("mN90Hits","vector<double>",&vmN90Hits);
 
   t1->Branch("ltrexists" ,"vector<int>",&ltrexists);
 
@@ -309,6 +324,10 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    tcPhi->clear();
    tcEt->clear();
  
+   vmEmf->clear();
+   vmfHPD->clear();
+   vmN90Hits->clear();
+
    ltrexists->clear();
  
    d0ltr->clear();
@@ -407,7 +426,8 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
  
        CaloJetRef RawCaloJet = (*iTau).rawJetRef();
 	 
-       if( RawCaloJet->pt() < 10.0 ) continue;
+       if(     iTau->pt()   < 10.0) continue;
+       if(fabs(iTau->eta()) >  2.5) continue;
        
        EtaRaw->push_back(RawCaloJet->eta());
        PhiRaw->push_back(RawCaloJet->phi());
@@ -416,6 +436,9 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
        tcEta->push_back(iTau->eta());
        tcPhi->push_back(iTau->phi());
        tcEt->push_back(iTau->pt());
+
+       double m = sqrt( (iTau->energy()*iTau->energy()) - (iTau->p()*iTau->p()) ); 
+       mass->push_back(m);
        
        double mN90     = RawCaloJet->n90();
        double mEmf     = RawCaloJet->emEnergyFraction(); 	
@@ -427,20 +450,23 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
        if(mEmf < 0.01) continue;
        if(mfHPD>0.98) continue;
        if(mN90Hits < 2) continue;
-       if(fabs(cjet->eta()) > 2.5) continue;
        */
   
+       vmEmf->push_back(mEmf);
+       vmfHPD->push_back(mfHPD);
+       vmN90Hits->push_back(mN90Hits);
+
        DiscriminatorByLeadingTrackFinding = (*theCaloTauDiscriminatorByLeadingTrackFinding)[theCaloTauRef];
        DiscriminatorByLeadingTrackPtCut   = (*theCaloTauDiscriminatorByLeadingTrackPtCut)[theCaloTauRef];
        DiscriminatorByIsolation           = (*theCaloTauDiscriminatorByIsolation)[theCaloTauRef];
        DiscriminatorAgainstElectron       = (*theCaloTauDiscriminatorAgainstElectron)[theCaloTauRef];
-
 
        // e.m. isolation
        float pisol = 1000.;
        if(DiscriminatorByLeadingTrackPtCut == 1.) { pisol = (*iTau).isolationECALhitsEtSum();}
        
        emisolat->push_back(pisol);
+
        dByLeadingTrackFinding->push_back(DiscriminatorByLeadingTrackFinding);
        dByLeadingTrackPtCut->push_back(DiscriminatorByLeadingTrackPtCut);
        dByIsolation->push_back(DiscriminatorByIsolation);
@@ -471,7 +497,7 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 				       isolationAnnulus_Tracksmaxn);
 	   
        // leading track in cone 0.5 around jet axis
-       const TrackRef leadingTrack =op.leadTk(metric,isolationConeSize,ptLeadingTrackMin);
+       const TrackRef leadingTrack =op.leadTk(metric,matchingConeSize,ptLeadingTrackMin);
        
        int ltr= 1;
 
