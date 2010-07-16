@@ -41,7 +41,8 @@ process.skimming = cms.EDFilter("Photon10Filter",
 process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = cms.untracked.vstring('keep *'), 
-    fileName = cms.untracked.string('Photon10.root'),
+    fileName = cms.untracked.string('rfio:/castor/cern.ch/user/a/anikiten/Photon10Skim/Photon10.root'),
+#    fileName = cms.untracked.string('Photon10.root'),
     dataset = cms.untracked.PSet(dataTier = cms.untracked.string('RAW'),filterName = cms.untracked.string('Photon10Filter'))
 )
 
