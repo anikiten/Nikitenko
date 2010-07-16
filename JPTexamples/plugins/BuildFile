@@ -1,4 +1,4 @@
-<library name=UserCodeNikitenkoJPTexamplesPlugins file=JetPlusTrackAnalysis.cc,JetPlusTrackAnalysis_Data.cc,JPTAnalyzer_DataTau.cc>
+<library name=UserCodeNikitenkoJPTexamplesPlugins file=JetPlusTrackAnalysis.cc,JetPlusTrackAnalysis_Data.cc,JPTAnalyzer_DataTau.cc,Photon10Filter.cc>
   <use name=DataFormats/TauReco>
   <use name=RecoTauTag/TauTagTools>
   <use name=DataFormats/CaloTowers>

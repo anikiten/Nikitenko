@@ -237,12 +237,12 @@ Photon10Filter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
      unsigned index = triggerNames.triggerIndex(triggerNames.triggerName(ihlt));
      if ( triggerNames.triggerName(ihlt) == Photon10) {
-       std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-		 <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+       //       std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
+       //		 <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
        if (triggerResults->accept(ihlt) == 1) {
 	 retcode = true;
-	 accepted = accepted + 1;
-	 std::cout <<" event accepted ! = " << accepted << std::endl;
+	 //	 accepted = accepted + 1;
+	 //	 std::cout <<" event accepted ! = " << accepted << std::endl;
        }
      }
    }
