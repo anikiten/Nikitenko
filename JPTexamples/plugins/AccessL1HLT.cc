@@ -30,6 +30,7 @@
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenuFwd.h"
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
@@ -130,10 +131,12 @@ private:
   virtual void endJob() ;
 
   // ----------member data ---------------------------
-  InputTag srcL1CenJet;
-  InputTag srcL1TauJet;
-  InputTag srcL1FwdJet;
-  InputTag srcTriggerResults_;
+  InputTag  srcL1CenJet;
+  InputTag  srcL1TauJet;
+  InputTag  srcL1FwdJet;
+  InputTag  srcHLTSummary;
+  InputTag  srcTriggerResults_;
+  std::vector<edm::InputTag> hltPaths_;
 };
 
 //
@@ -166,10 +169,13 @@ AccessL1HLT::AccessL1HLT(const edm::ParameterSet& iConfig)
    //now do what ever initialization is needed
   using namespace edm;
   // 
-  srcL1CenJet  = iConfig.getParameter<edm::InputTag>("L1CenJet");
-  srcL1TauJet  = iConfig.getParameter<edm::InputTag>("L1TauJet");
-  srcL1FwdJet  = iConfig.getParameter<edm::InputTag>("L1FwdJet");
+  srcL1CenJet   = iConfig.getParameter<edm::InputTag>("L1CenJet");
+  srcL1TauJet   = iConfig.getParameter<edm::InputTag>("L1TauJet");
+  srcL1FwdJet   = iConfig.getParameter<edm::InputTag>("L1FwdJet");
+  srcHLTSummary = iConfig.getParameter<edm::InputTag> ("HLTSummary");
   srcTriggerResults_ = iConfig.getParameter<edm::InputTag> ("TriggerResults");
+  hltPaths_          = iConfig.getParameter<std::vector<edm::InputTag> >("HLTPaths");
+
 }
 
 
@@ -244,10 +250,10 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
      unsigned index = triggerNames.triggerIndex(triggerNames.triggerName(ihlt));
-     if ( triggerNames.triggerName(ihlt) == Photon10) {
+     //     if ( triggerNames.triggerName(ihlt) == Photon10) {
        std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
 		 <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
-     }
+       //     }
    }
 
    edm::Handle<l1extra::L1JetParticleCollection> lCenJet;
@@ -255,8 +261,8 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<l1extra::L1JetParticleCollection> lTauJet;
 
    iEvent.getByLabel(srcL1CenJet,lCenJet);
-   iEvent.getByLabel(srcL1TauJet,lTauJet);
    iEvent.getByLabel(srcL1FwdJet,lFwdJet);
+   iEvent.getByLabel(srcL1TauJet,lTauJet);
    
    std::cout <<" N taus = " << lTauJet->size()
 	     <<" N cent = " << lCenJet->size()
@@ -267,7 +273,10 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        for (l1extra::L1JetParticleCollection::const_iterator iter = lTauJet->begin(); iter != lTauJet->end(); iter++)
 	 {
 	   // variables ...
-	   std::cout <<" Taus:  pt = " << (*iter).pt() << std::endl;
+	   std::cout <<" L1 Taus:  pt = " << (*iter).pt() 
+		     <<" eta = " << (*iter).eta()
+		     <<" phi = " << (*iter).phi() << std::endl;
+
 	   /*
 	     lVars.pT = (*iter).pt();
 	     lVars.ET = (*iter).et();
@@ -278,6 +287,42 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 }
      }
 
+
+   edm::Handle<trigger::TriggerEvent> lHltSummary;
+   iEvent.getByLabel(srcHLTSummary,lHltSummary);
+
+   if (lHltSummary.isValid()) {
+
+     const trigger::TriggerObjectCollection & toc(lHltSummary->getObjects());
+     
+     //cout
+     for (unsigned i=0; i < lHltSummary->sizeFilters(); i++){
+       const edm::InputTag & lTag = lHltSummary->filterTag(i);
+       std::cout << "ele " << i << ": " << lTag << std::endl;
+     }
+     
+     for (unsigned i(0); i < hltPaths_.size(); i++){
+       const int index = lHltSummary->filterIndex(hltPaths_[i]);
+       //       if (index >= lHltSummary->sizeFilters()) {
+       std::cout << " ---> My filter " << hltPaths_[i] << std::endl;
+       //       continue;
+       //     }
+       const trigger::Keys & k = lHltSummary->filterKeys(index);
+       
+       for (trigger::Keys::const_iterator ki = k.begin(); ki !=k.end(); ++ki ) {
+	 std::cout <<"       pT = " << toc[*ki].pt()
+		   <<" eta = " << toc[*ki].eta()
+		   <<" phi = " << toc[*ki].phi()
+		   <<" id = " << toc[*ki].id() << std::endl;
+	 // ... variables ...
+	 //	 lVars.pT = toc[*ki].pt();
+	 //	 lVars.eta = toc[*ki].eta();
+	 //	 lVars.phi = toc[*ki].phi();
+	 //	 lVars.id = toc[*ki].id();
+	 //	 lVars.mass = toc[*ki].mass();
+       }
+     }
+   }
 
    /*
   //  std::map<double,int> pTjptIndex;

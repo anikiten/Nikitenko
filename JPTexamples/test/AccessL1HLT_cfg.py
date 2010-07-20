@@ -27,7 +27,7 @@ process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(3)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -49,16 +49,9 @@ process.myjetplustrack = cms.EDFilter("AccessL1HLT",
      L1FwdJet = cms.InputTag("l1extraParticles","Forward"),
      HLTSummary = cms.InputTag("hltTriggerSummaryAOD"),
      TriggerResults = cms.InputTag("TriggerResults","","HLT"),
-     HLTTags = cms.VInputTag(cms.InputTag("hltL1sJet15U","","HLT"),
-                             cms.InputTag("hltL1sJet30U","","HLT"),
-                             cms.InputTag("hltL1sJet50U","","HLT"),
-                             cms.InputTag("hltL1sFwdJet20U","","HLT"),
-                             cms.InputTag("hltL1sL1Jet10U","","HLT"),
-                             cms.InputTag("hltL1sL1Jet6U","","HLT"),
-                             cms.InputTag("hltL1sL1SingleCenJet","","HLT"),
-                             cms.InputTag("hltL1sL1SingleForJet","","HLT"),
-                             cms.InputTag("hltL1sL1SingleTauJet","","HLT"),
-                             cms.InputTag("hltL1sSingleLooseIsoTau20","","HLT"))
+     HLTPaths = cms.VInputTag(cms.InputTag("hltL1sL1SingleCenJet","","HLT"),
+                              cms.InputTag("hltL1sL1SingleForJet","","HLT"),
+                              cms.InputTag("hltL1sL1SingleTauJet","","HLT"))
 )
 
 
