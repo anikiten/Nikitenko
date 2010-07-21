@@ -287,6 +287,18 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 }
      }
 
+   /*
+     If you want to have a complicated path with many filters
+     and you need to access each of those then please use
+     TriggerEventWithRefs
+     A good example in Tau HLT DQM is
+     here :
+     
+     http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/DQM/HLTEvF/src/HLTTauDQMPathPlotter.cc?revision=1.9&view=markup
+     
+     Check the getFilterCollectiion
+   */
+
 
    edm::Handle<trigger::TriggerEvent> lHltSummary;
    iEvent.getByLabel(srcHLTSummary,lHltSummary);
