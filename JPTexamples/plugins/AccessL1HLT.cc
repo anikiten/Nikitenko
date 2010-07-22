@@ -287,7 +287,11 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 }
      }
 
-   /*
+
+   // HLT staff
+   //  access objects passed your filter
+
+   /*  from Mike
      If you want to have a complicated path with many filters
      and you need to access each of those then please use
      TriggerEventWithRefs
@@ -300,6 +304,29 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    */
 
 
+   /* example frrom Sam 
+      edm::Handle<trigger::TriggerEvent> trigEvt;
+      iEvent.getByLabel("hltTriggerSummaryAOD",hltTag,trigEvt);
+      
+      size_t filterNrInEvt = trigEvt->filterIndex(edm::InputTag(filterName,"",hltTag).encode());
+      if(filterNrInEvt<trigEvt->sizeFilters()){ //filter found in event
+      
+      const trigger::Keys& trigKeys = trigEvt->filterKeys(filterNrInEvt);  //trigger::Keys is actually a vector<uint16_t> holding
+      the position of trigger objects in the trigger collection passing the filter
+      const trigger::TriggerObjectCollection & trigObjColl(trigEvt->getObjects());
+      for(trigger::Keys::const_iterator keyIt=trigKeys.begin();keyIt!=trigKeys.end();++keyIt){ //we now have access to all triggerobjects passing filter
+      float trigObjEta = trigObjColl[*keyIt].eta();
+      float trigObjPhi = trigObjColl[*keyIt].phi();
+      if (reco::deltaR(detEta,detPhi,trigObjEta,trigObjPhi) < maxDeltaR){
+      return true;
+      }//end dR<maxDeltaR trig obj match test
+    }//end loop over all objects passing filter
+    }//check filter is present in event
+    return false;
+    }
+   */
+
+   // Working example
    edm::Handle<trigger::TriggerEvent> lHltSummary;
    iEvent.getByLabel(srcHLTSummary,lHltSummary);
 
@@ -335,174 +362,6 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        }
      }
    }
-
-   /*
-  //  std::map<double,int> pTjptIndex;
-
-  std::map<double,const JPTJet*> pTjptIndex;
-
-  jjpt = 0;
-  run = iEvent.id().run();
-  event = iEvent.id().event();
-  PVx = -1000.; 
-  PVy = -1000.; 
-  PVz = -1000.;
-  EtaRaw->clear();
-  PhiRaw->clear();
-  EtJPT->clear();
-  EtaJPT->clear();
-  PhiJPT->clear();
-  EtJPT->clear();
-  pTtrkMax->clear(); 
-  Ntrk->clear();
-  NPxlMaxPtTrk->clear();
-  NSiIMaxPtTrk->clear();
-  NSiOMaxPtTrk->clear();
-
-  // initialize vector containing four highest Et gen jets > 20 GeV
-  //   vector<CLHEP::HepLorentzVector> gjets;
-  //   gjets.clear();
-  
-  // get jet ID map
-  edm::Handle<ValueMap<reco::JetID> > jetsID;
-  iEvent.getByLabel(jetsIDSrc,jetsID);
-
-   // pf jets
-  edm::Handle<PFJetCollection> pfjetsakt5;
-  iEvent.getByLabel("ak5PFJets", pfjetsakt5);
-   
-  // JPT jets
-  edm::Handle<reco::JPTJetCollection> jptjets;
-  iEvent.getByLabel(JPTjetsSrc, jptjets);
-  
-  // Calo jets
-  edm::Handle<CaloJetCollection> calojets;
-  iEvent.getByLabel(calojetsSrc, calojets);
-
-  // get vertex
-  edm::Handle<reco::VertexCollection> recVtxs;
-  iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
-
-  int nvtx = 0;
-  unsigned ntrkV = 0;
-  
-  
-  for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
-    {
-      if (!((*recVtxs)[ind].isFake())) 
-	{
-	  nvtx = nvtx + 1;
-	  if(nvtx == 1) {
-	    PVx  = (*recVtxs)[ind].x();
-	    PVy  = (*recVtxs)[ind].y();
-	    PVz  = (*recVtxs)[ind].z();
-	    //      ndof(PV)>=5.0
-	    //	     ntrkV = (*recVtxs)[ind].tracksSize();
-	    reco::Vertex::trackRef_iterator ittrk;
-	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
-	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++; 
-	    }
-	}
-    }
-  
-  if( (nvtx == 1) && (ntrkV > 3) && (ntrkV < 100) ) {
-
-     // PF jet energy corrections
-    //    const JetCorrector* correctorPF = JetCorrector::getJetCorrector (JetCorrectionPF, iSetup);
-    
-    // MC jet energy corrections
-    //    const JetCorrector* correctorMC = JetCorrector::getJetCorrector (JetCorrectionMC, iSetup);
-     
-    if(jptjets->size() != 0) {
-
-      for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
-	if(jptjet->pt() > 10.) {
-	  pTjptIndex[jptjet->pt()] = &(*jptjet);
-	}
-      }
-    }
-  }
-
-  int jc = 0;
-  //      for(map<double,int>::reverse_iterator it = pTjptIndex.end(); it != pTjptIndex.begin(); ++it) {
-  map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
-  map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
-  while (rfirst != rlast) {
-
-    //    cout <<" jc = " << jc <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
-
-    const JPTJet* jptjet = (*rfirst).second;
-    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
-
-    //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-
-    double mN90Hits_jpt  = (*jetsID)[jptjetRef].n90Hits;
-    double mfHPD_jpt     = (*jetsID)[jptjetRef].fHPD;
-    double mfRBX_jpt     = (*jetsID)[jptjetRef].fRBX;
-
-    double mN90      = rawcalojet->n90();
-    double mEmf      = rawcalojet->emEnergyFraction(); 	
-    
-    // access tracks used in JPT
-    TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
-    TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
-    int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
-    // find track with max pT and number of layers it crosses
-    double pTMax = 0.;
-    int NLayersPxl = 0;
-    int NLayersSiI = 0;
-    int NLayersSiO = 0;
-    // loop over in-vertex-in calo tracks
-    for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
-	 iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
-      const double pt  = (*iInConeVtxTrk)->pt();
-      if(pt > pTMax) {
-	pTMax = pt;
-	NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-      }
-    }
-    
-    // loop over in-vertex-out of calo tracks
-    for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
-	 iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
-      const double pt  = (*iInConeVtxTrk)->pt();
-      if(pt > pTMax) {
-	pTMax = pt;
-	NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-      }
-    }
-    
-    EtaRaw->push_back(jptjetRef->eta());
-    PhiRaw->push_back(jptjetRef->phi());
-    EtJPT->push_back(jptjetRef->pt());
-    EtaJPT->push_back(jptjet->eta());
-    PhiJPT->push_back(jptjet->phi());
-    EtJPT->push_back(jptjet->pt());
-    pTtrkMax->push_back(pTMax);
-    Ntrk->push_back(npions);
-    NPxlMaxPtTrk->push_back(NLayersPxl);
-    NSiIMaxPtTrk->push_back(NLayersSiI);
-    NSiOMaxPtTrk->push_back(NLayersSiO);
-    
-    cout <<" jpt jet pT = " << jptjet->pt()
-	 <<" jpt eta = " << jptjet->eta() 
-	 <<" jpt phi = " << jptjet->phi() 
-	 <<" raw pt = " << jptjetRef->pt()
-	 <<" raw eta = " << jptjetRef->eta()
-	 <<" raw phi = " << jptjetRef->phi() 
-	 <<" Ntrk1 = " << pionsInVertexInCalo.size()
-	 <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
-    jc++;
-    rfirst++;
-  }
-  // fill tree
-  if(pTjptIndex.size() != 0) t1->Fill();
-   */
 }
 
 
