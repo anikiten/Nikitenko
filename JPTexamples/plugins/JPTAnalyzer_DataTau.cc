@@ -539,6 +539,7 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	 for (reco::TrackRefVector::const_iterator it = isolatTracks.begin(); it != isolatTracks.end(); ++it) {
 	   const double pt  = (*it)->pt();
 	   //	     double dz = fabs(leadingTrack->dz()-(*it)->dz());
+	   // fabs((*it).dz(pv.position()))<=tktorefpointmaxDZ)
 	   double dz = fabs(leadingTrack->vz()-(*it)->vz());
 	   if(dz > dzMax) {
 	     dzMax = dz;
