@@ -13,6 +13,7 @@ process = cms.Process('HLT2')
 # HLT_SingleIsoTau30_Trk5_NoJEC (Threshold 30 ,Leading Track 5 , Track iso)
 #     --This is the 1E31 path but without corrections)
 #  MC_31X global tag has correct L1 Menu 
+#  to have latest L1 Tau isolation algo need to use  cmssw > 362
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -28,7 +29,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.172.2.6 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('RelVal nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
