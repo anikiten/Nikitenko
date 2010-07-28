@@ -152,6 +152,8 @@ class JPTAnalyzer_DataTau : public edm::EDAnalyzer {
   std::vector<double> *ptminisol;
   // max dz ltr - trl
   std::vector<double> *dzmaxltr;  
+  // max dz vtx - trk
+  std::vector<double> *dzmaxvtx;  
   // ecal isolation
   std::vector<float>  *emisolat;  
   // discriminators
@@ -205,6 +207,7 @@ JPTAnalyzer_DataTau::beginJob()
   ntrisol   = new std::vector<int>();
   ptminisol = new std::vector<double>();
   dzmaxltr  = new std::vector<double>();
+  dzmaxvtx  = new std::vector<double>();
   emisolat  = new std::vector<float>();  
 
   dByLeadingTrackFinding = new std::vector<float>();
@@ -247,6 +250,7 @@ JPTAnalyzer_DataTau::beginJob()
   t1->Branch("ntrisol" ,"vector<int>",&ntrisol);
   t1->Branch("ptminisol" ,"vector<double>",&ptminisol);
   t1->Branch("dzmaxltr" ,"vector<double>",&dzmaxltr);
+  t1->Branch("dzmaxvtx" ,"vector<double>",&dzmaxvtx);
   t1->Branch("emisolat" ,"vector<float>",&emisolat);
 
   t1->Branch("dByLeadingTrackFinding" ,"vector<float>",&dByLeadingTrackFinding);
@@ -338,6 +342,7 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    ntrisol->clear();
    ptminisol->clear();
    dzmaxltr->clear();
+   dzmaxvtx->clear();
    emisolat->clear();
 
    dByLeadingTrackFinding->clear();
@@ -496,7 +501,7 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 				       isolationConeSize,
 				       isolationAnnulus_Tracksmaxn);
 	   
-       // leading track in cone 0.5 around jet axis
+       // leading track in cone 0.1 around jet axis
        const TrackRef leadingTrack =op.leadTk(metric,matchingConeSize,ptLeadingTrackMin);
        
        int ltr= 1;
@@ -536,11 +541,16 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	 pTtrkMin = 1000.;
 	 pTmin = 1000.;
 	 double dzMax = 0.;
+	 double dzvtxMax = 0.;
 	 for (reco::TrackRefVector::const_iterator it = isolatTracks.begin(); it != isolatTracks.end(); ++it) {
 	   const double pt  = (*it)->pt();
 	   //	     double dz = fabs(leadingTrack->dz()-(*it)->dz());
 	   // fabs((*it).dz(pv.position()))<=tktorefpointmaxDZ)
 	   double dz = fabs(leadingTrack->vz()-(*it)->vz());
+	   double dzvtx = fabs( (*it)->dz((*recVtxs)[0].position()) );
+	   if(dzvtx > dzvtxMax ) {
+	     dzvtxMax = dzvtx;
+	   }
 	   if(dz > dzMax) {
 	     dzMax = dz;
 	   }
@@ -551,6 +561,7 @@ JPTAnalyzer_DataTau::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	 }
 	 ptminisol->push_back(pTtrkMin);
 	 dzmaxltr->push_back(dzMax);
+	 dzmaxvtx->push_back(dzvtxMax);
        }
        jtau = jtau + 1;
      }
