@@ -5,6 +5,26 @@
 # with command line options: RelVal --step=HLT --conditions=auto:startup --filein=file:RelVal_HLT_8E29.root --fileout=RelVal_HLT2_8E29.root --number=100 --mc --no_exec --datatier RAW-HLT --eventcontent=FEVTDEBUGHLT --customise=HLTrigger/Configuration/customL1THLT_Options.py --python_filename=RelVal_HLT2_8E29.py --processName=HLT2
 import FWCore.ParameterSet.Config as cms
 
+# change Tau HLT: 
+#You need to change the threshold in all the modules at HLT
+#hltFilterL2EtCutSingleIsoTau30Trk5NoJEC
+#hltFilterL2EcalIsolationSingleIsoTau30Trk5NoJEC
+#hltFilterL25LeadingTrackPtCutSingleIsoTau30Trk5NoJEC
+#hltFilterL3TrackIsolationSingleIsoTau30Trk5NoJEC
+#
+#In the attempt to make a tau trigger for W->tau nu
+#we found that without changing anything in L1
+#we could decrease the L2 to 25 GeV by juts cutting
+#harder on ECAL Isolation .
+#That happened by changing the module :
+#hltL2TauRelaxingIsolationSelector
+#and especially this line :
+# EcalIsolationEt = cms.vdouble( 5.0, 0.025, 7.5E-4 ),
+#
+# to
+#
+# EcalIsolationEt = cms.vdouble( 3.0, 0.025, 7.5E-4 ),
+
 process = cms.Process('HLT2')
 
 # The paths that are running are:
@@ -29,7 +49,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('RelVal nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
