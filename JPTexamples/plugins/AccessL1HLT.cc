@@ -199,6 +199,7 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   using namespace edm;
 
   // L1
+
    edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
    iEvent.getByLabel("gtDigis",l1GtRR);
    
@@ -220,9 +221,11 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        //algo
        //if(algBitNumber == 124) 
        std::cout << " algo bits " << algBitNumber << " " 
-		 << (algo->second).algoName() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+	 //		 << (algo->second).algoName() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+		 << (algo->second).algoAlias() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
      }
 
+     /*
      for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
        int techBitNumber = ( techTrig->second).algoBitNumber();
        //technical
@@ -232,6 +235,7 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		 << (techTrig->second).algoName() 
 		 << " " << technicalTriggerWordBeforeMask.at(techBitNumber) << std::endl;
      }
+     */
    }
 
    //int printVerbosity = 0;
@@ -248,14 +252,19 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    std::string Photon10 = "HLT_Photon10_L1R";
 
+   double ac = 0.;
    for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
      unsigned index = triggerNames.triggerIndex(triggerNames.triggerName(ihlt));
      //     if ( triggerNames.triggerName(ihlt) == Photon10) {
-       std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-		 <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
-       //     }
+     std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
+     	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+     //     }
+     if((ihlt != 4) && (triggerResults->accept(ihlt) == 1.)) {ac = 1.0;}
    }
 
+   std::cout <<" ---> accept = " << ac << std::endl;
+
+   /*
    edm::Handle<l1extra::L1JetParticleCollection> lCenJet;
    edm::Handle<l1extra::L1JetParticleCollection> lFwdJet;
    edm::Handle<l1extra::L1JetParticleCollection> lTauJet;
@@ -277,16 +286,10 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		     <<" eta = " << (*iter).eta()
 		     <<" phi = " << (*iter).phi() << std::endl;
 
-	   /*
-	     lVars.pT = (*iter).pt();
-	     lVars.ET = (*iter).et();
-	     lVars.eta = (*iter).eta();
-	     lVars.phi = (*iter).phi();
-	     lVars.bx = (*iter).bx();
-	   */
+//	     lVars.bx = (*iter).bx();
 	 }
      }
-
+*/
 
    // HLT staff
    //  access objects passed your filter
@@ -327,6 +330,7 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    */
 
    // Working example
+   /*
    edm::Handle<trigger::TriggerEvent> lHltSummary;
    iEvent.getByLabel(srcHLTSummary,lHltSummary);
 
@@ -362,6 +366,7 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        }
      }
    }
+   */
 }
 
 
