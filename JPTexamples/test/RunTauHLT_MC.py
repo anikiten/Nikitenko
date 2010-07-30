@@ -29,7 +29,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('RelVal nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -44,18 +44,30 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 # /Wtaunu/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
 # /Wtaunu/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RAW
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/E41B7B7E-FC37-DF11-A644-0030487CD7C0.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/CE827AB6-FB37-DF11-A060-0030487A3232.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/BE02950D-FC37-DF11-8F15-0030487CD812.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/BA63E8D1-FA37-DF11-83A7-0030487CAF0E.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/9E73096C-FB37-DF11-9AEA-00304879FBB2.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/5EE4E3EF-1638-DF11-87EF-0030487CD7E0.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/586F1D21-FA37-DF11-A2A5-001617DBD5AC.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/5021A055-FD37-DF11-9814-0030487C8CB6.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/3CED1546-FD37-DF11-9051-0030487CD6F2.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/1E35230D-FF37-DF11-9E2A-0030487A3C9A.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/0AFCD774-FD37-DF11-B08E-0030487A18F2.root',
-                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/007B499F-FB37-DF11-9440-0030487C6062.root'
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/E41B7B7E-FC37-DF11-A644-0030487CD7C0.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/CE827AB6-FB37-DF11-A060-0030487A3232.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/BE02950D-FC37-DF11-8F15-0030487CD812.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/BA63E8D1-FA37-DF11-83A7-0030487CAF0E.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/9E73096C-FB37-DF11-9AEA-00304879FBB2.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/5EE4E3EF-1638-DF11-87EF-0030487CD7E0.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/586F1D21-FA37-DF11-A2A5-001617DBD5AC.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/5021A055-FD37-DF11-9814-0030487C8CB6.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/3CED1546-FD37-DF11-9051-0030487CD6F2.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/1E35230D-FF37-DF11-9E2A-0030487A3C9A.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/0AFCD774-FD37-DF11-B08E-0030487A18F2.root',
+#                '/store/relval/CMSSW_3_6_0_pre4/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V3-v1/0002/007B499F-FB37-DF11-9440-0030487C6062.root'
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0006/BEB9D2C1-5878-DF11-B8B7-00248C55CC97.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0006/849DB6ED-1778-DF11-B21B-001731EF61B4.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/EE443EC1-0F78-DF11-8674-003048679008.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/BAC023AF-1278-DF11-8311-0026189438B5.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/AEFF8CDC-1178-DF11-A5D1-001A928116F8.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/A8EC22C9-1178-DF11-83DA-0018F3D096AA.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/98BCA10D-1178-DF11-9DF1-0026189437F9.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/926B2E1D-1278-DF11-BBF3-002618943981.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/6ADB1893-0F78-DF11-AE6F-0026189438F8.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/5415AD92-1678-DF11-8D85-001731EF61B4.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/4C40081E-1778-DF11-B95A-003048D42D92.root',
+        '/store/relval/CMSSW_3_6_3/RelValZTT/GEN-SIM-DIGI-RAW-HLTDEBUG/START36_V10-v1/0005/321A39D9-1078-DF11-8679-0018F3D0962A.root'
     )
 )
 
@@ -73,7 +85,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 # Additional output definition
 
 # Other statements
-process.GlobalTag.globaltag = 'START36_V10::All'
+process.GlobalTag.globaltag = 'START36_V9::All'
 
 # Path and EndPath definitions
 process.endjob_step = cms.Path(process.endOfProcess)
