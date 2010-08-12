@@ -141,6 +141,13 @@ private:
   InputTag  srcHLTSummary;
   InputTag  srcTriggerResults_;
   std::vector<edm::InputTag> hltPaths_;
+
+  // counters
+  double ntot;
+  double ntau30;
+  double ntau20;
+  double ntaumet30;
+  double ntaumet20;
 };
 
 //
@@ -180,6 +187,12 @@ AccessL1HLT::AccessL1HLT(const edm::ParameterSet& iConfig)
   srcTriggerResults_ = iConfig.getParameter<edm::InputTag> ("TriggerResults");
   hltPaths_          = iConfig.getParameter<std::vector<edm::InputTag> >("HLTPaths");
 
+  // counters
+  ntot      = 0; 
+  ntau30    = 0;
+  ntau20    = 0;
+  ntaumet30 = 0;
+  ntaumet20 = 0;
 }
 
 
@@ -202,41 +215,40 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
+  ntot += 1.;
+
   // L1
 
   m_l1GtUtils.retrieveL1EventSetup(iSetup);
   int iErrorCode = -1;
-
-  //  std::string m_nameAlgTechTrig = "L1_ETM20";
-  //  bool decisionBeforeMaskAlgTechTrig = m_l1GtUtils.decisionBeforeMask(iEvent, m_nameAlgTechTrig, iErrorCode);
-  //  std::cout <<" ===>  L1_ETM20 algo: iErrorCode = " << iErrorCode
-  //       <<"  decision = " << decisionBeforeMaskAlgTechTrig << std::endl;
-
-
+  std::string m_nameAlgTechTrig = "L1_ETM20";
+  bool l1_etm20 = m_l1GtUtils.decisionBeforeMask(iEvent, m_nameAlgTechTrig, iErrorCode);
+  
+  /*
+  // Algo bits
   edm::ESHandle<L1GtTriggerMenu> menuRcd;
   iSetup.get<L1GtTriggerMenuRcd>().get(menuRcd) ;
   const L1GtTriggerMenu* menu = menuRcd.product();
   
   for (CItAlgo algo = menu->gtAlgorithmMap().begin(); algo != menu->gtAlgorithmMap().end(); ++algo) {
     int algBitNumber = ( algo->second).algoBitNumber();
-    //algo
-    //if(algBitNumber == 124) 
     std::cout << " algo bits " << algBitNumber 
-	      << " name: "  << (algo->second).algoName() 
-      	      << " alias: " << (algo->second).algoAlias() 
-	      << " decision = " << m_l1GtUtils.decisionBeforeMask(iEvent,(algo->second).algoName(),iErrorCode) << std::endl;
-  }
-    
-  /*
-    for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
-    int techBitNumber = ( techTrig->second).algoBitNumber();
-    //technical
-    //       if(techBitNumber ==40) 
-    std::cout << " tech bits " 
-    << techBitNumber << " "
-    << (techTrig->second).algoName() 
-    << " " << technicalTriggerWordBeforeMask.at(techBitNumber) << std::endl;
+    << " name: "  << (algo->second).algoName() 
+    << " alias: " << (algo->second).algoAlias() 
+    << " decision = " << m_l1GtUtils.decisionBeforeMask(iEvent,(algo->second).algoName(),iErrorCode) << std::endl;
     }
+  */    
+
+  /*
+  // Technical bits
+  for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
+  int techBitNumber = ( techTrig->second).algoBitNumber();
+  //technical
+  //       if(techBitNumber ==40) 
+  std::cout << " tech bits " 
+  << techBitNumber << " "
+  << (techTrig->second).algoName() << std::endl;
+  }
   */
   
   //int printVerbosity = 0;
@@ -251,19 +263,25 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //   unsigned index = triggerNames.triggerIndex("HLT_PhysicsDeclared");
    //   bool physdecl= (index<triggerNames.size()&&triggerResults->accept(index)) ? 1 : 0;
 
-   std::string Photon10 = "HLT_Photon10_L1R";
-
-   double ac = 0.;
    for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
      unsigned index = triggerNames.triggerIndex(triggerNames.triggerName(ihlt));
-     //     if ( triggerNames.triggerName(ihlt) == Photon10) {
-     std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-     	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
-     //     }
-     if((ihlt != 4) && (triggerResults->accept(ihlt) == 1.)) {ac = 1.0;}
+     if( (ihlt == 0) || (ihlt == 2) ) {
+       std::cout <<" ==> HLT bit " << ihlt 
+		 <<" name = " << triggerNames.triggerName(ihlt) 
+		 <<" accepted = " << triggerResults->accept(ihlt) 
+		 <<" l1_etm20 = " << l1_etm20 << std::endl; 
+       if( (triggerResults->accept(ihlt) == 1) && (ihlt == 0) ){ntau30 += 1.;}
+       if( (triggerResults->accept(ihlt) == 1) && (ihlt == 2) ){ntau20 += 1.;}
+       if( (triggerResults->accept(ihlt) == 1) && (ihlt == 0) && (l1_etm20 == 1) ) {ntaumet30 += 1.;}
+       if( (triggerResults->accept(ihlt) == 1) && (ihlt == 2) && (l1_etm20 == 1) ) {ntaumet20 += 1.;}
+     }
    }
 
-   std::cout <<" ---> accept = " << ac << std::endl;
+   std::cout <<"     ntot = " << ntot
+	     <<" ntau30 = " << ntau30
+	     <<" ntau20 = " << ntau20
+	     <<" ntaumet30 = " << ntaumet30 
+	     <<" ntaumet20 = " << ntaumet20 << std::endl;
 
    /*
    edm::Handle<l1extra::L1JetParticleCollection> lCenJet;
