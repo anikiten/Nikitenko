@@ -206,10 +206,11 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   m_l1GtUtils.retrieveL1EventSetup(iSetup);
   int iErrorCode = -1;
-  std::string m_nameAlgTechTrig = "L1_ETM20";
-  bool decisionBeforeMaskAlgTechTrig = m_l1GtUtils.decisionBeforeMask(iEvent, m_nameAlgTechTrig, iErrorCode);
-  std::cout <<" ===>  L1_ETM20 algo: iErrorCode = " << iErrorCode
-       <<"  decision = " << decisionBeforeMaskAlgTechTrig << std::endl;
+
+  //  std::string m_nameAlgTechTrig = "L1_ETM20";
+  //  bool decisionBeforeMaskAlgTechTrig = m_l1GtUtils.decisionBeforeMask(iEvent, m_nameAlgTechTrig, iErrorCode);
+  //  std::cout <<" ===>  L1_ETM20 algo: iErrorCode = " << iErrorCode
+  //       <<"  decision = " << decisionBeforeMaskAlgTechTrig << std::endl;
 
 
   edm::ESHandle<L1GtTriggerMenu> menuRcd;
@@ -222,9 +223,8 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //if(algBitNumber == 124) 
     std::cout << " algo bits " << algBitNumber 
 	      << " name: "  << (algo->second).algoName() 
-      	      << " alias: " << (algo->second).algoAlias() << std::endl;
-      //<< " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
-      //	      << (algo->second).algoAlias() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+      	      << " alias: " << (algo->second).algoAlias() 
+	      << " decision = " << m_l1GtUtils.decisionBeforeMask(iEvent,(algo->second).algoName(),iErrorCode) << std::endl;
   }
     
   /*
