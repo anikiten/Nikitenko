@@ -200,46 +200,44 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // L1
 
-   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
-   iEvent.getByLabel("gtDigis",l1GtRR);
+  edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
+  iEvent.getByLabel("gtDigis",l1GtRR);
    
-   //   edm::Handle<L1GlobalTriggerObjectMapRecord> l1GtOMRec;
-   //   iEvent.getByLabel("hltL1GtObjectMap",l1GtOMRec);
-   
-   edm::ESHandle<L1GtTriggerMenu> menuRcd;
-   iSetup.get<L1GtTriggerMenuRcd>().get(menuRcd) ;
-   const L1GtTriggerMenu* menu = menuRcd.product();
+      
+  edm::ESHandle<L1GtTriggerMenu> menuRcd;
+  iSetup.get<L1GtTriggerMenuRcd>().get(menuRcd) ;
+  const L1GtTriggerMenu* menu = menuRcd.product();
+  
+  if(l1GtRR.isValid()) {
 
-   if(l1GtRR.isValid()) {
-
-     L1GlobalTriggerReadoutRecord L1GTRR = *l1GtRR.product();
-     const TechnicalTriggerWord&  technicalTriggerWordBeforeMask =  L1GTRR.technicalTriggerWord();
-     DecisionWord gtDecisionWord = L1GTRR.decisionWord();
-
-     for (CItAlgo algo = menu->gtAlgorithmMap().begin(); algo != menu->gtAlgorithmMap().end(); ++algo) {
-       int algBitNumber = ( algo->second).algoBitNumber();
-       //algo
-       //if(algBitNumber == 124) 
-       std::cout << " algo bits " << algBitNumber << " " 
-	 //		 << (algo->second).algoName() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
-		 << (algo->second).algoAlias() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
-     }
-
-     /*
-     for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
-       int techBitNumber = ( techTrig->second).algoBitNumber();
-       //technical
-       //       if(techBitNumber ==40) 
-       std::cout << " tech bits " 
-		 << techBitNumber << " "
-		 << (techTrig->second).algoName() 
-		 << " " << technicalTriggerWordBeforeMask.at(techBitNumber) << std::endl;
-     }
-     */
-   }
-
-   //int printVerbosity = 0;
-   //menu->print(std::cout, printVerbosity);
+    L1GlobalTriggerReadoutRecord L1GTRR = *l1GtRR.product();
+    const TechnicalTriggerWord&  technicalTriggerWordBeforeMask =  L1GTRR.technicalTriggerWord();
+    DecisionWord gtDecisionWord = L1GTRR.decisionWord();
+     
+    for (CItAlgo algo = menu->gtAlgorithmMap().begin(); algo != menu->gtAlgorithmMap().end(); ++algo) {
+      int algBitNumber = ( algo->second).algoBitNumber();
+      //algo
+      //if(algBitNumber == 124) 
+      std::cout << " algo bits " << algBitNumber << " " 
+	//		 << (algo->second).algoName() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+		<< (algo->second).algoAlias() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+    }
+    
+  /*
+    for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
+    int techBitNumber = ( techTrig->second).algoBitNumber();
+    //technical
+    //       if(techBitNumber ==40) 
+    std::cout << " tech bits " 
+    << techBitNumber << " "
+    << (techTrig->second).algoName() 
+    << " " << technicalTriggerWordBeforeMask.at(techBitNumber) << std::endl;
+    }
+  */
+  }
+  
+  //int printVerbosity = 0;
+  //menu->print(std::cout, printVerbosity);
    
    // HLT
    edm::Handle<TriggerResults> triggerResults;
