@@ -19,6 +19,7 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 //
 // HLT/L1 and Trigger data formats
+#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
@@ -125,6 +126,9 @@ public:
 
 
 private:
+
+  L1GtUtils m_l1GtUtils;
+
   //      virtual void beginJob(const edm::EventSetup&) ;
   virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
@@ -200,28 +204,28 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // L1
 
-  edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
-  iEvent.getByLabel("gtDigis",l1GtRR);
-   
-      
+  m_l1GtUtils.retrieveL1EventSetup(iSetup);
+  int iErrorCode = -1;
+  std::string m_nameAlgTechTrig = "L1_ETM20";
+  bool decisionBeforeMaskAlgTechTrig = m_l1GtUtils.decisionBeforeMask(iEvent, m_nameAlgTechTrig, iErrorCode);
+  std::cout <<" ===>  L1_ETM20 algo: iErrorCode = " << iErrorCode
+       <<"  decision = " << decisionBeforeMaskAlgTechTrig << std::endl;
+
+
   edm::ESHandle<L1GtTriggerMenu> menuRcd;
   iSetup.get<L1GtTriggerMenuRcd>().get(menuRcd) ;
   const L1GtTriggerMenu* menu = menuRcd.product();
   
-  if(l1GtRR.isValid()) {
-
-    L1GlobalTriggerReadoutRecord L1GTRR = *l1GtRR.product();
-    const TechnicalTriggerWord&  technicalTriggerWordBeforeMask =  L1GTRR.technicalTriggerWord();
-    DecisionWord gtDecisionWord = L1GTRR.decisionWord();
-     
-    for (CItAlgo algo = menu->gtAlgorithmMap().begin(); algo != menu->gtAlgorithmMap().end(); ++algo) {
-      int algBitNumber = ( algo->second).algoBitNumber();
-      //algo
-      //if(algBitNumber == 124) 
-      std::cout << " algo bits " << algBitNumber << " " 
-	//		 << (algo->second).algoName() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
-		<< (algo->second).algoAlias() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
-    }
+  for (CItAlgo algo = menu->gtAlgorithmMap().begin(); algo != menu->gtAlgorithmMap().end(); ++algo) {
+    int algBitNumber = ( algo->second).algoBitNumber();
+    //algo
+    //if(algBitNumber == 124) 
+    std::cout << " algo bits " << algBitNumber 
+	      << " name: "  << (algo->second).algoName() 
+      	      << " alias: " << (algo->second).algoAlias() << std::endl;
+      //<< " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+      //	      << (algo->second).algoAlias() << " " <<  gtDecisionWord.at(algBitNumber) << std::endl;
+  }
     
   /*
     for (CItAlgo techTrig = menu->gtTechnicalTriggerMap().begin(); techTrig != menu->gtTechnicalTriggerMap().end(); ++techTrig) {
@@ -234,7 +238,6 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     << " " << technicalTriggerWordBeforeMask.at(techBitNumber) << std::endl;
     }
   */
-  }
   
   //int printVerbosity = 0;
   //menu->print(std::cout, printVerbosity);

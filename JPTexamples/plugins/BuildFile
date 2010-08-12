@@ -41,6 +41,7 @@
   <use name=TrackingTools/TrajectoryState>
   <use name=RecoJets/JetPlusTracks>
   <use name=DataFormats/L1Trigger>
+  <use name=L1Trigger/GlobalTriggerAnalyzer>
   <use name=CondFormats/L1TObjects>
   <use name=CondFormats/DataRecord>
   <use name=clhep>
