@@ -19,6 +19,7 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 //
 // HLT/L1 and Trigger data formats
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
@@ -128,11 +129,14 @@ public:
 private:
 
   L1GtUtils m_l1GtUtils;
+  HLTConfigProvider hltConfig_;
 
   //      virtual void beginJob(const edm::EventSetup&) ;
+  virtual void beginRun(edm::Run const &, edm::EventSetup const&) ;
   virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
+  
 
   // ----------member data ---------------------------
   InputTag  srcL1CenJet;
@@ -158,6 +162,13 @@ private:
 // static data member definitions
 //
 
+//
+void
+AccessL1HLT::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
+{
+  bool changed(true);
+  hltConfig_.init(iRun,iSetup,"HLT",changed);
+}
 // ------------ method called once each job just before starting event loop  ------------
 void 
 //AccessL1HLT::beginJob(const edm::EventSetup&)
@@ -265,16 +276,18 @@ AccessL1HLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
      unsigned index = triggerNames.triggerIndex(triggerNames.triggerName(ihlt));
-     if( (ihlt == 0) || (ihlt == 2) ) {
+     //     if( (ihlt == 0) || (ihlt == 2) ) {
+       int prescale = hltConfig_.prescaleValue(iEvent, iSetup,triggerNames.triggerName(ihlt));
        std::cout <<" ==> HLT bit " << ihlt 
-		 <<" name = " << triggerNames.triggerName(ihlt) 
+		 <<" name = " << triggerNames.triggerName(ihlt)
+		 <<" prescale = " << prescale 
 		 <<" accepted = " << triggerResults->accept(ihlt) 
 		 <<" l1_etm20 = " << l1_etm20 << std::endl; 
        if( (triggerResults->accept(ihlt) == 1) && (ihlt == 0) ){ntau30 += 1.;}
        if( (triggerResults->accept(ihlt) == 1) && (ihlt == 2) ){ntau20 += 1.;}
        if( (triggerResults->accept(ihlt) == 1) && (ihlt == 0) && (l1_etm20 == 1) ) {ntaumet30 += 1.;}
        if( (triggerResults->accept(ihlt) == 1) && (ihlt == 2) && (l1_etm20 == 1) ) {ntaumet20 += 1.;}
-     }
+       //     }
    }
 
    std::cout <<"     ntot = " << ntot
