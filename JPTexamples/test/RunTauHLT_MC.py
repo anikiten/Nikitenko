@@ -49,7 +49,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.3 $'),
+    version = cms.untracked.string('$Revision: 1.4 $'),
     annotation = cms.untracked.string('RelVal nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -95,7 +95,7 @@ process.source = cms.Source("PoolSource",
 process.output = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
-    fileName = cms.untracked.string('TauHLTPOutput.root'),
+    fileName = cms.untracked.string('TauHLTPOutputECAL3.root'),
     dataset = cms.untracked.PSet(
         dataTier = cms.untracked.string('RAW-HLT'),
         filterName = cms.untracked.string('')
@@ -104,8 +104,16 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 # Additional output definition
 
-# Other statements
+# for MC 
 process.GlobalTag.globaltag = 'START36_V9::All'
+
+# to run HLT on RAW data
+# CMSSW 3.6.x, you should use "GR10_H_V6A::All"
+# CMSSW 3.8.x, you should use "GR10_H_V8::All"
+#    abd add :
+#     process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
+#     process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+
 
 # Path and EndPath definitions
 process.endjob_step = cms.Path(process.endOfProcess)
