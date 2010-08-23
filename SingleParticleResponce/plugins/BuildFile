@@ -1,0 +1,23 @@
+<library name=UserCodeNikitenkoSinglePionResponse file=SinglePionEfficiencyNew.cc>
+ <use name=root>
+ <use name=boost>
+ <use name=FWCore/Framework>
+ <use name=FWCore/ParameterSet>
+ <use name=RecoTracker/DebugTools>
+ <use name=RecoTracker/CkfPattern>
+ <use name=SimTracker/TrackAssociation>
+ <use name=TrackingTools/TrackAssociator>
+ <use name=TrackingTools/TrajectoryState>
+ <use name=JetMETCorrections/Algorithms>
+ <use name=JetMETCorrections/Objects>
+ <use name=SimDataFormats/GeneratorProducts>
+ <use name=SimGeneral/HepPDTRecord>
+ <use name=Geometry/CaloTopology>
+ <use name=Geometry/CaloGeometry>
+# <use name=Geometry/CaloEventSetup>
+ <use name=Geometry/EcalMapping>
+ <use name=DataFormats/L1Trigger>
+ <use name=CondFormats/L1TObjects>
+ <use name=DataFormats/EcalDigi>
+ <flags EDM_PLUGIN=1>
+</library>
