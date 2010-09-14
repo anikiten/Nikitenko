@@ -12,6 +12,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ParameterSet/interface/InputTag.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
@@ -35,8 +36,10 @@ private:
 
   // ----------member data ---------------------------
       
-  std::string label_;
+  //  std::string hepmc_;
   
+  InputTag  hepmc_; 
+
 };
 
 
@@ -49,10 +52,10 @@ void DPSAnalyser::endJob() {
   return ; 
 }
 
-DPSAnalyser::DPSAnalyser(const edm::ParameterSet& iConfig) : 
-label_(iConfig.getUntrackedParameter("moduleLabel",std::string("generator")))
+DPSAnalyser::DPSAnalyser(const edm::ParameterSet& iConfig)  
 {
    //now do what ever initialization is needed
+hepmc_ = iConfig.getParameter<edm::InputTag>("hepmc");
 
 }
 
@@ -74,10 +77,12 @@ void DPSAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    using namespace edm;
    bool accepted = false;
    Handle<HepMCProduct> evt;
-   iEvent.getByLabel(label_, evt);
+   iEvent.getByLabel(hepmc_, evt);
 
    HepMC::GenEvent * myGenEvent = new  HepMC::GenEvent(*(evt->GetEvent()));
-    
+
+   std::cout << *myGenEvent << std::endl;
+   
    //if(processID == 0 || processID == myGenEvent->signal_process_id()) {
     
    for ( HepMC::GenEvent::particle_iterator p = myGenEvent->particles_begin();

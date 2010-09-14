@@ -1,8 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("copy") 
+process = cms.Process("COPY") 
 
-process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(10))
 
 process.source = cms.Source("PoolSource", 
                             fileNames=cms.untracked.vstring(
@@ -11,6 +11,7 @@ process.source = cms.Source("PoolSource",
                             
                             )
                             )
-process.copyAll = cms.OutputModule("PoolOutputModule", fileName=cms.untracked.string("OutPut.root"))
-process.printEventNumber = cms.EDAnalyzer("AsciiOutputModule")
+process.copyAll = cms.OutputModule("PoolOutputModule", fileName=cms.untracked.string("sherpa.root"))
+process.printEventNumber = cms.OutputModule("AsciiOutputModule")
+# process.printEventNumber = cms.EDAnalyzer("AsciiOutputModule")
 process.out = cms.EndPath(process.copyAll + process.printEventNumber)
