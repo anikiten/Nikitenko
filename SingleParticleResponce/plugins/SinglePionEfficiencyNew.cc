@@ -201,7 +201,7 @@ public:
 		      //		      std::vector<EcalTriggerElectronicsId>& xtals);
 
 private:
-  virtual void beginJob(const edm::EventSetup&) ;
+  virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
@@ -210,6 +210,7 @@ private:
   string fOutputFileName ;
   TFile*      hOutputFile ;
   TTree*      t1;
+  TH1F*       hbheSignalE; 
   // names of modules, producing object collections
   string tracksSrc;
   string pxltracksSrc;
@@ -248,7 +249,8 @@ private:
   //
   double eCaloTowers1, eCaloTowers2;
   // end
-
+int hcal_empty;
+int ecal_empty;
   // track hit associator
   TrackerHitAssociator* hitAssociator;
   // track associator to detector parameters 
@@ -347,6 +349,8 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
    Nlayers2 = 0; NpxlHits2 = 0; NoutLayers2 = 0;
    //
    eCaloTowers1 = 0.; eCaloTowers2 = 0.;
+
+
    //
    // extract tracker geometry
    //
@@ -381,6 +385,16 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
    edm::ESHandle<EcalElectronicsMapping> hElecMap;
    iSetup.get<EcalMappingRcd>().get(hElecMap);
    const EcalElectronicsMapping& elecMap = *hElecMap;
+
+  std::vector<Provenance const*> theProvenance;
+  iEvent.getAllProvenance(theProvenance);
+
+  for( std::vector<Provenance const*>::const_iterator ip = theProvenance.begin();
+                                                      ip != theProvenance.end(); ip++)
+  {
+     cout<<" Print all module/label names "<<(**ip).moduleName()<<" "<<(**ip).moduleLabel()<<
+     " "<<(**ip).productInstanceName()<<endl;
+  }
 
    // get MC info
    edm::Handle<HepMCProduct> EvtHandle ;
@@ -442,9 +456,9 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
    for (itb=barrelRecHitsHandle->begin(); itb!=barrelRecHitsHandle->end(); itb++) {
      GlobalPoint pos = geo->getPosition(itb->detid());
      double eta = pos.eta();
-     //     double the = pos.theta();
+         // double the = pos.theta();
      double phi = pos.phi();
-     //     double et  = itb->energy() * sin(the);
+        //  double et  = itb->energy() * sin(the);
      double DR1 = deltaR(genpions[0].eta(),genpions[0].phi(),eta,phi);
      double DR2 = deltaR(genpions[1].eta(),genpions[1].phi(),eta,phi);
      /*
@@ -466,8 +480,8 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
      GlobalPoint pos = geo->getPosition(itb->detid());
      double eta = pos.eta();
      double phi = pos.phi();
-     //     double the = pos.theta();
-     //     double et  = itb->energy() * sin(the);
+      //   double the = pos.theta();
+      //   double et  = itb->energy() * sin(the);
      double DR1 = deltaR(genpions[0].eta(),genpions[0].phi(),eta,phi);
      double DR2 = deltaR(genpions[1].eta(),genpions[1].phi(),eta,phi);
      if(DR1 < 0.5) {
@@ -489,15 +503,15 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
    iEvent.getByLabel(hbheInputSrc,hbhe);
    const HBHERecHitCollection Hithbhe = *(hbhe.product());
 
-   //   cout <<" ===> ZSP HBHERecHitCollection size = " << Hithbhe.size() << endl;
-   //   cout <<" ===> NO ZSP HBHERecHitCollection size = " << HithbheR.size() << endl;
+      cout <<" ===> ZSP HBHERecHitCollection size = " << Hithbhe.size() << endl;
+      //cout <<" ===> NO ZSP HBHERecHitCollection size = " << HithbheR.size() << endl;
 
    for(HBHERecHitCollection::const_iterator hbheItr=Hithbhe.begin(); hbheItr!=Hithbhe.end(); hbheItr++) {
      GlobalPoint pos = geo->getPosition( hbheItr->detid()); 
      double eta = pos.eta();
      double phi = pos.phi();
-     //     double the = pos.theta();
-     //     double et  = hbheItr->energy() * sin(the);
+         //double the = pos.theta();
+         //double et  = hbheItr->energy() * sin(the);
      double DR1 = deltaR(genpions[0].eta(),genpions[0].phi(),eta,phi);
      double DR2 = deltaR(genpions[1].eta(),genpions[1].phi(),eta,phi);
      if(DR1 < 0.5) {
@@ -506,13 +520,17 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
      if(DR2 < 0.5) {
        eCalo2  = eCalo2  + hbheItr->energy();
      }
-     /*
+    /* 
      cout <<" HBHE rechit, energy = " << hbheItr->energy()
      	  <<" eta = " << pos.eta()
      	  <<" phi = " << pos.phi() 
 	  <<" theta = " << pos.theta() 
 	  <<" et = " << et << endl;
      */
+         DetId id = (*hbheItr).detid(); 
+         HcalDetId hid=HcalDetId(id);
+
+          if(hid.depth() == 1)     hbheSignalE->Fill(hbheItr->energy());
    }
 
    etCalo1 = eCalo1 * sin(genpions[0].theta());
@@ -527,7 +545,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 
    edm::Handle<SiPixelRecHitCollection> pxlrecHitColl;
    iEvent.getByLabel(pxlhitsSrc, pxlrecHitColl);
-   //   cout <<"  Size of pxl rec hit collection = " << (pxlrecHitColl.product())->size() << endl;
+    //  cout <<"  Size of pxl rec hit collection = " << (pxlrecHitColl.product())->size() << endl;
    
    // initiate track hit associator
    std::vector<PSimHit> matched;
@@ -539,15 +557,15 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
     //   Handle<TrackCollection> tracks;
    Handle<TrackCollection> tracks;
    iEvent.getByLabel(tracksSrc, tracks);
-   //   cout << "====> number of reco tracks "<< tracks->size() << endl;
+    //  cout << "====> number of reco tracks "<< tracks->size() << endl;
    // pixel track collection
    Handle<TrackCollection> pxltracks;
    iEvent.getByLabel(pxltracksSrc, pxltracks);
-   //   cout << "====> number of pxl tracks "<< pxltracks->size() << endl;
+    //  cout << "====> number of pxl tracks "<< pxltracks->size() << endl;
    //   cout <<" Sim Track size = " << theSimTracks.size() << endl;
 
    for(size_t j = 0; j < theSimTracks.size(); j++){
-     /*
+    /* 
      cout <<" sim track j = " << j
 	  <<" track mom = " << theSimTracks[j].momentum().pt() 
 	  <<" genpartIndex = " << theSimTracks[j].genpartIndex()
@@ -570,7 +588,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
     etaSim2    = genpions[1].eta(); 
     phiSim2    = genpions[1].phi();
 
-    //    cout <<" Reco track size = " << tracks->size() << endl;
+       //cout <<" Reco track size = " << tracks->size() << endl;
 
     for(TrackCollection::const_iterator track = tracks->begin();
 	track != tracks->end(); track++) {
@@ -612,7 +630,8 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
       double eHCAL3x3i = -1000.; 
       double eHCAL5x5i = -1000.; 
       double eCaloTowers = 0.;
-
+	hcal_empty = 0;
+	ecal_empty = 0;
       const FreeTrajectoryState fts = trackAssociator_->getFreeTrajectoryState(iSetup, *track);
       TrackDetMatchInfo info = trackAssociator_->associate(iEvent, iSetup, fts, parameters_);
       if( info.isGoodEcal != 0 ) {
@@ -621,7 +640,8 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 
 	// collect tower energy in cone 0.2
 	for(CaloTowerCollection::const_iterator towerItr = towers->begin(); 
-	    towerItr != towers->end(); ++towerItr) {
+	    towerItr != towers->end(); ++towerItr) 
+        {
 	  double towerE   = towerItr->energy();
 	  double towerEta = towerItr->eta();
 	  double towerPhi = towerItr->phi();
@@ -629,7 +649,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 	  if(DR < 0.2 && towerE != 0.) {
 	    eCaloTowers = eCaloTowers + towerE; 
 	  }
-	}
+	} // calo
 
 	/*
 	  cout <<" on ECAL x = " << info.trkGlobPosAtEcal.x()
@@ -660,47 +680,57 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 	  eECAL11x11i = eECALmatrix(theNavigator,endcapRecHitsHandle,5,5);
 	  //	  cout <<" endcap energy in 7x7 ECAL cells = " << eECAL7x7i << endl;
 	  //	  }
-	}
-	
+	} // eb/ee
+//else {
+//	ecal_empty=1;
+//     }
 	// closet HCAL cell
 	if( info.isGoodHcal != 0 ) {
-	  const GlobalPoint pointH(info.trkGlobPosAtHcal.x(),info.trkGlobPosAtHcal.y(),info.trkGlobPosAtHcal.z());
-	  const DetId ClosestCell = gHBHE->getClosestCell(pointH);
-	  HcalDetId hcd = ClosestCell;
+          const GlobalPoint pointH(info.trkGlobPosAtHcal.x(),info.trkGlobPosAtHcal.y(),info.trkGlobPosAtHcal.z());	
+          const DetId ClosestCell = gHBHE->getClosestCell(pointH);
+ 	  HcalDetId hcd = ClosestCell;
 	  if(abs(hcd.ieta()) <= 25) {
-	    /*
-	      cout <<" eta inp = " << etaimp
-	      <<" Hcal closest cell ieta = " << hcd.ieta()
-	      <<" iphi = " << hcd.iphi()
-	      <<" depth = " << hcd.depth()
-	      <<" subdet = " << hcd.subdet() << endl;
-	    */
-	    eHCAL3x3i = eHCALmatrix(theHBHETopology, ClosestCell, Hithbhe,1,1);  
-	    eHCAL5x5i = eHCALmatrix(theHBHETopology, ClosestCell, Hithbhe,2,2);  
-	  }
 	  /*
-	    HBHERecHitCollection::const_iterator hbheItr = Hithbhe.find(ClosestCell);
-	    if(hbheItr != Hithbhe.end()) {
-	    cout <<" energy of closest hit = " << hbheItr->energy() << endl;
-	    }
-	    cout <<" before navigator " << endl;
-	    CaloNavigator<DetId> theNavigator(ClosestCell,theHBHETopology);
-	    cout <<" after navigator " << endl;
-	    
-	    cout <<" detector = " << ClosestCell.det()
-	    <<" sub det = " << ClosestCell.subdetId()
-	    <<" idsubdet = " << ClosestCell.subdet() 
-	    <<" ieta = " << ClosestCell.ieta()
-	    <<" iphi = " << ClosestCell.iphi() << endl;
-	    
-	    //	const CaloSubdetectorTopology* theHBHETopology = theCaloTopology->getSubdetectorTopology(ClosestCell);
-	    if(!theHBHETopology) {cout <<" no pointer to HcalTopology " << endl;}
-	    //        std::vector<DetId> vNeighboursDetId = theHBHETopology->north(ClosestCell);
-	    DetId next = theNavigator.north();
-	    cout <<" after north " << endl;
+	    cout <<" eta inp = " << etaimp
+	    <<" Hcal closest cell ieta = " << hcd.ieta()
+	    <<" iphi = " << hcd.iphi()
+	    <<" depth = " << hcd.depth()
+	    <<" subdet = " << hcd.subdet() << endl;
 	  */
+	  eHCAL3x3i = eHCALmatrix(theHBHETopology, ClosestCell, Hithbhe,1,1);  
+	  eHCAL5x5i = eHCALmatrix(theHBHETopology, ClosestCell, Hithbhe,2,2);  
 	}
+	/*
+	  HBHERecHitCollection::const_iterator hbheItr = Hithbhe.find(ClosestCell);
+	  if(hbheItr != Hithbhe.end()) {
+	  cout <<" energy of closest hit = " << hbheItr->energy() << endl;
+	  }
+	  cout <<" before navigator " << endl;
+	  CaloNavigator<DetId> theNavigator(ClosestCell,theHBHETopology);
+	  cout <<" after navigator " << endl;
+	  
+	  cout <<" detector = " << ClosestCell.det()
+	  <<" sub det = " << ClosestCell.subdetId()
+	  <<" idsubdet = " << ClosestCell.subdet() 
+	  <<" ieta = " << ClosestCell.ieta()
+	  <<" iphi = " << ClosestCell.iphi() << endl;
+	  
+	  //	const CaloSubdetectorTopology* theHBHETopology = theCaloTopology->getSubdetectorTopology(ClosestCell);
+	  if(!theHBHETopology) {cout <<" no pointer to HcalTopology " << endl;}
+	  //        std::vector<DetId> vNeighboursDetId = theHBHETopology->north(ClosestCell);
+	  DetId next = theNavigator.north();
+	  cout <<" after north " << endl;
+	*/
+	}
+else {
+      hcal_empty = 1;
+     }
+
       }
+else {
+	ecal_empty = 1;
+     }
+cout<<"ecal_empty "<<ecal_empty<<" hcal_empty "<<hcal_empty<<endl;
 
       //      size_t Nhits = track->recHitsSize();
       //      size_t NpxlHits = track->hitPattern().numberOfValidPixelHits();
@@ -797,7 +827,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 	     << "# of rechits = " << track->recHitsSize() 
 	     << " best matched simtrack id= " << idmax 
 	     << " purity = " << purity << endl;
-	     .*/
+	     */
 	//	     << " sim track mom = " << theSimTracks[idmax-1].momentum().pt() << endl;
       } else {
 	//	cout <<"  !!!!  no HepMC particles associated with this pixel triplet " << endl;
@@ -845,7 +875,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
       t++;
     }
 
-    /*
+   /* 
     cout <<" " << endl;
 
     cout <<" best matched track with 1st pion: ptTrk1 = " << ptTrk1
@@ -868,8 +898,8 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
     for(TrackCollection::const_iterator pxltrack = pxltracks->begin();
 	pxltrack != pxltracks->end(); ++pxltrack) {
       SimTrackIds.clear();
-      //      size_t Nhits = pxltrack->recHitsSize();
-      //      size_t NpxlHits = pxltrack->hitPattern().numberOfValidPixelHits();
+         //   size_t Nhits = pxltrack->recHitsSize();
+         //   size_t NpxlHits = pxltrack->hitPattern().numberOfValidPixelHits();
       /*
       cout <<"  " << endl;
       cout <<" pixel track " << t
@@ -1054,7 +1084,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 	if(abs(ecalTower->id().ieta()) <= 17) {
 	  EBSrFlagCollection::const_iterator itSrfeb = hEbSrFlags_->find(ecalTower->id());
 	  srf = itSrfeb->value();
-	//	  srf = itSrfee->value(); //*itSrf instead of itSrf->value() should also work
+	//	  srf = itSrfee->value(); //itSrf instead of itSrf->value() should also work
 	  srf &= ~EcalSrFlag::SRF_FORCED_MASK; //drops forced bit
 	  bool towerWasReadInFullReadoutMode = (srf == EcalSrFlag::SRF_FULL);
 	  cout <<" ieta = " << ecalTower->id().ieta()
@@ -1091,7 +1121,7 @@ SinglePionEfficiencyNew::analyze(const edm::Event& iEvent, const edm::EventSetup
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-SinglePionEfficiencyNew::beginJob(const edm::EventSetup& iSetup)
+SinglePionEfficiencyNew::beginJob()
 {
 
   using namespace edm;
@@ -1101,15 +1131,19 @@ SinglePionEfficiencyNew::beginJob(const edm::EventSetup& iSetup)
 
   // create tree
   hOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
-  t1 = new TTree("t1","analysis tree");
-  // sim tracks
+  t1 = new TTree("t1","analysis tree"); 
+ // sim tracks
   t1->Branch("ptSim1",&ptSim1,"ptSim1/D");
   t1->Branch("etaSim1",&etaSim1,"etaSim1/D");
   t1->Branch("phiSim1",&phiSim1,"phiSim1/D");
   t1->Branch("ptSim2",&ptSim2,"ptSim2/D");
   t1->Branch("etaSim2",&etaSim2,"etaSim2/D");
   t1->Branch("phiSim2",&phiSim2,"phiSim2/D");
-  // reco tracks
+  
+  t1->Branch("ecal_empty", &ecal_empty, "ecal_empty/I");
+  t1->Branch("hcal_empty", &hcal_empty, "hcal_empty/I");
+
+// reco tracks
   t1->Branch("ptTrk1",&ptTrk1,"ptTrk1/D");
   t1->Branch("etaTrk1",&etaTrk1,"etaTrk1/D");
   t1->Branch("phiTrk1",&phiTrk1,"phiTrk1/D");
@@ -1161,7 +1195,7 @@ SinglePionEfficiencyNew::beginJob(const edm::EventSetup& iSetup)
   t1->Branch("NoutLayers2",&NoutLayers2,"NoutLayers2/I");
   t1->Branch("eCaloTowers1",&eCaloTowers1,"eCaloTowers1/D");
   t1->Branch("eCaloTowers2",&eCaloTowers2,"eCaloTowers2/D");
-
+      hbheSignalE = new TH1F("hbheSignalE","hbheSignalE", 320, -10., 10.);
   return ;
 }
 
@@ -1170,7 +1204,11 @@ void
 SinglePionEfficiencyNew::endJob() {
 
   //  delete hitAssociator;
+
   hOutputFile->Write() ;
+  hOutputFile->cd();
+   t1->Write();
+    hbheSignalE->Write() ;
   hOutputFile->Close() ;
   return ;
 
