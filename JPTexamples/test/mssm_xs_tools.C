@@ -734,11 +734,26 @@ void mssm_xs_tools::myanalysis(){
 
   const Int_t nbhmass = 11;
   Double_t mass[nbhmass]={90., 100., 120., 130., 140., 160., 180., 200., 250., 300., 350.};
+
+  Double_t xsect_x_Br_limit[nbhmass]={185.99, 148.32, 36.17, 22.42, 15.74, 8.77, 5.78, 4.35, 2.46, 1.58, 1.23};
+
   Double_t tanb_exp[nbhmass];
   Double_t tanb_exp_thu[nbhmass];
   Double_t tanb_exp_thd[nbhmass];
 
-  Double_t xsect_x_Br_limit[nbhmass]={185.99, 148.32, 36.17, 22.42, 15.74, 8.77, 5.78, 4.35, 2.46, 1.58, 1.23};
+
+  Double_t tanb_exp_abdel[nbhmass];
+  Double_t tanb_exp_thu_abdel[nbhmass];
+  Double_t tanb_exp_thd_abdel[nbhmass];
+
+  Double_t br_abdel[nbhmass] =           {0.096, 0.098, 0.101, 0.103, 0.104, 0.106, 0.108, 0.110, 0.115, 0.118, 0.121};
+  Double_t ggh_abdel[nbhmass] =          {542.3, 320.3, 126.3, 83.2,  56.3,  27.5,  14.5,   8.04,  2.24,  0.76, 0.30};
+  Double_t err_ggh_up_abdel[nbhmass]   = { 0.5,  0.5,   0.5,   0.5,   0.5,   0.5,   0.5,    0.5,   0.5,   0.5,  0.5};
+  Double_t err_ggh_down_abdel[nbhmass] = { 0.4,  0.4,   0.4,   0.4,   0.4,   0.4,   0.4,    0.4,   0.4,   0.4,  0.4};
+
+  Double_t bbh_abdel[nbhmass] =          {487.8, 346.5, 186.6, 141.0, 108.1, 65.8,  42.0,   27.6, 10.97,  4.94, 2.43};
+  Double_t err_bbh_up_abdel[nbhmass]   = {0.44,  0.41,  0.36,  0.34,  0.31,  0.28,  0.25,   0.24, 0.23,   0.24, 0.26};
+  Double_t err_bbh_down_abdel[nbhmass] = {0.33,  0.30,  0.27,  0.27,  0.27,  0.27,  0.26,   0.26,  0.25,   0.25, 0.25};
 
   /*
   cout <<" gg->A: xsect = " << Give_Xsec_ggFA(300,30)
@@ -760,16 +775,55 @@ void mssm_xs_tools::myanalysis(){
     Int_t tan     = 0;
     Int_t tanhigh = 0;
 
+    Int_t tanlow_abdel  = 0;
+    Int_t tan_abdel     = 0;
+    Int_t tanhigh_abdel = 0;
+
+    std::cout <<" " << std::endl;
+
     for(Int_t j = 10; j < 60; j ++) {
+
       Double_t tanb = 1.*j;
       Double_t xsec_x_Br = 0.;
       Double_t xsect_x_Br_UncU = 0.;
       Double_t xsect_x_Br_UncD = 0.; 
+
+      Double_t tanb_abdel = 1.*j;
+      Double_t xsec_x_Br_abdel = (ggh_abdel[i] + bbh_abdel[i]) * br_abdel[i] * 2.0 * (tanb_abdel*tanb_abdel) 
+	* 0.001;
+      Double_t xsect_x_Br_UncU_abdel = (ggh_abdel[i]*err_ggh_up_abdel[i] + bbh_abdel[i]*err_bbh_up_abdel[i]) * br_abdel[i] * 2.0 * (tanb_abdel*tanb_abdel) 
+	* 0.001;
+      Double_t xsect_x_Br_UncD_abdel = -1.0 * (ggh_abdel[i]*err_ggh_down_abdel[i] + bbh_abdel[i]*err_bbh_down_abdel[i]) * br_abdel[i] * 2.0 * (tanb_abdel*tanb_abdel) 
+	* 0.001; 
+
       if(mass[i] < 130) {
 	xsec_x_Br = 
 	  (Give_Xsec_ggFA(mass[i],tanb)+Give_Xsec_bbA5f(mass[i],tanb))*Give_BR_A_tautau(mass[i],tanb) +
 	  (Give_Xsec_ggFh(mass[i],tanb)+Give_Xsec_bbh5f(mass[i],tanb))*Give_BR_h_tautau(mass[i],tanb);
 
+	//  sum of PDF unce in quardature
+	xsect_x_Br_UncU = 
+	  (Give_XsecUnc_muup_ggFA(mass[i],tanb)+Give_XsecUnc_muup_bbA5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb))) *
+	  Give_BR_A_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_muup_ggFh(mass[i],tanb)+Give_XsecUnc_muup_bbh5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFh(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFh(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbh5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbh5f(mass[i],tanb))) *
+	  Give_BR_h_tautau(mass[i],tanb);                        
+
+	xsect_x_Br_UncD = 
+	  (Give_XsecUnc_mudown_ggFA(mass[i],tanb)+Give_XsecUnc_mudown_bbA5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFA(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFA(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbA5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbA5f(mass[i],tanb))) *
+	  Give_BR_A_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_mudown_ggFh(mass[i],tanb)+Give_XsecUnc_mudown_bbh5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFh(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFh(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbh5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbh5f(mass[i],tanb))) *
+	  Give_BR_h_tautau(mass[i],tanb);                        
+
+
+	/* linear sum of PDF
 	xsect_x_Br_UncU = 
 	  (Give_XsecUnc_muup_ggFA(mass[i],tanb)+Give_XsecUnc_muup_bbA5f(mass[i],tanb) +
 	   Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb) + Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb)) *
@@ -785,6 +839,7 @@ void mssm_xs_tools::myanalysis(){
 	  (Give_XsecUnc_mudown_ggFh(mass[i],tanb)+Give_XsecUnc_mudown_bbh5f(mass[i],tanb) +
 	   Give_XsecUnc_pdfalphas68down_ggFh(mass[i],tanb) + Give_XsecUnc_pdfalphas68down_bbh5f(mass[i],tanb)) *
 	  Give_BR_h_tautau(mass[i],tanb);                        
+	*/
       }
       
       if(mass[i] == 130.) {
@@ -793,6 +848,36 @@ void mssm_xs_tools::myanalysis(){
 	  (Give_Xsec_ggFH(mass[i],tanb)+Give_Xsec_bbH5f(mass[i],tanb))*Give_BR_H_tautau(mass[i],tanb) +
 	  (Give_Xsec_ggFh(mass[i],tanb)+Give_Xsec_bbh5f(mass[i],tanb))*Give_BR_h_tautau(mass[i],tanb);
 
+	//  sum of PDF unce in quardature
+	xsect_x_Br_UncU = 
+	  (Give_XsecUnc_muup_ggFA(mass[i],tanb)+Give_XsecUnc_muup_bbA5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb))) *
+	  Give_BR_A_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_muup_ggFh(mass[i],tanb)+Give_XsecUnc_muup_bbh5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFh(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFh(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbh5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbh5f(mass[i],tanb))) *
+	  Give_BR_h_tautau(mass[i],tanb) +
+	  (Give_XsecUnc_muup_ggFH(mass[i],tanb)+Give_XsecUnc_muup_bbH5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFH(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFH(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbH5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbH5f(mass[i],tanb))) *
+	  Give_BR_H_tautau(mass[i],tanb);                        
+                        
+	xsect_x_Br_UncD = 
+	  (Give_XsecUnc_mudown_ggFA(mass[i],tanb)+Give_XsecUnc_mudown_bbA5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFA(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFA(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbA5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbA5f(mass[i],tanb))) *
+	  Give_BR_A_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_mudown_ggFh(mass[i],tanb)+Give_XsecUnc_mudown_bbh5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFh(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFh(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbh5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbh5f(mass[i],tanb))) *
+	  Give_BR_h_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_mudown_ggFH(mass[i],tanb)+Give_XsecUnc_mudown_bbH5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFH(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFH(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbH5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbH5f(mass[i],tanb))) *
+	  Give_BR_H_tautau(mass[i],tanb);                        
+
+	/* PDF unce. are added linerly
 	xsect_x_Br_UncU = 
 	  (Give_XsecUnc_muup_ggFA(mass[i],tanb)+Give_XsecUnc_muup_bbA5f(mass[i],tanb) +
 	   Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb) + Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb)) *
@@ -814,6 +899,8 @@ void mssm_xs_tools::myanalysis(){
 	  (Give_XsecUnc_mudown_ggFh(mass[i],tanb)+Give_XsecUnc_mudown_bbh5f(mass[i],tanb) +
 	   Give_XsecUnc_pdfalphas68down_ggFh(mass[i],tanb) + Give_XsecUnc_pdfalphas68down_bbh5f(mass[i],tanb)) *
 	  Give_BR_h_tautau(mass[i],tanb);                        
+	*/
+
       }
       
       if(mass[i] > 130) {
@@ -821,6 +908,28 @@ void mssm_xs_tools::myanalysis(){
 	  (Give_Xsec_ggFA(mass[i],tanb)+Give_Xsec_bbA5f(mass[i],tanb))*Give_BR_A_tautau(mass[i],tanb) +
 	  (Give_Xsec_ggFH(mass[i],tanb)+Give_Xsec_bbH5f(mass[i],tanb))*Give_BR_H_tautau(mass[i],tanb);
 
+	// PDF are added in quardature
+	xsect_x_Br_UncU = 
+	  (Give_XsecUnc_muup_ggFA(mass[i],tanb)+Give_XsecUnc_muup_bbA5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb))) *
+	  Give_BR_A_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_muup_ggFH(mass[i],tanb)+Give_XsecUnc_muup_bbH5f(mass[i],tanb) +
+	   sqrt(Give_XsecUnc_pdfalphas68up_ggFH(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_ggFH(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68up_bbH5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68up_bbH5f(mass[i],tanb))) *
+	  Give_BR_H_tautau(mass[i],tanb);                        
+
+	xsect_x_Br_UncD = 
+	  (Give_XsecUnc_mudown_ggFA(mass[i],tanb)+Give_XsecUnc_mudown_bbA5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFA(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFA(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbA5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbA5f(mass[i],tanb))) *
+	  Give_BR_A_tautau(mass[i],tanb) +                        
+	  (Give_XsecUnc_mudown_ggFH(mass[i],tanb)+Give_XsecUnc_mudown_bbH5f(mass[i],tanb) -
+	   sqrt(Give_XsecUnc_pdfalphas68down_ggFH(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_ggFH(mass[i],tanb) + 
+		Give_XsecUnc_pdfalphas68down_bbH5f(mass[i],tanb)*Give_XsecUnc_pdfalphas68down_bbH5f(mass[i],tanb))) *
+	  Give_BR_H_tautau(mass[i],tanb);                        
+
+	/* PDF are added linearly
 	xsect_x_Br_UncU = 
 	  (Give_XsecUnc_muup_ggFA(mass[i],tanb)+Give_XsecUnc_muup_bbA5f(mass[i],tanb) +
 	   Give_XsecUnc_pdfalphas68up_ggFA(mass[i],tanb) + Give_XsecUnc_pdfalphas68up_bbA5f(mass[i],tanb)) *
@@ -836,6 +945,7 @@ void mssm_xs_tools::myanalysis(){
 	  (Give_XsecUnc_mudown_ggFH(mass[i],tanb)+Give_XsecUnc_mudown_bbH5f(mass[i],tanb) +
 	   Give_XsecUnc_pdfalphas68down_ggFH(mass[i],tanb) + Give_XsecUnc_pdfalphas68down_bbH5f(mass[i],tanb)) *
 	  Give_BR_H_tautau(mass[i],tanb);                        
+	*/
       }
 
       Double_t xsec_x_Br_pb = xsec_x_Br * 0.001; 
@@ -852,30 +962,62 @@ void mssm_xs_tools::myanalysis(){
 
       if(tanlow == 0) {
 	if( (xsec_x_Br_pb + xsect_x_Br_UncU_pb)  > xsect_x_Br_limit[i]) {
-	  std::cout<<" mass = "<< mass[i] <<" tanb low = "<< tanb <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncU_pb
-		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tanb_exp_thu[i] = tanb;
+	  if(mass[i] == 140.) {tanb_exp_thu[i] = tanb-1;}
+	  if(mass[i] == 160.) {tanb_exp_thu[i] = tanb-1;}
+	  std::cout<<" mass = "<< mass[i] <<" tanb low = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncU_pb
+		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tanlow = 1;
 	}
       }
 
       if(tan == 0) {
 	if( xsec_x_Br_pb > xsect_x_Br_limit[i]) {
-	  std::cout<<" mass = "<< mass[i] <<" tanb = "<< tanb <<"  xsect x Br = " << xsec_x_Br_pb 
-		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tanb_exp[i] = tanb;
+	  std::cout<<" mass = "<< mass[i] <<" tanb = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb 
+		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tan = 1;
 	}
       }
 
       if(tanhigh == 0) {
 	if( (xsec_x_Br_pb + xsect_x_Br_UncD_pb)  > xsect_x_Br_limit[i]) {
-	  std::cout<<" mass = "<< mass[i] <<" tanb high = "<< tanb <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
-		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tanb_exp_thd[i] = tanb;
+	  std::cout<<" mass = "<< mass[i] <<" tanb high = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
+		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
           tanhigh = 1;
 	}
       }
+
+      // Adbel
+      if(tanlow_abdel == 0) {
+	if( (xsec_x_Br_abdel + xsect_x_Br_UncU_abdel)  > xsect_x_Br_limit[i]) {
+	  //	  std::cout<<" Abdel: mass = "<< mass[i] <<" tanb low = "<< tanb <<"  xsect x Br = " << xsec_x_Br_abdel +  xsect_x_Br_UncU_abdel
+	  //		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
+	  tanb_exp_thu_abdel[i] = tanb_abdel;
+	  tanlow_abdel = 1;
+	}
+      }
+
+      if(tan_abdel == 0) {
+	if( xsec_x_Br_abdel > xsect_x_Br_limit[i]) {
+	  //	  std::cout<<" Abdel: mass = "<< mass[i] <<" tanb = "<< tanb_abdel <<"  xsect x Br = " << xsec_x_Br_abdel
+	  //		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
+	  tanb_exp_abdel[i] = tanb_abdel;
+	  tan_abdel = 1;
+	}
+      }
+
+      if(tanhigh_abdel == 0) {
+	if( (xsec_x_Br_abdel + xsect_x_Br_UncD_abdel)  > xsect_x_Br_limit[i]) {
+	  //	  std::cout<<" Abdel: mass = "<< mass[i] <<" tanb high = "<< tanb_abdel <<"  xsect x Br = " << xsec_x_Br_abdel +  xsect_x_Br_UncD_abdel
+	  //		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
+	  tanb_exp_thd_abdel[i] = tanb_abdel;
+          tanhigh_abdel = 1;
+	}
+      }
+
+      //
     }
   }
 
@@ -886,34 +1028,65 @@ void mssm_xs_tools::myanalysis(){
   TGraph* gr_tanb_exp_thu  = new TGraph(nbhmass,mass,tanb_exp_thu);
   TGraph* gr_tanb_exp_thd  = new TGraph(nbhmass,mass,tanb_exp_thd);
 
+  TGraph* gr_tanb_exp_abdel  = new TGraph(nbhmass,mass,tanb_exp_abdel);
+  TGraph* gr_tanb_exp_thu_abdel  = new TGraph(nbhmass,mass,tanb_exp_thu_abdel);
+  TGraph* gr_tanb_exp_thd_abdel  = new TGraph(nbhmass,mass,tanb_exp_thd_abdel);
+
   TAxis* xaxis = gr_tanb_exp->GetXaxis();
   TAxis* yaxis = gr_tanb_exp->GetYaxis();
-  gr_tanb_exp->GetXaxis()->SetTitle("M_{A}, GeV");
+  gr_tanb_exp->GetXaxis()->SetTitle("M_{A} (GeV)");
   gr_tanb_exp->GetYaxis()->SetTitle("tan #beta");
   gr_tanb_exp->GetXaxis()->CenterTitle();
   gr_tanb_exp->GetYaxis()->CenterTitle();
   xaxis->SetLimits(90.,350.);
-  gr_tanb_exp->SetMarkerStyle(21);
-  gr_tanb_exp->SetMaximum(50.);
-  gr_tanb_exp->SetMinimum(0.);
+  gr_tanb_exp->SetMarkerStyle(20);
+  gr_tanb_exp->SetLineWidth(3);
+  gr_tanb_exp->SetMaximum(55.);
+  gr_tanb_exp->SetMinimum(5.);
   gr_tanb_exp->Draw("ALP");
 
-  gr_tanb_exp_thu->SetMarkerStyle(20);
+  gr_tanb_exp_thu->SetMarkerStyle(22);
   gr_tanb_exp_thu->Draw("LP");
-  gr_tanb_exp_thd->SetMarkerStyle(22);
+  gr_tanb_exp_thd->SetMarkerStyle(21);
   gr_tanb_exp_thd->Draw("LP");
 
+  //  gr_tanb_exp_abdel->SetMarkerStyle(24);
+  //  gr_tanb_exp_abdel->Draw("P");
+  gr_tanb_exp_thu_abdel->SetMarkerStyle(26);
+  gr_tanb_exp_thu_abdel->SetLineStyle(3);
+  gr_tanb_exp_thu_abdel->Draw("LP");
+  gr_tanb_exp_thd_abdel->SetLineStyle(3);
+  gr_tanb_exp_thd_abdel->SetMarkerStyle(25);
+  gr_tanb_exp_thd_abdel->Draw("LP");
+
+
   TLatex *t = new TLatex();
+  t->SetTextSize(0.045);
+  t->DrawLatex(150.,50,"CMS 36 pb^{-1}, 7 TeV");
   t->SetTextSize(0.042);
-  TLegend *leg = new TLegend(0.5,0.2,0.9,0.4,NULL,"brNDC");
+  t->DrawLatex(150.,45,"H #rightarrow #tau #tau, MSSM m_{h}^{max}");
+  t->DrawLatex(130.,40,"Observed limit at 95 \% C.L.");
+
+  TLegend *leg = new TLegend(0.6,0.15,0.9,0.45,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(gr_tanb_exp,"no th. uncertainty","P");
-  leg->AddEntry(gr_tanb_exp_thu,"+#Delta #sigma _{th}","P");
-  leg->AddEntry(gr_tanb_exp_thd,"-#Delta #sigma _{th}","P");
+  leg->AddEntry(gr_tanb_exp,"no th. uncert.","LP");
+  leg->AddEntry(gr_tanb_exp_thu,"  +#Delta _{1}^{theory}","LP");
+  leg->AddEntry(gr_tanb_exp_thd,"  -#Delta _{1}^{theory}","LP");
+  leg->AddEntry(gr_tanb_exp_thu_abdel,"  +#Delta _{2}^{theory}","LP");
+  leg->AddEntry(gr_tanb_exp_thd_abdel,"  -#Delta _{2}^{theory}","LP");
   leg->Draw();  
-  //  t->DrawLatex(1.,0.85,"CMSSW169, single #pi ^{+} and #pi ^{-}. |#eta ^{#pi}|< 2.5");
-  
+
+  /*
+  TLegend *leg_abdel = new TLegend(0.5,0.15,0.8,0.25,NULL,"brNDC");
+  leg_abdel->SetFillColor(10);
+  //  leg_abdel->AddEntry(gr_tanb_exp_abdel,"A.D.: no th. uncertainty","P");
+  leg_abdel->AddEntry(gr_tanb_exp_thu_abdel,"+#Delta #sigma _{th}","LP");
+  leg_abdel->AddEntry(gr_tanb_exp_thd_abdel,"-#Delta #sigma _{th}","LP");
+  leg_abdel->Draw();  
+  */
+
   c1->SaveAs("matanb.gif");
+  c1->SaveAs("matanb.pdf");
 
 }
 
