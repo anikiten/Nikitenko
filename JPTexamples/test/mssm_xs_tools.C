@@ -732,10 +732,16 @@ Double_t mssm_xs_tools::Give_XsecUnc_pdfalphas68down_ggFh(Double_t mA, Double_t 
 void mssm_xs_tools::myanalysis(){
   std::cout<<"My analysis starts"<<std::endl;
 
-  const Int_t nbhmass = 11;
-  Double_t mass[nbhmass]={90., 100., 120., 130., 140., 160., 180., 200., 250., 300., 350.};
+  const Int_t nbhmass = 10;
+  //  Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300., 350.};
+  Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300.};
 
-  Double_t xsect_x_Br_limit[nbhmass]={185.99, 148.32, 36.17, 22.42, 15.74, 8.77, 5.78, 4.35, 2.46, 1.58, 1.23};
+  // old
+  //  Double_t xsect_x_Br_limit[nbhmass]={185.99, 148.32, 36.17, 22.42, 15.74, 8.77, 5.78, 4.35, 2.46, 1.58, 1.23};
+  // new svfit
+  Double_t xsect_x_Br_limit[nbhmass]={124.441, 114.092, 57.477, 34.178, 23.907, 11.985, 10.122, 9.234, 5.292, 2.877};
+  // new mvis
+  //  Double_t xsect_x_Br_limit[nbhmass]={165.300, 98.735, 28.170, 19.585, 15.405, 10.739, 9.144, 8.091, 5.700, 3.930};
 
   Double_t tanb_exp[nbhmass];
   Double_t tanb_exp_thu[nbhmass];
@@ -746,6 +752,16 @@ void mssm_xs_tools::myanalysis(){
   Double_t tanb_exp_thu_abdel[nbhmass];
   Double_t tanb_exp_thd_abdel[nbhmass];
 
+  Double_t br_abdel[nbhmass] =           {0.096, 0.098, 0.101, 0.103, 0.104, 0.106, 0.108, 0.110, 0.115, 0.118};
+  Double_t ggh_abdel[nbhmass] =          {542.3, 320.3, 126.3, 83.2,  56.3,  27.5,  14.5,   8.04,  2.24,  0.76};
+  Double_t err_ggh_up_abdel[nbhmass]   = { 0.5,  0.5,   0.5,   0.5,   0.5,   0.5,   0.5,    0.5,   0.5,   0.5};
+  Double_t err_ggh_down_abdel[nbhmass] = { 0.4,  0.4,   0.4,   0.4,   0.4,   0.4,   0.4,    0.4,   0.4,   0.4};
+
+  Double_t bbh_abdel[nbhmass] =          {487.8, 346.5, 186.6, 141.0, 108.1, 65.8,  42.0,   27.6, 10.97,  4.94};
+  Double_t err_bbh_up_abdel[nbhmass]   = {0.44,  0.41,  0.36,  0.34,  0.31,  0.28,  0.25,   0.24, 0.23,   0.24};
+  Double_t err_bbh_down_abdel[nbhmass] = {0.33,  0.30,  0.27,  0.27,  0.27,  0.27,  0.26,   0.26,  0.25,   0.25};
+
+  /*
   Double_t br_abdel[nbhmass] =           {0.096, 0.098, 0.101, 0.103, 0.104, 0.106, 0.108, 0.110, 0.115, 0.118, 0.121};
   Double_t ggh_abdel[nbhmass] =          {542.3, 320.3, 126.3, 83.2,  56.3,  27.5,  14.5,   8.04,  2.24,  0.76, 0.30};
   Double_t err_ggh_up_abdel[nbhmass]   = { 0.5,  0.5,   0.5,   0.5,   0.5,   0.5,   0.5,    0.5,   0.5,   0.5,  0.5};
@@ -754,6 +770,7 @@ void mssm_xs_tools::myanalysis(){
   Double_t bbh_abdel[nbhmass] =          {487.8, 346.5, 186.6, 141.0, 108.1, 65.8,  42.0,   27.6, 10.97,  4.94, 2.43};
   Double_t err_bbh_up_abdel[nbhmass]   = {0.44,  0.41,  0.36,  0.34,  0.31,  0.28,  0.25,   0.24, 0.23,   0.24, 0.26};
   Double_t err_bbh_down_abdel[nbhmass] = {0.33,  0.30,  0.27,  0.27,  0.27,  0.27,  0.26,   0.26,  0.25,   0.25, 0.25};
+  */
 
   /*
   cout <<" gg->A: xsect = " << Give_Xsec_ggFA(300,30)
@@ -963,8 +980,8 @@ void mssm_xs_tools::myanalysis(){
       if(tanlow == 0) {
 	if( (xsec_x_Br_pb + xsect_x_Br_UncU_pb)  > xsect_x_Br_limit[i]) {
 	  tanb_exp_thu[i] = tanb;
-	  if(mass[i] == 140.) {tanb_exp_thu[i] = tanb-1;}
-	  if(mass[i] == 160.) {tanb_exp_thu[i] = tanb-1;}
+	  //	  if(mass[i] == 140.) {tanb_exp_thu[i] = tanb-1;}
+	  //	  if(mass[i] == 160.) {tanb_exp_thu[i] = tanb-1;}
 	  std::cout<<" mass = "<< mass[i] <<" tanb low = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncU_pb
 		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tanlow = 1;
@@ -974,7 +991,7 @@ void mssm_xs_tools::myanalysis(){
       if(tan == 0) {
 	if( xsec_x_Br_pb > xsect_x_Br_limit[i]) {
 	  tanb_exp[i] = tanb;
-	  std::cout<<" mass = "<< mass[i] <<" tanb = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb 
+	  std::cout<<" mass = "<< mass[i] <<" tanb = "<< tanb_exp[i] <<"  xsect x Br = " << xsec_x_Br_pb 
 		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
 	  tan = 1;
 	}
@@ -983,7 +1000,7 @@ void mssm_xs_tools::myanalysis(){
       if(tanhigh == 0) {
 	if( (xsec_x_Br_pb + xsect_x_Br_UncD_pb)  > xsect_x_Br_limit[i]) {
 	  tanb_exp_thd[i] = tanb;
-	  std::cout<<" mass = "<< mass[i] <<" tanb high = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
+	  std::cout<<" mass = "<< mass[i] <<" tanb high = "<< tanb_exp_thd[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
 		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
           tanhigh = 1;
 	}
@@ -1062,10 +1079,19 @@ void mssm_xs_tools::myanalysis(){
 
   TLatex *t = new TLatex();
   t->SetTextSize(0.045);
-  t->DrawLatex(150.,50,"CMS 36 pb^{-1}, 7 TeV");
+  t->DrawLatex(110.,50,"CMS 36 pb^{-1}, 7 TeV");
   t->SetTextSize(0.042);
-  t->DrawLatex(150.,45,"H #rightarrow #tau #tau, MSSM m_{h}^{max}");
-  t->DrawLatex(130.,40,"Observed limit at 95 \% C.L.");
+  t->DrawLatex(110.,45,"H #rightarrow #tau #tau, MSSM m_{h}^{max}");
+  t->DrawLatex(240.,30,"Observed limit"); 
+  t->DrawLatex(250.,26,"at 95 \% C.L.");
+
+  t->SetTextSize(0.03);
+  t->DrawLatex(100.,15,"#Delta _{1}^{theory} - Handbook for LHC"); 
+  t->DrawLatex(135.,12.5,"Higgs Cross Sections");
+  t->DrawLatex(100.,9,"#Delta _{2}^{theory} - Baglio, Djouadi"); 
+  t->DrawLatex(135.,6.5," arXiv:1012.0530");
+
+
 
   TLegend *leg = new TLegend(0.6,0.15,0.9,0.45,NULL,"brNDC");
   leg->SetFillColor(10);
@@ -1086,7 +1112,7 @@ void mssm_xs_tools::myanalysis(){
   */
 
   c1->SaveAs("matanb.gif");
-  c1->SaveAs("matanb.pdf");
+  c1->SaveAs("matanb.png");
 
 }
 
