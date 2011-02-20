@@ -736,9 +736,9 @@ void mssm_xs_tools::myanalysis(){
   //  Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300., 350.};
   Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300.};
 
-  // new svfit
+  // svfit xsect x Br limits
   //  Double_t xsect_x_Br_limit[nbhmass]={146.4, 103.9,     33.7,     21.5,  14.5,    9.5,    8.3,   7.9,    4.9, 3.6};
-  // new mvis
+  //  mvis xsect x Br limits
   Double_t xsect_x_Br_limit[nbhmass]={156.8, 104.1,     30.2,     20.6,  16.1,   11.2,    9.4,   8.0,    5.4, 3.8};
 
   Double_t tanb_exp[nbhmass];
