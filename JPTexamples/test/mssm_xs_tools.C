@@ -736,12 +736,10 @@ void mssm_xs_tools::myanalysis(){
   //  Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300., 350.};
   Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300.};
 
-  // old
-  //  Double_t xsect_x_Br_limit[nbhmass]={185.99, 148.32, 36.17, 22.42, 15.74, 8.77, 5.78, 4.35, 2.46, 1.58, 1.23};
   // new svfit
-  Double_t xsect_x_Br_limit[nbhmass]={124.441, 114.092, 57.477, 34.178, 23.907, 11.985, 10.122, 9.234, 5.292, 2.877};
+  //  Double_t xsect_x_Br_limit[nbhmass]={146.4, 103.9,     33.7,     21.5,  14.5,    9.5,    8.3,   7.9,    4.9, 3.6};
   // new mvis
-  //  Double_t xsect_x_Br_limit[nbhmass]={165.300, 98.735, 28.170, 19.585, 15.405, 10.739, 9.144, 8.091, 5.700, 3.930};
+  Double_t xsect_x_Br_limit[nbhmass]={156.8, 104.1,     30.2,     20.6,  16.1,   11.2,    9.4,   8.0,    5.4, 3.8};
 
   Double_t tanb_exp[nbhmass];
   Double_t tanb_exp_thu[nbhmass];
@@ -1111,7 +1109,7 @@ void mssm_xs_tools::myanalysis(){
   leg_abdel->Draw();  
   */
 
-  c1->SaveAs("matanb.gif");
+  c1->SaveAs("matanb.eps");
   c1->SaveAs("matanb.png");
 
 }
