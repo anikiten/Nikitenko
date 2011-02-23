@@ -737,9 +737,9 @@ void mssm_xs_tools::myanalysis(){
   Double_t mass[nbhmass]=            {90.,    100.,     120.,     130.,  140.,   160.,   180.,   200.,  250., 300.};
 
   // svfit xsect x Br limits
-  //  Double_t xsect_x_Br_limit[nbhmass]={146.4, 103.9,     33.7,     21.5,  14.5,    9.5,    8.3,   7.9,    4.9, 3.6};
+    Double_t xsect_x_Br_limit[nbhmass]={147.745, 112.300, 39.611, 25.398, 18.199, 11.370, 9.785, 8.708, 5.773, 4.360};
   //  mvis xsect x Br limits
-  Double_t xsect_x_Br_limit[nbhmass]={156.8, 104.1,     30.2,     20.6,  16.1,   11.2,    9.4,   8.0,    5.4, 3.8};
+  //  Double_t xsect_x_Br_limit[nbhmass]={142.659, 112.754, 38.724, 25.858, 20.577, 14.007, 11.832, 11.212, 7.488, 5.049};
 
   Double_t tanb_exp[nbhmass];
   Double_t tanb_exp_thu[nbhmass];
@@ -795,6 +795,10 @@ void mssm_xs_tools::myanalysis(){
     Int_t tanhigh_abdel = 0;
 
     std::cout <<" " << std::endl;
+
+    Double_t xsec_x_Br_pb_old = 0;
+    Double_t xsect_x_Br_UncU_pb_old = 0;
+    Double_t xsect_x_Br_UncD_pb_old = 0;
 
     for(Int_t j = 10; j < 60; j ++) {
 
@@ -981,7 +985,7 @@ void mssm_xs_tools::myanalysis(){
 	  //	  if(mass[i] == 140.) {tanb_exp_thu[i] = tanb-1;}
 	  //	  if(mass[i] == 160.) {tanb_exp_thu[i] = tanb-1;}
 	  std::cout<<" mass = "<< mass[i] <<" tanb low = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncU_pb
-		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
+		   <<" limit = " << xsect_x_Br_limit[i] << " xsect x Br at " << tanb-1 <<" = " << xsec_x_Br_pb_old +  xsect_x_Br_UncU_pb_old << std::endl;
 	  tanlow = 1;
 	}
       }
@@ -990,7 +994,7 @@ void mssm_xs_tools::myanalysis(){
 	if( xsec_x_Br_pb > xsect_x_Br_limit[i]) {
 	  tanb_exp[i] = tanb;
 	  std::cout<<" mass = "<< mass[i] <<" tanb = "<< tanb_exp[i] <<"  xsect x Br = " << xsec_x_Br_pb 
-		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
+		   <<" limit = " << xsect_x_Br_limit[i] <<" xsect x Br at " << tanb-1 <<" = " << xsec_x_Br_pb_old << std::endl;
 	  tan = 1;
 	}
       }
@@ -999,11 +1003,17 @@ void mssm_xs_tools::myanalysis(){
 	if( (xsec_x_Br_pb + xsect_x_Br_UncD_pb)  > xsect_x_Br_limit[i]) {
 	  tanb_exp_thd[i] = tanb;
 	  std::cout<<" mass = "<< mass[i] <<" tanb high = "<< tanb_exp_thd[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
-		   <<" limit = " << xsect_x_Br_limit[i] << std::endl;
+		   <<" limit = " << xsect_x_Br_limit[i] <<" xsect x Br at "<< tanb-1 <<" = " <<  xsec_x_Br_pb_old +  xsect_x_Br_UncD_pb_old << std::endl;
           tanhigh = 1;
 	}
       }
+      if( (tanhigh == 0) && (j == 59)) {tanb_exp_thd[i] = 60;}
 
+      xsec_x_Br_pb_old = xsec_x_Br_pb;
+      xsect_x_Br_UncU_pb_old = xsect_x_Br_UncU_pb;
+      xsect_x_Br_UncD_pb_old = xsect_x_Br_UncD_pb;
+
+      //.................................................................................................................................................
       // Adbel
       if(tanlow_abdel == 0) {
 	if( (xsec_x_Br_abdel + xsect_x_Br_UncU_abdel)  > xsect_x_Br_limit[i]) {
@@ -1032,6 +1042,8 @@ void mssm_xs_tools::myanalysis(){
 	}
       }
 
+      if( (tanhigh_abdel == 0) && (j == 59)) {tanb_exp_thd_abdel[i] = 60;}
+
       //
     }
   }
@@ -1039,13 +1051,13 @@ void mssm_xs_tools::myanalysis(){
   setTDRStyle(0,0);
   // create graphs
   TCanvas* c1 = new TCanvas("X","Y",1);
-  TGraph* gr_tanb_exp  = new TGraph(nbhmass,mass,tanb_exp);
-  TGraph* gr_tanb_exp_thu  = new TGraph(nbhmass,mass,tanb_exp_thu);
-  TGraph* gr_tanb_exp_thd  = new TGraph(nbhmass,mass,tanb_exp_thd);
+  TGraph* gr_tanb_exp  = new TGraph(nbhmass-1,mass,tanb_exp);
+  TGraph* gr_tanb_exp_thu  = new TGraph(nbhmass-1,mass,tanb_exp_thu);
+  TGraph* gr_tanb_exp_thd  = new TGraph(nbhmass-1,mass,tanb_exp_thd);
 
-  TGraph* gr_tanb_exp_abdel  = new TGraph(nbhmass,mass,tanb_exp_abdel);
-  TGraph* gr_tanb_exp_thu_abdel  = new TGraph(nbhmass,mass,tanb_exp_thu_abdel);
-  TGraph* gr_tanb_exp_thd_abdel  = new TGraph(nbhmass,mass,tanb_exp_thd_abdel);
+  TGraph* gr_tanb_exp_abdel  = new TGraph(nbhmass-1,mass,tanb_exp_abdel);
+  TGraph* gr_tanb_exp_thu_abdel  = new TGraph(nbhmass-1,mass,tanb_exp_thu_abdel);
+  TGraph* gr_tanb_exp_thd_abdel  = new TGraph(nbhmass-1,mass,tanb_exp_thd_abdel);
 
   TAxis* xaxis = gr_tanb_exp->GetXaxis();
   TAxis* yaxis = gr_tanb_exp->GetYaxis();
