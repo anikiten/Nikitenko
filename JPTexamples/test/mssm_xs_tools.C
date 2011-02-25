@@ -975,16 +975,21 @@ void mssm_xs_tools::myanalysis(){
       cout << " MA = " << mass[i] 
 	   <<" tanb = " << tanb 
 	   <<" xsect x Br = " << xsec_x_Br_pb
-	   <<" + " << xsect_x_Br_UncU_pb
-	   <<" - " << xsect_x_Br_UncD_pb << endl;
-      */	
+	   <<",  + sigma = " << xsec_x_Br_pb+xsect_x_Br_UncU_pb
+	   <<",  - sigma = " << xsec_x_Br_pb+xsect_x_Br_UncD_pb << endl;
+      */
 
+      /*
+      cout << " MA = " << mass[i] 
+	   <<" tanb = " << tanb 
+	   <<" xsect x Br = " << xsec_x_Br_abdel
+	   <<" + " << xsect_x_Br_UncU_abdel
+	   <<" - " << xsect_x_Br_UncD_abdel << endl;
+      */
       if(tanlow == 0) {
 	if( (xsec_x_Br_pb + xsect_x_Br_UncU_pb)  > xsect_x_Br_limit[i]) {
 	  tanb_exp_thu[i] = tanb;
-	  //	  if(mass[i] == 140.) {tanb_exp_thu[i] = tanb-1;}
-	  //	  if(mass[i] == 160.) {tanb_exp_thu[i] = tanb-1;}
-	  std::cout<<" mass = "<< mass[i] <<" tanb low = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncU_pb
+	  std::cout<<"--> mass = "<< mass[i] <<" tanb low = "<< tanb_exp_thu[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncU_pb
 		   <<" limit = " << xsect_x_Br_limit[i] << " xsect x Br at " << tanb-1 <<" = " << xsec_x_Br_pb_old +  xsect_x_Br_UncU_pb_old << std::endl;
 	  tanlow = 1;
 	}
@@ -993,8 +998,10 @@ void mssm_xs_tools::myanalysis(){
       if(tan == 0) {
 	if( xsec_x_Br_pb > xsect_x_Br_limit[i]) {
 	  tanb_exp[i] = tanb;
-	  std::cout<<" mass = "<< mass[i] <<" tanb = "<< tanb_exp[i] <<"  xsect x Br = " << xsec_x_Br_pb 
-		   <<" limit = " << xsect_x_Br_limit[i] <<" xsect x Br at " << tanb-1 <<" = " << xsec_x_Br_pb_old << std::endl;
+	  Double_t diff = (xsec_x_Br_pb-xsec_x_Br_pb_old) / xsec_x_Br_pb_old;
+	  std::cout<<"--> mass = "<< mass[i] <<" tanb = "<< tanb_exp[i] <<"  xsect x Br = " << xsec_x_Br_pb 
+		   <<" limit = " << xsect_x_Br_limit[i] <<" xsect x Br at " << tanb-1 <<" = " << xsec_x_Br_pb_old 
+		   <<" diff = " << diff << std::endl;
 	  tan = 1;
 	}
       }
@@ -1002,7 +1009,7 @@ void mssm_xs_tools::myanalysis(){
       if(tanhigh == 0) {
 	if( (xsec_x_Br_pb + xsect_x_Br_UncD_pb)  > xsect_x_Br_limit[i]) {
 	  tanb_exp_thd[i] = tanb;
-	  std::cout<<" mass = "<< mass[i] <<" tanb high = "<< tanb_exp_thd[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
+	  std::cout<<"--> mass = "<< mass[i] <<" tanb high = "<< tanb_exp_thd[i] <<"  xsect x Br = " << xsec_x_Br_pb +  xsect_x_Br_UncD_pb
 		   <<" limit = " << xsect_x_Br_limit[i] <<" xsect x Br at "<< tanb-1 <<" = " <<  xsec_x_Br_pb_old +  xsect_x_Br_UncD_pb_old << std::endl;
           tanhigh = 1;
 	}
