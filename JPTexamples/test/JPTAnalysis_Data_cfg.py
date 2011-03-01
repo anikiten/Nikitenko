@@ -10,7 +10,9 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 #process.GlobalTag.globaltag = cms.string('MC_3XY_V21::All')
 
-process.GlobalTag.globaltag = cms.string('GR_R_38X_V15::All')
+# process.GlobalTag.globaltag = cms.string('GR_R_38X_V15::All')
+
+process.GlobalTag.globaltag = cms.string('START39_V8::All')
 
 process.load("Configuration.StandardSequences.Simulation_cff")
 
