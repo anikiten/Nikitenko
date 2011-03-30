@@ -363,10 +363,15 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   edm::Handle<PFJetCollection> pfjetsakt5;
   iEvent.getByLabel("ak5PFJets", pfjetsakt5);
    
-  // JPT jets
+  // JPT jets not corrected
   edm::Handle<reco::JPTJetCollection> jptjets;
   iEvent.getByLabel(JPTjetsSrc, jptjets);
   
+  // JPT jets L1L2L3 corrected
+  edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
+  iEvent.getByLabel("ak5JPTJetsL1L2L3", jptjetsl1l2l3);
+ 
+
   // Calo jets
   edm::Handle<CaloJetCollection> calojets;
   iEvent.getByLabel(calojetsSrc, calojets);

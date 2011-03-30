@@ -32,13 +32,17 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 process.ak5JPTL1Offset.useCondDB = False
-process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Fall10',algorithm = 'AK5JPT' )
-process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Fall10',algorithm = 'AK5JPT' )
-process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Fall10',algorithm = 'AK5JPT' )
+process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
+process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
+process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
+
+# process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Fall10',algorithm = 'AK5JPT' )
+# process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Fall10',algorithm = 'AK5JPT' )
+# process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Fall10',algorithm = 'AK5JPT' )
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(2)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -63,7 +67,7 @@ process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_Data",
 # CaloJetsL2L3 = cms.InputTag("ak5CaloJetsL2L3"),
 
 
-# process.dump = cms.EDFilter("EventContentAnalyzer")
+process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
 # process.p1 = cms.Path(process.dump)
 
@@ -72,3 +76,5 @@ process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_Data",
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
 
 process.p1 = cms.Path(process.ak5JPTJetsL1L2L3*process.myjetplustrack)
+
+# process.p1 = cms.Path(process.dump)
