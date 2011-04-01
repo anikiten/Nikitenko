@@ -1,5 +1,5 @@
 <export></export>
-   <library file="*.cc" name="RecoJetsJetPlusTracks_plugins">
+   <library file="*.cc" name="SingleParticleResponce_plugins">
 <use name=root>
 <use name=boost>
 <use name=RecoTracker/DebugTools>
