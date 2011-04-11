@@ -34,9 +34,7 @@ JetPlusTrackZSPCorJetAntiKt5.ResponseMap = "CondFormats/JetMETObjects/data/CMSSW
 JetPlusTrackZSPCorJetAntiKt5.EfficiencyMap = "CondFormats/JetMETObjects/data/CMSSW_362_TrackNonEff.txt"
 JetPlusTrackZSPCorJetAntiKt5.UseEfficiency = True
 JetPlusTrackZSPCorJetAntiKt5.UseZSP = True
-# JetPlusTrackZSPCorJetAntiKt5.tagName = cms.vstring('ZSP_CMSSW390_Akt_05_PU0')
-JetPlusTrackZSPCorJetAntiKt5.tagName = cms.vstring('ZSP_CMSSW332_Iterative_Cone_05_PU0')
-
+JetPlusTrackZSPCorJetAntiKt5.tagName = cms.vstring('ZSP_CMSSW390_Akt_05_PU0')
 
 process.load("RecoJets.Configuration.RecoJPTJets_cff")
 
