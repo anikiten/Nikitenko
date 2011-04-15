@@ -6,7 +6,8 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-process.GlobalTag.globaltag = cms.string('START311_V2::All')
+# process.GlobalTag.globaltag = cms.string('START311_V2::All')
+process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
 
 # process.load("Configuration.StandardSequences.Services_cff")
 # process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -36,7 +37,9 @@ fileNames = cms.untracked.vstring(
 # '/store/relval/CMSSW_3_6_0_pre2/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_3XY_V24-v1/0001/22D67382-A427-DF11-975F-00261894397E.root')
 #'/store/relval/CMSSW_3_6_0_pre6/RelValQCD_Pt_3000_3500/GEN-SIM-RECO/START36_V4-v1/0011/FE30B408-D044-DF11-92FC-0026189438C1.root')
 # '/store/relval/CMSSW_3_9_7/RelValQCD_Pt_80_120/GEN-SIM-RECO/START39_V8-v1/0050/1C628AB0-CA0D-E011-BC46-001A92810A94.root')
-  '/store/relval/CMSSW_4_1_3/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0037/648B6AA5-C751-E011-8208-001A928116C6.root')
+#  '/store/relval/CMSSW_4_1_3/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0037/648B6AA5-C751-E011-8208-001A928116C6.root')
+# '/store/relval/CMSSW_3_11_1/RelValProdMinBias/AODSIM/MC_311_V1_64bit-v1/0091/5AAB06A6-DB35-E011-AE91-0018F3D095FA.root')
+'/store/relval/CMSSW_3_11_1/RelValProdTTbar/AODSIM/MC_311_V1_64bit-v1/0091/9C4D3BA6-DB35-E011-A35F-0018F3D095EA.root')
 )
 
 
