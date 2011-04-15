@@ -16,8 +16,8 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Utilities/interface/InputTag.h"
 //#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 //
 // HLT/L1 and Trigger data formats
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
@@ -98,7 +98,6 @@
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/GenVector/PxPyPzE4D.h"
 
-//
 using namespace std;
 using namespace reco;
 
@@ -123,17 +122,17 @@ private:
   string fOutputFileName ;
   // names of modules, producing object collections
   // raw calo jet ID map
-  InputTag jetsIDSrc;
+  edm::InputTag jetsIDSrc;
   // calo jets
-  InputTag calojetsSrc; 
+  edm::InputTag calojetsSrc; 
   // JPT jets
-  InputTag JPTjetsSrc;
+  edm::InputTag JPTjetsSrc;
   // MC jet corrections
   //  string JetCorrectionMC;
   // PF jet corrections
   //  string JetCorrectionPF;
   // HLT result
-  InputTag srcTriggerResults_;
+  edm:: InputTag srcTriggerResults_;
 
   // variables to store in ntpl
   int     jjpt;
@@ -327,7 +326,7 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
      std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
 	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
    }
-*/
+  */
 
   //  std::map<double,int> pTjptIndex;
 
@@ -358,20 +357,16 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   // get jet ID map
   edm::Handle<ValueMap<reco::JetID> > jetsID;
   iEvent.getByLabel(jetsIDSrc,jetsID);
+  // 'ak5JetID'
 
    // pf jets
   edm::Handle<PFJetCollection> pfjetsakt5;
   iEvent.getByLabel("ak5PFJets", pfjetsakt5);
    
-  // JPT jets not corrected
+  // JPT jets
   edm::Handle<reco::JPTJetCollection> jptjets;
   iEvent.getByLabel(JPTjetsSrc, jptjets);
   
-  // JPT jets L1L2L3 corrected
-  edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
-  iEvent.getByLabel("ak5JPTJetsL1L2L3", jptjetsl1l2l3);
- 
-
   // Calo jets
   edm::Handle<CaloJetCollection> calojets;
   iEvent.getByLabel(calojetsSrc, calojets);
@@ -382,7 +377,6 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
 
   int nvtx = 0;
   unsigned ntrkV = 0;
-  
   
   for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
     {
@@ -402,7 +396,7 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
 	}
     }
   
-  if( (nvtx == 1) && (ntrkV > 3) && (ntrkV < 100) ) {
+  if( (nvtx >= 1) && (ntrkV > 3) && (ntrkV < 100) ) {
 
      // PF jet energy corrections
     //    const JetCorrector* correctorPF = JetCorrector::getJetCorrector (JetCorrectionPF, iSetup);
@@ -425,8 +419,6 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
   map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
   while (rfirst != rlast) {
-
-    //    cout <<" jc = " << jc <<" energy = " << (*rfirst).first <<" jet energy = " << ((*rfirst).second)->pt() << endl;
 
     const JPTJet* jptjet = (*rfirst).second;
     RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
@@ -476,7 +468,7 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
     
     EtaRaw->push_back(jptjetRef->eta());
     PhiRaw->push_back(jptjetRef->phi());
-    EtJPT->push_back(jptjetRef->pt());
+    EtRaw->push_back(jptjetRef->pt());
     EtaJPT->push_back(jptjet->eta());
     PhiJPT->push_back(jptjet->phi());
     EtJPT->push_back(jptjet->pt());
