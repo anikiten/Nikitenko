@@ -75,7 +75,7 @@ addJetCollection( process,
 ##
 ## let it run
 process.p = cms.Path(
-   process.recoJPTJets*process.patDefaultSequence
+   process.jetPlusTrackZSPCorJetAntiKt5*process.patDefaultSequence
     )
 
 ## ------------------------------------------------------
