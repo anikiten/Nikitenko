@@ -30,7 +30,7 @@ process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',al
 process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10000)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -43,6 +43,7 @@ fileNames = cms.untracked.vstring(
 # '/store/relval/CMSSW_3_11_1/RelValProdMinBias/AODSIM/MC_311_V1_64bit-v1/0091/5AAB06A6-DB35-E011-AE91-0018F3D095FA.root')
 # '/store/relval/CMSSW_3_11_1/RelValProdTTbar/AODSIM/MC_311_V1_64bit-v1/0091/9C4D3BA6-DB35-E011-A35F-0018F3D095EA.root')
  '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
+#  '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F269BBAB-F357-E011-BA9C-003048CFB40C.root')
 )
 
 

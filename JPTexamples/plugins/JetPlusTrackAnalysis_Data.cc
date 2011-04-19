@@ -136,7 +136,7 @@ private:
 
   // variables to store in ntpl
   int     jjpt;
-  int     run, event;
+  int     run, event, nvertex;
   double  PVx, PVy, PVz;
   // eta/phi/pt of raw calo jet from JPT
 
@@ -196,6 +196,8 @@ JetPlusTrackAnalysis_Data::beginJob()
   t1->Branch("jjpt",&jjpt,"jjpt/I");
   t1->Branch("run",&run,"run/I");
   t1->Branch("event",&event,"event/I");
+
+  t1->Branch("nvertex",&nvertex,"nvertex/I");
 
   t1->Branch("PVx",&PVx,"PVx/D");
   t1->Branch("PVy",&PVy,"PVy/D");
@@ -335,6 +337,7 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   jjpt = 0;
   run = iEvent.id().run();
   event = iEvent.id().event();
+  nvertex = 0;
   PVx = -1000.; 
   PVy = -1000.; 
   PVz = -1000.;
@@ -380,23 +383,27 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   
   for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
     {
-      if (!((*recVtxs)[ind].isFake())) 
+      if ( !((*recVtxs)[ind].isFake()) && ((*recVtxs)[ind].ndof() > 4) )
 	{
 	  nvtx = nvtx + 1;
 	  if(nvtx == 1) {
 	    PVx  = (*recVtxs)[ind].x();
 	    PVy  = (*recVtxs)[ind].y();
 	    PVz  = (*recVtxs)[ind].z();
+
 	    //      ndof(PV)>=5.0
 	    //	     ntrkV = (*recVtxs)[ind].tracksSize();
-	    reco::Vertex::trackRef_iterator ittrk;
-	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
-	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++; 
-	    }
+
+	    //	    reco::Vertex::trackRef_iterator ittrk;
+	    //	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
+	    //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
+	  }
 	}
     }
-  
-  if( (nvtx >= 1) && (ntrkV > 3) && (ntrkV < 100) ) {
+
+  nvertex = nvtx;
+
+  if( nvtx >= 1 ) {
 
      // PF jet energy corrections
     //    const JetCorrector* correctorPF = JetCorrector::getJetCorrector (JetCorrectionPF, iSetup);
@@ -407,7 +414,7 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
     if(jptjets->size() != 0) {
 
       for(JPTJetCollection::const_iterator jptjet = jptjets->begin(); jptjet != jptjets->end(); ++jptjet ) { 
-	if(jptjet->pt() > 10.) {
+	if(jptjet->pt() > 20.) {
 	  pTjptIndex[jptjet->pt()] = &(*jptjet);
 	}
       }
@@ -426,13 +433,21 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
 
     //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
 
-    double mN90Hits_jpt  = (*jetsID)[jptjetRef].n90Hits;
-    double mfHPD_jpt     = (*jetsID)[jptjetRef].fHPD;
-    double mfRBX_jpt     = (*jetsID)[jptjetRef].fRBX;
+    double mN90Hits  = (*jetsID)[jptjetRef].n90Hits;
+    double mfHPD     = (*jetsID)[jptjetRef].fHPD;
+    double mfRBX     = (*jetsID)[jptjetRef].fRBX;
 
     double mN90      = rawcalojet->n90();
     double mEmf      = rawcalojet->emEnergyFraction(); 	
-    
+ 
+    jc++;
+    rfirst++;
+
+    if(mEmf  < 0.01) continue;
+    if(mfHPD > 0.98) continue;
+    if(mfRBX > 0.98) continue;
+    if(mN90  < 2) continue;
+
     // access tracks used in JPT
     TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
     TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
@@ -486,8 +501,6 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
 	 <<" raw phi = " << jptjetRef->phi() 
 	 <<" Ntrk1 = " << pionsInVertexInCalo.size()
 	 <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
-    jc++;
-    rfirst++;
   }
   // fill tree
   if(pTjptIndex.size() != 0) t1->Fill();
