@@ -42,6 +42,7 @@ JetPlusTrackZSPCorJetAntiKt5.tagName = cms.vstring('ZSP_CMSSW390_Akt_05_PU0')
 # both Fall10.db and JEC_cff.py files are under JPTexamples/test should be moved to RecoJets/JetPlusTracks/python
 # example how it is working for RECO/AOD analysis is JetShapeJPTAnalysis_mc_s_z2.py
 
+process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 process.load("RecoJets.Configuration.RecoJPTJets_cff")
 
 # JES
@@ -75,7 +76,7 @@ addJetCollection( process,
 ##
 ## let it run
 process.p = cms.Path(
-   process.jetPlusTrackZSPCorJetAntiKt5*process.patDefaultSequence
+   process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.patDefaultSequence
     )
 
 ## ------------------------------------------------------
