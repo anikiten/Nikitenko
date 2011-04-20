@@ -122,19 +122,19 @@ private:
   string fOutputFileName ;
   // names of modules, producing object collections
   // raw calo jet ID map
-  InputTag jetsIDSrc;
+  edm::InputTag jetsIDSrc;
   // calo jets
-  InputTag genjetsSrc; 
+  edm::InputTag genjetsSrc; 
   // calo jets
-  InputTag calojetsSrc; 
+  edm::InputTag calojetsSrc; 
   // JPT jets
-  InputTag JPTjetsSrc;
+  edm::InputTag JPTjetsSrc;
   // MC jet corrections
   //  string JetCorrectionMC;
   // PF jet corrections
   //  string JetCorrectionPF;
   // HLT result
-  InputTag srcTriggerResults_;
+  edm:: InputTag srcTriggerResults_;
 
   // variables to store in ntpl
   int     jjpt;

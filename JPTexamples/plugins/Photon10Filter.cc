@@ -121,7 +121,7 @@ public:
 
 private:
   // HLT result
-  InputTag srcTriggerResults_;
+  edm::InputTag srcTriggerResults_;
   int accepted;
 
 };

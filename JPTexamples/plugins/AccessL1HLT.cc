@@ -140,11 +140,11 @@ private:
   
 
   // ----------member data ---------------------------
-  InputTag  srcL1CenJet;
-  InputTag  srcL1TauJet;
-  InputTag  srcL1FwdJet;
-  InputTag  srcHLTSummary;
-  InputTag  srcTriggerResults_;
+  edm::InputTag  srcL1CenJet;
+  edm::InputTag  srcL1TauJet;
+  edm::InputTag  srcL1FwdJet;
+  edm::InputTag  srcHLTSummary;
+  edm::InputTag  srcTriggerResults_;
   std::vector<edm::InputTag> hltPaths_;
 
   // counters
