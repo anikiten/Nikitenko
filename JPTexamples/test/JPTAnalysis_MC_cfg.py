@@ -10,23 +10,35 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 # process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
 process.GlobalTag.globaltag = cms.string('MC_42_V6::All')
 
-# process.load("Configuration.StandardSequences.Services_cff")
-# process.load("Configuration.StandardSequences.Reconstruction_cff")
-# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-# process.GlobalTag.globaltag = cms.string('MC_3XY_V21::All')
-# process.GlobalTag.globaltag = cms.string('GR_R_38X_V15::All')
-# process.GlobalTag.globaltag = cms.string('START39_V8::All')
-# process.load("Configuration.StandardSequences.Simulation_cff")
-# process.load("Configuration.StandardSequences.MixingNoPileUp_cff")
-# process.load("Configuration.StandardSequences.VtxSmearedGauss_cff")
-
-process.load("RecoJets.Configuration.RecoJPTJets_cff")
+# process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
-process.ak5JPTL1Offset.useCondDB = False
-process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
-process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
-process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
+#
+# Summer10 corrections 
+# process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
+# process.ak5JPTL1Offset.useCondDB = False
+# process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
+# process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
+# process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
+
+# Preliminary Spring11 corrections for CMSSW_4_2_0
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+      cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_Jec11V0_AK5JPT'),
+            label  = cms.untracked.string('AK5JPT')
+            )
+      ),
+      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
+      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
+)
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
@@ -42,7 +54,7 @@ fileNames = cms.untracked.vstring(
 
 
 process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_MC",
-     HistOutFile = cms.untracked.string('JPTAnalysis_MC.root'),
+     HistOutFile = cms.untracked.string('JPTAnalysis_Data.root'),
     genjets = cms.InputTag("ak5GenJets"),
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
