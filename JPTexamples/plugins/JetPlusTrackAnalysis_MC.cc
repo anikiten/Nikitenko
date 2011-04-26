@@ -446,9 +446,9 @@ JetPlusTrackAnalysis_MC::analyze(const edm::Event& iEvent, const edm::EventSetup
 
     //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
 
-    double mN90Hits_jpt  = (*jetsID)[jptjetRef].n90Hits;
-    double mfHPD_jpt     = (*jetsID)[jptjetRef].fHPD;
-    double mfRBX_jpt     = (*jetsID)[jptjetRef].fRBX;
+    double mN90Hits  = (*jetsID)[jptjetRef].n90Hits;
+    double mfHPD     = (*jetsID)[jptjetRef].fHPD;
+    double mfRBX     = (*jetsID)[jptjetRef].fRBX;
 
     double mN90      = rawcalojet->n90();
     double mEmf      = rawcalojet->emEnergyFraction(); 	
