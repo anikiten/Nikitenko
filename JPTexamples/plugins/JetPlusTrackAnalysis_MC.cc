@@ -453,6 +453,14 @@ JetPlusTrackAnalysis_MC::analyze(const edm::Event& iEvent, const edm::EventSetup
     double mN90      = rawcalojet->n90();
     double mEmf      = rawcalojet->emEnergyFraction(); 	
     
+    jc++;
+    rfirst++;
+
+    if(mEmf  < 0.01) continue;
+    if(mfHPD > 0.98) continue;
+    if(mfRBX > 0.98) continue;
+    if(mN90  < 2) continue;
+
     // access tracks used in JPT
     TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
     TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
@@ -506,8 +514,6 @@ JetPlusTrackAnalysis_MC::analyze(const edm::Event& iEvent, const edm::EventSetup
 	 <<" raw phi = " << jptjetRef->phi() 
 	 <<" Ntrk1 = " << pionsInVertexInCalo.size()
 	 <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
-    jc++;
-    rfirst++;
   }
   // fill tree
   if(pTjptIndex.size() != 0) t1->Fill();
