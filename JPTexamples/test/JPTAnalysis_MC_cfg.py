@@ -20,6 +20,8 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
 # process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
 
+
+
 # Preliminary Spring11 corrections for CMSSW_4_2_0
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 process.jec = cms.ESSource("PoolDBESSource",
@@ -30,7 +32,7 @@ process.jec = cms.ESSource("PoolDBESSource",
       toGet = cms.VPSet(
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_Jec11V0_AK5JPT'),
+            tag    = cms.string('JetCorrectorParametersCollection_Jec11_V1_AK5JPT'),
             label  = cms.untracked.string('AK5JPT')
             )
       ),
