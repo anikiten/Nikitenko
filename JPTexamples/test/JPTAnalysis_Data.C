@@ -12,7 +12,7 @@ Float_t JPTAnalysis_Data::deltaPhi(Float_t phi1, Float_t phi2)
   return dphi;
 }
 
-void JPTAnalysis_Data::setTDRStyle(Int_t ylog) {
+void JPTAnalysis_Data::setTDRStyle(Int_t xlog, Int_t ylog) {
 
   TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
 
@@ -134,7 +134,7 @@ void JPTAnalysis_Data::setTDRStyle(Int_t ylog) {
   tdrStyle->SetPadTickY(1);
 
 // Change for log plots:
-  tdrStyle->SetOptLogx(0);
+  tdrStyle->SetOptLogx(xlog);
   tdrStyle->SetOptLogy(ylog);
   tdrStyle->SetOptLogz(0);
 
@@ -190,6 +190,8 @@ void JPTAnalysis_Data::Loop()
 
    Long64_t nentries = fChain->GetEntriesFast();
 
+   TH1F * hNV      = new TH1F( "hNV", "NV", 10, 0., 10);
+
    TH1F * hNtrkV1  = new TH1F( "hNtrkV1", "NtrkV1", 30, 0., 30);
    TH1F * hNtrkV2  = new TH1F( "hNtrkV2", "NtrkV2", 30, 0., 30);
    TH1F * hNtrkV3  = new TH1F( "hNtrkV3", "NtrkV3", 30, 0., 30);
@@ -198,13 +200,26 @@ void JPTAnalysis_Data::Loop()
    TH1F * hNtrkV6  = new TH1F( "hNtrkV6", "NtrkV6", 30, 0., 30);
    TH1F * hNtrkV7  = new TH1F( "hNtrkV7", "NtrkV7", 30, 0., 30);
 
+   TH1F * hDZnv2      = new TH1F( "hDZnv2", "DZnv2", 400, 0., 20);
+   TH1F * hDZnv5      = new TH1F( "hDZnv5", "DZnv5", 400, 0., 20);
+   TH1F * hDZnv8      = new TH1F( "hDZnv8", "DZnv8", 400, 0., 20);
+
+   TH1F * hpTj      = new TH1F( "hpTj", "pTj", 30, 0., 150);
+
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      for(unsigned int i = 0; i < (*EtJPT).size(); i++) {
-	if( (fabs((*EtaJPT)[i]) < 2.0) && ((*EtJPT)[i] > 30.) ) {
+
+      hNV->Fill(nvertex);  
+      if(nvertex == 2) hDZnv2->Fill(DZmin);
+      if(nvertex == 5) hDZnv5->Fill(DZmin);
+      if(nvertex == 8) hDZnv8->Fill(DZmin);
+    
+	for(unsigned int i = 0; i < (*EtJPT).size(); i++) {
+	if( (fabs((*EtaJPT)[i]) < 2.0) && ((*EtJPT)[i] > 20.) && ((*EtJPT)[i] < 100.) ) {
+	  hpTj->Fill((*EtJPT)[i]);
 	  if(nvertex == 1) {
 	    hNtrkV1->Fill((*Ntrk)[i]);
 	  }
@@ -228,12 +243,24 @@ void JPTAnalysis_Data::Loop()
    scale = 1./hNtrkV7->Integral();
    hNtrkV7->Scale(scale);
 
-   setTDRStyle(0);
+   setTDRStyle(0,0);
    gStyle->SetOptFit();
+   TCanvas* c0 = new TCanvas("X","Y",1);
+   hNV->GetXaxis()->SetTitle("N primary off-line vertices");
+   hNV->GetYaxis()->SetTitle("Nev");
+   hNV->SetLineWidth(3);
+   hNV->SetMaximum(3000.0);
+   hNV->Draw("hist");
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.04);
+   t->DrawLatex(0.5,2500,"/Run2011A/Jet/AOD/PromptReco-v1. Run 161312");
+   c0->SaveAs("NV.gif");
+
    TCanvas* c1 = new TCanvas("X","Y",1);
    hNtrkV1->GetXaxis()->SetTitle("N tracks");
    hNtrkV1->GetYaxis()->SetTitle("Nev");
    hNtrkV1->SetLineWidth(3);
+   hNtrkV1->SetMaximum(0.16);
    hNtrkV1->Draw("hist");
 
    hNtrkV4->SetLineWidth(3);
@@ -243,5 +270,68 @@ void JPTAnalysis_Data::Loop()
    hNtrkV7->SetLineWidth(3);
    hNtrkV7->SetLineStyle(3);
    hNtrkV7->Draw("same");
-   c1->SaveAs("Ntrk30.gif");
+
+   TLegend *leg = new TLegend(0.5,0.4,0.9,0.6,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hNtrkV1,"Npvtx = 1","L");
+   leg->AddEntry(hNtrkV4,"Npvtx = 4","L");
+   leg->AddEntry(hNtrkV7,"Npvtx = 7","L");
+   leg->Draw();
+
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.045);
+   t->DrawLatex(1.0,0.15,"/Run2011A/Jet/AOD/PromptReco-v1");
+   t->DrawLatex(13.0,0.14,"Run 161312");
+   t->DrawLatex(13.0,0.12,"20 < p_{T}^{JPT raw} < 100 GeV");
+   t->DrawLatex(13.0,0.11,"| #eta | < 2.0");
+   c1->SaveAs("Ntrk20.gif");
+
+   setTDRStyle(1,1);
+   gStyle->SetOptFit();
+   TCanvas* c2 = new TCanvas("X","Y",1);
+   hDZnv2->GetXaxis()->SetTitle("#Delta Z_{min}(signal PV - PU PV), cm");
+   hDZnv2->SetAxisRange(0.05, 20., "X");
+   hDZnv2->GetYaxis()->SetTitle("Nev / 0.05 cm");
+   hDZnv2->SetLineStyle(2);
+   hDZnv2->SetLineWidth(3);
+   hDZnv2->SetMaximum(100.0);
+   hDZnv2->Draw("hist");
+
+   hDZnv5->SetLineStyle(3);
+   hDZnv5->SetLineWidth(3);
+   hDZnv5->Draw("same");
+
+
+   hDZnv8->SetLineStyle(1);
+   hDZnv8->SetLineWidth(3);
+   hDZnv8->Draw("same");
+
+   TLegend *leg = new TLegend(0.15,0.6,0.4,0.8,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hDZnv2,"Npvtx = 2","L");
+   leg->AddEntry(hDZnv5,"Npvtx = 5","L");
+   leg->AddEntry(hDZnv8,"Npvtx = 8","L");
+   leg->Draw();
+
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.04);
+   t->DrawLatex(0.1,70,"/Run2011A/Jet/AOD/PromptReco-v1");
+   t->DrawLatex(1.0,50,"Run 161312");
+   c2->SaveAs("DZmin.gif");
+
+   setTDRStyle(0,0);
+   gStyle->SetOptFit();
+   TCanvas* c3 = new TCanvas("X","Y",1);
+   hpTj->GetXaxis()->SetTitle("p_{T}^{JPT raw}, GeV");
+   hpTj->GetYaxis()->SetTitle("Nev / 5 GeV");
+   hpTj->SetLineWidth(3);
+   //   hpTj->SetMaximum(100.0);
+   hpTj->Draw("hist");
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.04);
+   t->DrawLatex(30,2400,"/Run2011A/Jet/AOD/PromptReco-v1");
+   t->DrawLatex(60,2200,"Run 161312");
+   t->SetTextSize(0.05);
+   t->DrawLatex(60,1500,"| #eta | < 2.0");
+   c3->SaveAs("pTj.gif");
 }

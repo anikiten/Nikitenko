@@ -25,6 +25,7 @@ public :
    Double_t        PVx;
    Double_t        PVy;
    Double_t        PVz;
+   Double_t        DZmin;
    vector<double>  *EtaRaw;
    vector<double>  *PhiRaw;
    vector<double>  *EtRaw;
@@ -45,6 +46,7 @@ public :
    TBranch        *b_PVx;   //!
    TBranch        *b_PVy;   //!
    TBranch        *b_PVz;   //!
+   TBranch        *b_DZmin;   //!
    TBranch        *b_EtaRaw;   //!
    TBranch        *b_PhiRaw;   //!
    TBranch        *b_EtRaw;   //!
@@ -76,7 +78,8 @@ JPTAnalysis_Data::JPTAnalysis_Data(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("rfio:///castor/cern.ch/user/a/anikiten/Data2011/JPTAnalysis_Data.root");
+     //     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("rfio:///castor/cern.ch/user/a/anikiten/Data2011/JPTAnalysis_Data.root");
+     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("JPTAnalysis_Data.root");
       if (!f) {
          f = new TFile("JPTAnalysis_Data.root");
       }
@@ -148,6 +151,7 @@ void JPTAnalysis_Data::Init(TTree *tree)
    fChain->SetBranchAddress("PVx", &PVx, &b_PVx);
    fChain->SetBranchAddress("PVy", &PVy, &b_PVy);
    fChain->SetBranchAddress("PVz", &PVz, &b_PVz);
+   fChain->SetBranchAddress("DZmin", &DZmin, &b_DZmin);
    fChain->SetBranchAddress("EtaRaw", &EtaRaw, &b_EtaRaw);
    fChain->SetBranchAddress("PhiRaw", &PhiRaw, &b_PhiRaw);
    fChain->SetBranchAddress("EtRaw", &EtRaw, &b_EtRaw);
