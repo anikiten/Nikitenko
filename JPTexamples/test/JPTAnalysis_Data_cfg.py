@@ -6,10 +6,10 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-# process.GlobalTag.globaltag = cms.string('START311_V2::All')
-# process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
 
-process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
+process.GlobalTag.globaltag = cms.string('START311_V2::All')
+# process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
+# process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
 
 # process.load("Configuration.StandardSequences.Services_cff")
 # process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -21,6 +21,9 @@ process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
 # process.load("Configuration.StandardSequences.MixingNoPileUp_cff")
 # process.load("Configuration.StandardSequences.VtxSmearedGauss_cff")
 
+#
+# Summer10 corrections. For 4_1_X use pre420 corrections. For 420 use 420 JES
+#
 process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
@@ -28,6 +31,28 @@ process.ak5JPTL1Offset.useCondDB = False
 process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
 process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
 process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
+#
+# pre 420 corrections
+#
+# Preliminary Spring11 corrections for CMSSW_4_2_0 to be used with 4_1_X for JPT
+#
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+      cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_Jec11_V1_AK5JPT'),
+            label  = cms.untracked.string('AK5JPT')
+            )
+      ),
+      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
+      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
+)
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
@@ -35,20 +60,13 @@ process.maxEvents = cms.untracked.PSet(
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
-#'/store/relval/CMSSW_3_5_0/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_3XY_V21-v1/0012/16F61E92-3513-DF11-97DB-00248C0BE013.root')
-# '/store/relval/CMSSW_3_6_0_pre2/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_3XY_V24-v1/0001/22D67382-A427-DF11-975F-00261894397E.root')
-#'/store/relval/CMSSW_3_6_0_pre6/RelValQCD_Pt_3000_3500/GEN-SIM-RECO/START36_V4-v1/0011/FE30B408-D044-DF11-92FC-0026189438C1.root')
-# '/store/relval/CMSSW_3_9_7/RelValQCD_Pt_80_120/GEN-SIM-RECO/START39_V8-v1/0050/1C628AB0-CA0D-E011-BC46-001A92810A94.root')
-#  '/store/relval/CMSSW_4_1_3/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0037/648B6AA5-C751-E011-8208-001A928116C6.root')
-# '/store/relval/CMSSW_3_11_1/RelValProdMinBias/AODSIM/MC_311_V1_64bit-v1/0091/5AAB06A6-DB35-E011-AE91-0018F3D095FA.root')
-# '/store/relval/CMSSW_3_11_1/RelValProdTTbar/AODSIM/MC_311_V1_64bit-v1/0091/9C4D3BA6-DB35-E011-A35F-0018F3D095EA.root')
  '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
-#  '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F269BBAB-F357-E011-BA9C-003048CFB40C.root')
 )
 
 
 process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_Data",
     HistOutFile = cms.untracked.string('JPTAnalysis_Data.root'),
+#    HistOutFile = cms.untracked.string('JPTAnalysis_MC.root'),
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
