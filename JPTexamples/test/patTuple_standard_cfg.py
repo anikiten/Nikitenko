@@ -2,7 +2,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 
-# comment this line for CMSSW_4_1_4
+# use proper tag. corresponding to CMSSW version !
 process.GlobalTag.globaltag = cms.string('MC_42_V9::All')
 
 ## ------------------------------------------------------
@@ -22,7 +22,9 @@ process.GlobalTag.globaltag = cms.string('MC_42_V9::All')
 
 process.out.outputCommands+= ["keep *_selectedPatJets*_*_*"]  ##  (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
 
-# produce JPT jets: uncomment these lines for 4_1_X
+#
+# produce JPT jets: uncomment these lines for 4_1_X and 3_9_X
+#
 # from RecoJets.JetPlusTracks.JetPlusTrackCorrections_cff import *
 # JetPlusTrackZSPCorJetAntiKt5.LeakageMap = "CondFormats/JetMETObjects/data/CMSSW_362_TrackLeakage.txt"
 # JetPlusTrackZSPCorJetAntiKt5.ResponseMap = "CondFormats/JetMETObjects/data/CMSSW_362_response.txt"
@@ -31,12 +33,9 @@ process.out.outputCommands+= ["keep *_selectedPatJets*_*_*"]  ##  (e.g. taken fr
 # JetPlusTrackZSPCorJetAntiKt5.UseZSP = True
 # JetPlusTrackZSPCorJetAntiKt5.tagName = cms.vstring('ZSP_CMSSW390_Akt_05_PU0')
 
-# if one wants another JEC like Fall10 put JecFall10.db file into DB using JEC_cff.py with following line: 
-# process.load("RecoJets.JetPlusTracks.JEC_cff")
-# both Fall10.db and JEC_cff.py files are under JPTexamples/test should be moved to RecoJets/JetPlusTracks/python
-# example how it is working for RECO/AOD analysis is JetShapeJPTAnalysis_mc_s_z2.py
-
-#JES: comment these lines in case of CMSSW_4_1_X: preliminary Spring11 corrections for CMSSW_4_2_0
+#
+#JES: preliminary Spring11 corrections for CMSSW_4_2_0 to be used with 4_1_X. Comment these lines for 3_9_X and 4_2_X.
+#
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 process.jec = cms.ESSource("PoolDBESSource",
       DBParameters = cms.PSet(
@@ -56,7 +55,7 @@ process.jec = cms.ESSource("PoolDBESSource",
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 ################################################################################################################
 
-# uncomment for CMSSW_4_1_4
+# uncomment next two lines for CMSSW_4_1_4 and 3_9_X
 # process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 # process.load("RecoJets.Configuration.RecoJPTJets_cff")
 
@@ -83,7 +82,7 @@ addJetCollection( process,
                            doJetID      = True,
                            jetIdLabel   = "ak5")
 ##
-## uncomment for CMSSW_4_1_4
+## uncomment for CMSSW_4_1_4 and 3_9_X
 # process.p = cms.Path(
 #   process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.patDefaultSequence
 #    )

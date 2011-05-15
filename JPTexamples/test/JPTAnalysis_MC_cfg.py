@@ -13,7 +13,8 @@ process.GlobalTag.globaltag = cms.string('MC_42_V6::All')
 # process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 #
-# Summer10 corrections 
+# Summer10 corrections to be used for 3_9_X
+#
 # process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 # process.ak5JPTL1Offset.useCondDB = False
 # process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
@@ -21,8 +22,10 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
 
 
-
-# Preliminary Spring11 corrections for CMSSW_4_2_0
+#
+# Preliminary Spring11 corrections for CMSSW_4_2_0 to be used with 4_1_X. Comment these lines for 4_2_X and 3_9_X
+#
+########################################################################################
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 process.jec = cms.ESSource("PoolDBESSource",
       DBParameters = cms.PSet(
@@ -40,7 +43,7 @@ process.jec = cms.ESSource("PoolDBESSource",
       connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
 )
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
-
+#########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
