@@ -34,24 +34,24 @@ process.out.outputCommands+= ["keep *_selectedPatJets*_*_*"]  ##  (e.g. taken fr
 # JetPlusTrackZSPCorJetAntiKt5.tagName = cms.vstring('ZSP_CMSSW390_Akt_05_PU0')
 
 #
-#JES: preliminary Spring11 corrections for CMSSW_4_2_0 to be used with 4_1_X. Comment these lines for 3_9_X and 4_2_X.
+#JES: preliminary Spring11 corrections for CMSSW_4_2_0 to be used with 4_1_X. Uncomment these lines for 4_1_X.
 #
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.jec = cms.ESSource("PoolDBESSource",
-      DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-        ),
-      timetype = cms.string('runnumber'),
-      toGet = cms.VPSet(
-      cms.PSet(
-            record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_Jec11_V1_AK5JPT'),
-            label  = cms.untracked.string('AK5JPT')
-            )
-      ),
-      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
-      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
-)
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#process.jec = cms.ESSource("PoolDBESSource",
+#      DBParameters = cms.PSet(
+#        messageLevel = cms.untracked.int32(0)
+#        ),
+#      timetype = cms.string('runnumber'),
+#      toGet = cms.VPSet(
+#      cms.PSet(
+#            record = cms.string('JetCorrectionsRecord'),
+#            tag    = cms.string('JetCorrectorParametersCollection_Jec11_V1_AK5JPT'),
+#            label  = cms.untracked.string('AK5JPT')
+#            )
+#      ),
+#      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
+#      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
+#)
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 ################################################################################################################
 
