@@ -22,15 +22,16 @@ process.GlobalTag.globaltag = cms.string('START311_V2::All')
 # process.load("Configuration.StandardSequences.VtxSmearedGauss_cff")
 
 #
-# Summer10 corrections. For 4_1_X use pre420 corrections. For 420 use 420 JES
+# Summer10 corrections. For 4_1_X use pre420 corrections. For 420X use 420X KJS
 #
 process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
-process.ak5JPTL1Offset.useCondDB = False
-process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
-process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
-process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
+
+#process.ak5JPTL1Offset.useCondDB = False
+#process.ak5JPTL2Relative = process.ak5CaloL2Relative.clone( era='Summer10',algorithm = 'AK5JPT' )
+#process.ak5JPTL3Absolute    = process.ak5CaloL3Absolute.clone( era='Summer10',algorithm = 'AK5JPT' )
+#process.ak5JPTResidual = process.ak5CaloResidual.clone( era='Summer10',algorithm = 'AK5JPT' )
 #
 # pre 420 corrections
 #
