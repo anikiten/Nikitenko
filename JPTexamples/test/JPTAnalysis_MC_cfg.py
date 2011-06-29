@@ -8,10 +8,12 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 # process.GlobalTag.globaltag = cms.string('START311_V2::All')
 # process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
-process.GlobalTag.globaltag = cms.string('MC_42_V6::All')
+process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
 
-# process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
+process.load("RecoJets.Configuration.RecoJPTJets_cff")
+
 #
 # Summer10 corrections to be used for 3_9_X
 #
@@ -26,23 +28,23 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # Preliminary Spring11 corrections for CMSSW_4_2_0 to be used with 4_1_X. Comment these lines for 4_2_X and 3_9_X
 #
 ########################################################################################
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.jec = cms.ESSource("PoolDBESSource",
-      DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-        ),
-      timetype = cms.string('runnumber'),
-      toGet = cms.VPSet(
-      cms.PSet(
-            record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_Jec11_V1_AK5JPT'),
-            label  = cms.untracked.string('AK5JPT')
-            )
-      ),
-      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
-      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
-)
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#process.jec = cms.ESSource("PoolDBESSource",
+#      DBParameters = cms.PSet(
+#        messageLevel = cms.untracked.int32(0)
+#        ),
+#      timetype = cms.string('runnumber'),
+#      toGet = cms.VPSet(
+#      cms.PSet(
+#            record = cms.string('JetCorrectionsRecord'),
+#            tag    = cms.string('JetCorrectorParametersCollection_Jec11_V1_AK5JPT'),
+#            label  = cms.untracked.string('AK5JPT')
+#            )
+#      ),
+#      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
+#      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
+#)
+# process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 #########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
@@ -54,7 +56,8 @@ fileNames = cms.untracked.vstring(
 #  '/store/relval/CMSSW_4_1_3/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0037/648B6AA5-C751-E011-8208-001A928116C6.root')
 # '/store/relval/CMSSW_3_11_1/RelValProdMinBias/AODSIM/MC_311_V1_64bit-v1/0091/5AAB06A6-DB35-E011-AE91-0018F3D095FA.root')
 # '/store/relval/CMSSW_3_11_1/RelValProdTTbar/AODSIM/MC_311_V1_64bit-v1/0091/9C4D3BA6-DB35-E011-A35F-0018F3D095EA.root')
-  '/store/relval/CMSSW_4_2_0/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_42_V9-v1/0054/6C66ADBF-6B5E-E011-89CF-00304867C16A.root')
+#  '/store/relval/CMSSW_4_2_0/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_42_V9-v1/0054/6C66ADBF-6B5E-E011-89CF-00304867C16A.root')
+  '/store/relval/CMSSW_4_2_5/RelValQCD_Pt_80_120/GEN-SIM-RECO/MC_42_V12-v1/0125/0A931853-0FA1-E011-96E6-003048D15E02.root')
 )
 
 
