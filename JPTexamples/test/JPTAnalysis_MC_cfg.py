@@ -83,6 +83,6 @@ process.dump = cms.EDAnalyzer("EventContentAnalyzer")
  
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
 
-process.p1 = cms.Path(process.ak5JPTJetsL1L2L3*process.myjetplustrack)
+process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
 
 # process.p1 = cms.Path(process.dump)
