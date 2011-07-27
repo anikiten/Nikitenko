@@ -500,7 +500,8 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
 	 <<" raw eta = " << jptjetRef->eta()
 	 <<" raw phi = " << jptjetRef->phi() 
 	 <<" Ntrk1 = " << pionsInVertexInCalo.size()
-	 <<" Ntrk2 = " << pionsInVertexOutCalo.size() << endl; 
+	 <<" Ntrk2 = " << pionsInVertexOutCalo.size()
+	 <<" Zch = " << jptjet->getSpecific().Zch << endl; 
   }
   // fill tree
   if(pTjptIndex.size() != 0) t1->Fill();
