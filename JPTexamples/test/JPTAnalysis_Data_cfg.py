@@ -58,7 +58,7 @@ process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2)
+    input = cms.untracked.int32(100)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -71,7 +71,7 @@ fileNames = cms.untracked.vstring(
 process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_Data",
     HistOutFile = cms.untracked.string('JPTAnalysis_Data.root'),
 #    HistOutFile = cms.untracked.string('JPTAnalysis_MC.root'),
-    muons    = cms.InputTag("muons"),	
+    Muons    = cms.InputTag("muons"),	
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),

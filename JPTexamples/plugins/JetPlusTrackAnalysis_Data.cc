@@ -50,6 +50,10 @@
 #include "Geometry/Records/interface/IdealGeometryRecord.h"
 #include "Geometry/CaloGeometry/interface/CaloCellGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+// muons
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
 //jets
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
@@ -110,8 +114,13 @@ public:
   explicit JetPlusTrackAnalysis_Data(const edm::ParameterSet&);
   ~JetPlusTrackAnalysis_Data();
 
+protected: 
+
+  // Some useful typedefs
+  typedef reco::MuonCollection RecoMuons;
 
 private:
+
   //      virtual void beginJob(const edm::EventSetup&) ;
   virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
@@ -121,6 +130,8 @@ private:
   // output root file
   string fOutputFileName ;
   // names of modules, producing object collections
+  // raw calo jet ID map
+  edm::InputTag muonsSrc;
   // raw calo jet ID map
   edm::InputTag jetsIDSrc;
   // calo jets
@@ -241,6 +252,8 @@ JetPlusTrackAnalysis_Data::JetPlusTrackAnalysis_Data(const edm::ParameterSet& iC
   fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
   //
   // get names of input object collections
+  // muons
+  muonsSrc         = iConfig.getParameter<edm::InputTag>("Muons");
   // raw calo jets
   jetsIDSrc        = iConfig.getParameter<edm::InputTag>("jetsID");
   // JPT jets
@@ -357,6 +370,20 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
   //   vector<CLHEP::HepLorentzVector> gjets;
   //   gjets.clear();
   
+  // muons
+  edm::Handle<RecoMuons> reco_muons;
+  iEvent.getByLabel(muonsSrc, reco_muons );
+  RecoMuons::const_iterator imuon = reco_muons->begin(); 
+  RecoMuons::const_iterator jmuon = reco_muons->end();
+  for ( ; imuon != jmuon; ++imuon ) {
+    if ( imuon->innerTrack().isNull() ||
+	 !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
+	 imuon->innerTrack()->pt() < 3.0 ) { continue; }
+    cout <<" muon pT = " << imuon->innerTrack()->pt()
+	 <<" eta = " << imuon->innerTrack()->eta()
+	 <<" phi = " << imuon->innerTrack()->phi() << endl;
+  }
+
   // get jet ID map
   edm::Handle<ValueMap<reco::JetID> > jetsID;
   iEvent.getByLabel(jetsIDSrc,jetsID);
