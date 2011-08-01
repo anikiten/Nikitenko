@@ -82,9 +82,9 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("JPTAnalysis_Data.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("DiMuAnalysis_Data.root");
       if (!f) {
-         f = new TFile("JPTAnalysis_Data.root");
+         f = new TFile("DiMuAnalysis_Data.root");
       }
       tree = (TTree*)gDirectory->Get("t1");
 
