@@ -103,10 +103,10 @@ using namespace reco;
 // class decleration
 //
 
-class JetPlusTrackAnalysis_Data : public edm::EDAnalyzer {
+class DiMuAnalysis_Data : public edm::EDAnalyzer {
 public:
-  explicit JetPlusTrackAnalysis_Data(const edm::ParameterSet&);
-  ~JetPlusTrackAnalysis_Data();
+  explicit DiMuAnalysis_Data(const edm::ParameterSet&);
+  ~DiMuAnalysis_Data();
 
 protected: 
 
@@ -184,8 +184,8 @@ private:
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-//JetPlusTrackAnalysis_Data::beginJob(const edm::EventSetup&)
-JetPlusTrackAnalysis_Data::beginJob()
+//DiMuAnalysis_Data::beginJob(const edm::EventSetup&)
+DiMuAnalysis_Data::beginJob()
 {
   using namespace edm;
 
@@ -246,7 +246,7 @@ JetPlusTrackAnalysis_Data::beginJob()
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-JetPlusTrackAnalysis_Data::endJob() {
+DiMuAnalysis_Data::endJob() {
 
   hOutputFile->Write() ;
   hOutputFile->Close() ;
@@ -257,7 +257,7 @@ JetPlusTrackAnalysis_Data::endJob() {
 //
 // constructors and destructor
 //
-JetPlusTrackAnalysis_Data::JetPlusTrackAnalysis_Data(const edm::ParameterSet& iConfig)
+DiMuAnalysis_Data::DiMuAnalysis_Data(const edm::ParameterSet& iConfig)
 
 {
    //now do what ever initialization is needed
@@ -286,7 +286,7 @@ JetPlusTrackAnalysis_Data::JetPlusTrackAnalysis_Data(const edm::ParameterSet& iC
 }
 
 
-JetPlusTrackAnalysis_Data::~JetPlusTrackAnalysis_Data()
+DiMuAnalysis_Data::~DiMuAnalysis_Data()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -301,7 +301,7 @@ JetPlusTrackAnalysis_Data::~JetPlusTrackAnalysis_Data()
 
 // ------------ method called to for each event  ------------
 void
-JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
@@ -601,4 +601,4 @@ JetPlusTrackAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSet
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(JetPlusTrackAnalysis_Data);
+DEFINE_FWK_MODULE(DiMuAnalysis_Data);

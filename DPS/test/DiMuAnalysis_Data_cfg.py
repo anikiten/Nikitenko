@@ -68,9 +68,9 @@ fileNames = cms.untracked.vstring(
 )
 
 
-process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_Data",
-    HistOutFile = cms.untracked.string('JPTAnalysis_Data.root'),
-#    HistOutFile = cms.untracked.string('JPTAnalysis_MC.root'),
+process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
+    HistOutFile = cms.untracked.string('DiMuAnalysis_Data.root'),
+#    HistOutFile = cms.untracked.string('DiMuAnalysis_MC.root'),
     Muons    = cms.InputTag("muons"),	
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
