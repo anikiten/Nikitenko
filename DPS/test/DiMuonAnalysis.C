@@ -202,7 +202,9 @@ void DiMuonAnalysis::Loop()
 //by  b_branchname->GetEntry(ientry); //read only this branch
    if (fChain == 0) return;
 
-   TH1F * hPtZ  = new TH1F( "hPtZ", "PtZ", 50, 0., 100.);
+   TH1F * hPtZ    = new TH1F( "hPtZ", "PtZ", 50, 0., 100.);
+   TH1F * hNvtx0  = new TH1F( "hNvtx0", "Nvtx0", 60, 0., 16.);
+   TH1F * hNvtx   = new TH1F( "hNvtx", "Nvtx", 60, 0., 16.);
 
    TH1F * hEtJ   = new TH1F( "hEtJ", "EtJ", 30, 0., 150.);
    TH1F * hEtaJ  = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
@@ -219,6 +221,7 @@ void DiMuonAnalysis::Loop()
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
       nev++;
+      Int_t smallbeta = 0;
       Int_t njets = EtJPT->size();
       Int_t nmuon = PtMu->size();
       // muons
@@ -231,7 +234,6 @@ void DiMuonAnalysis::Loop()
 	}
       }
       Double_t PtZ = sqrt(PtZx*PtZx + PtZy*PtZy);
-      hPtZ->Fill(PtZ);
       // jets
       for (unsigned int i = 0; i < njets; i++) {
 	Int_t muonmatch = 0;
@@ -244,14 +246,25 @@ void DiMuonAnalysis::Loop()
 	  }
 	}
 	if(muonmatch == 0 && fabs((*EtaJPT)[i]) < 2.0 ) {
-	  //	  if(nvertex == 1) {
-	  if(PtZ < 5.) {
+	  if(nvertex <=  200) {
+	  //	  if(PtZ < 5.) {
 	    hEtJ->Fill((*EtJPT)[i]); 
 	    hEtaJ->Fill((*EtaJPT)[i]); 
 	    hbeta->Fill((*beta)[i]);
+	    /*
+	    if((*beta)[i] < 0.02) cout <<" run " << run 
+				       <<" event " << event 
+				       <<" beta = " << (*beta)[i]
+				       <<" etaj = " << (*EtaJPT)[i]
+				       <<" ntrk = " << (*Ntrk)[i] << endl;
+	    */
+	    if( (*beta)[i] < 0.2) smallbeta = 1;
 	  } 
 	}
       }
+      hPtZ->Fill(PtZ);
+      hNvtx0->Fill(1.*nvertex);
+      if( smallbeta == 1) hNvtx->Fill(1.*nvertex);
    }
    setTDRStyle(0,0);
    // ===> jets: 
@@ -266,14 +279,29 @@ void DiMuonAnalysis::Loop()
    hEtaJ->GetYaxis()->SetTitle("Nev");
    hEtaJ->Draw("hist");
    // beta
-   TCanvas* c2 = new TCanvas("X","Y",1);
+   TCanvas* c3 = new TCanvas("X","Y",1);
    hbeta->GetXaxis()->SetTitle("beta");
    hbeta->GetYaxis()->SetTitle("Nev");
    hbeta->Draw("hist");
 
+   // Nvtx
+   setTDRStyle(0,1);
+   TCanvas* c4 = new TCanvas("X","Y",1);
+   hNvtx0->GetXaxis()->SetTitle("beta");
+   hNvtx0->GetYaxis()->SetTitle("Nev");
+   hNvtx->Sumw2();
+   hNvtx->Divide(hNvtx,hNvtx0,1.,1.,"B");
+   hNvtx->SetMaximum(0.500);
+   hNvtx->SetMinimum(0.005);
+   //   hDZnv2->SetLineStyle(2);
+   //   hDZnv2->SetLineWidth(3);
+   hNvtx->Draw("PE");
+
    //pTz
+   /*
    TCanvas* c2 = new TCanvas("X","Y",1);
    hPtZ->GetXaxis()->SetTitle("PtZ, GeV");
    hPtZ->GetYaxis()->SetTitle("Nev");
    hPtZ->Draw("hist");
+   */
 }
