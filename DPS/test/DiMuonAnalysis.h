@@ -81,6 +81,7 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
+/*
    if (tree == 0) {
       TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("DiMuAnalysis_Data.root");
       if (!f) {
@@ -89,6 +90,12 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
       tree = (TTree*)gDirectory->Get("t1");
 
    }
+*/
+  if (tree == 0) {
+    TChain * chain = new TChain("t1","");
+    chain->Add("DiMuAnalysis_Data_*.root");
+    tree = chain;
+  }
    Init(tree);
 }
 
