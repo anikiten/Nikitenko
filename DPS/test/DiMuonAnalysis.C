@@ -273,6 +273,18 @@ void DiMuonAnalysis::Loop()
 	    hEtJ->Fill((*EtJPT)[i]); 
 	    hEtaJ->Fill((*EtaJPT)[i]);
 	    DphiZJ = deltaPhi(PhiZ, (*PhiJPT)[i]);
+	    /*
+	    if(run == 163301) {
+	      if((*beta)[i] < 0.1) cout <<" run " << run 
+					<<" event " << event 
+					<<" beta = " << (*beta)[i]
+					<<" etaj = " << (*EtaJPT)[i]
+					<<" phij = " << (*PhiJPT)[i]
+					<<" et jpt = " << (*EtJPT)[i]
+					<<" ntrk = " << (*Ntrk)[i] 
+					<<" nvertex = " << nvertex << endl;
+	    }
+	    */
 	    if( (*beta)[i] < 0.1) {
 	      smallbeta = 1;
 	      hEtJ01->Fill((*EtJPT)[i]); 
@@ -280,13 +292,6 @@ void DiMuonAnalysis::Loop()
 	    }
 	    if(nvertex == 1 || nvertex == 2) {
 	      hbeta1->Fill((*beta)[i]);
-	      /*
-		if((*beta)[i] < 0.02) cout <<" run " << run 
-		<<" event " << event 
-		<<" beta = " << (*beta)[i]
-		<<" etaj = " << (*EtaJPT)[i]
-		<<" ntrk = " << (*Ntrk)[i] << endl;
-	      */
 	    }
 	    if(nvertex == 5 || nvertex == 6) {
 	      hbeta2->Fill((*beta)[i]);
