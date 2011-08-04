@@ -215,14 +215,21 @@ void DiMuonAnalysis::Loop()
    TH1F * hbeta3  = new TH1F( "hbeta3", "beta3", 25, 0., 1.0);
 
    TH1F * hNvtx01   = new TH1F( "hNvtx01", "Nvtx01", 16, 0., 16.);
-   TH1F * hEtJ01    = new TH1F( "hEtJ", "EtJ", 30, 0., 150.);
-   TH1F * hEtaJ01   = new TH1F( "hEtaJ", "EtaJ", 24, -2.4, 2.4);
-   TH1F * hNjets01  = new TH1F( "hNjets", "Njets", 6, 0., 6.);
+   TH1F * hEtJ01    = new TH1F( "hEtJ01", "EtJ01", 30, 0., 150.);
+   TH1F * hEtaJ01   = new TH1F( "hEtaJ01", "EtaJ01", 24, -2.4, 2.4);
+   TH1F * hNjets01  = new TH1F( "hNjets01", "Njets01", 6, 0., 6.);
    TH1F * hPtZ01    = new TH1F( "hPtZ01", "PtZ01", 25, 0., 100.);
    TH1F * hPtZ0     = new TH1F( "hPtZ0", "PtZ0", 25, 0., 100.);
 
    TH1F * hDphiZJ   = new TH1F( "hDphiZJ", "DphiZJ", 16, 0., 3.2);
    TH1F * hDphiZJ01 = new TH1F( "hDphiZJ01", "DphiZJ01", 32, 0., 3.2);
+
+   TH1F * hNtrk1    = new TH1F( "hNtrk1", "Ntrk1", 15, 0., 15);
+   TH1F * hNtrk101  = new TH1F( "hNtrk101", "Ntrk101", 15, 0., 15);
+   TH1F * hNtrk1g   = new TH1F( "hNtrk1g", "Ntrk1g", 15, 0., 15);
+   TH1F * hNtrk3    = new TH1F( "hNtrk3", "Ntrk3", 15, 0., 15);
+   TH1F * hNtrk301  = new TH1F( "hNtrk301", "Ntrk301", 15, 0., 15);
+   TH1F * hNtrk3g   = new TH1F( "hNtrk3g", "Ntrk3g", 15, 0., 15);
 
    Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nbytes = 0, nb = 0;
@@ -292,12 +299,16 @@ void DiMuonAnalysis::Loop()
 	    }
 	    if(nvertex == 1 || nvertex == 2) {
 	      hbeta1->Fill((*beta)[i]);
+	      hNtrk1->Fill((*Ntrk)[i]);
+	      if((*beta)[i] < 0.1)  {hNtrk101->Fill((*Ntrk)[i]);} else {hNtrk1g->Fill((*Ntrk)[i]);}
 	    }
 	    if(nvertex == 5 || nvertex == 6) {
 	      hbeta2->Fill((*beta)[i]);
 	    }
 	    if(nvertex > 7) {
 	      hbeta3->Fill((*beta)[i]);
+	      hNtrk3->Fill((*Ntrk)[i]);
+	      if((*beta)[i] < 0.1) {hNtrk301->Fill((*Ntrk)[i]);} else {hNtrk3g->Fill((*Ntrk)[i]);}
 	    }
 	  }
 	}
@@ -320,6 +331,7 @@ void DiMuonAnalysis::Loop()
 	}
       }
    }
+   /*
    setTDRStyle(0,0);
    // ===> di muon mass: 
    TCanvas* c1 = new TCanvas("X","Y",1);
@@ -328,6 +340,8 @@ void DiMuonAnalysis::Loop()
    hM2mu->Draw("hist");
    c1->SaveAs("M2mu.gif");
 
+   */
+
    // Et jet
    setTDRStyle(0,0);
    TCanvas* c2 = new TCanvas("X","Y",1);
@@ -335,6 +349,7 @@ void DiMuonAnalysis::Loop()
    hEtJ->GetYaxis()->SetTitle("Nev/5 GeV");
    hEtJ->Draw("hist");
    c2->SaveAs("EtJ.gif");
+
    // Et jet
    setTDRStyle(0,1);
    TCanvas* c21 = new TCanvas("X","Y",1);
@@ -352,14 +367,14 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hEtJ01,"jets with #beta < 0.1","L");
    leg->Draw();
    c21->SaveAs("EtJ01.gif");
- 
+
    // Eta jet
    setTDRStyle(0,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
    hEtaJ->GetXaxis()->SetTitle("#eta of jets with p_{T}>20 GeV");
    hEtaJ->GetYaxis()->SetTitle("Nev/0.2");
    hEtaJ->Draw("hist");
-   c3->SaveAs("EtJ.gif");
+   c3->SaveAs("EtaJ.gif");
    // Eta jet
    setTDRStyle(0,0);
    TCanvas* c31 = new TCanvas("X","Y",1);
@@ -402,6 +417,7 @@ void DiMuonAnalysis::Loop()
    leg->Draw();
    c41->SaveAs("Njets01.gif");
 
+   /*
    // Nvtx
    setTDRStyle(0,0);
    TCanvas* c5 = new TCanvas("X","Y",1);
@@ -487,5 +503,64 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hDphiZJ01,"Z + 1 jet #beta < 0.1","L");
    leg->Draw();
    c11->SaveAs("DphiZJ01.gif");
+
+   //Ntrk1
+   setTDRStyle(0,0);
+   TCanvas* c12 = new TCanvas("X","Y",1);
+   hNtrk1->GetXaxis()->SetTitle("N tracks in jet for Nvtx = 1 or 2");
+   hNtrk1->GetYaxis()->SetTitle("Nev");
+   hNtrk1->SetMaximum(100.);
+   hNtrk1->SetMinimum(0.0);
+   hNtrk1->Draw("hist"); 
+   hNtrk101->SetLineStyle(2);
+   hNtrk101->SetLineWidth(3);
+   hNtrk101->Draw("same");
+   TLegend *leg = new TLegend(0.45,0.8,0.9,0.95,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hNtrk1,"all jets","L");
+   leg->AddEntry(hNtrk101,"jets with #beta < 0.1","L");
+   leg->Draw();
+   c12->SaveAs("Ntrk101.gif");
+
+   //Ntrk3
+   setTDRStyle(0,0);
+   TCanvas* c13 = new TCanvas("X","Y",1);
+   hNtrk3->GetXaxis()->SetTitle("N tracks in jet for Nvtx > 7");
+   hNtrk3->GetYaxis()->SetTitle("Nev");
+   hNtrk3->SetMaximum(100.);
+   hNtrk3->SetMinimum(0.0);
+   hNtrk3->Draw("hist"); 
+   hNtrk301->SetLineStyle(2);
+   hNtrk301->SetLineWidth(3);
+   hNtrk301->Draw("same");
+   TLegend *leg = new TLegend(0.45,0.8,0.9,0.95,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hNtrk1,"all jets","L");
+   leg->AddEntry(hNtrk101,"jets with #beta < 0.1","L");
+   leg->Draw();
+   c13->SaveAs("Ntrk301.gif");
+
+   //Ntrk13g
+   setTDRStyle(0,0);
+   TCanvas* c14 = new TCanvas("X","Y",1);
+   hNtrk1g->GetXaxis()->SetTitle("N tracks in jets with #beta > 0.1");
+   hNtrk1g->GetYaxis()->SetTitle("Nev");
+   Double_t scale = 1/hNtrk1g->Integral();
+   hNtrk1g->Scale(scale);
+   hNtrk1g->SetMaximum(0.2);
+   hNtrk1g->SetMinimum(0.0);
+   hNtrk1g->Draw("hist"); 
+   scale = 1/hNtrk3g->Integral();
+   hNtrk3g->Scale(scale);
+   hNtrk3g->SetLineStyle(2);
+   hNtrk3g->SetLineWidth(3);
+   hNtrk3g->Draw("same");
+   TLegend *leg = new TLegend(0.45,0.8,0.9,0.95,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hNtrk1g,"Nvtx 1 or 2","L");
+   leg->AddEntry(hNtrk3g,"Nvtx > 7","L");
+   leg->Draw();
+   c14->SaveAs("Ntrk13g.gif");
+   */
 
 }
