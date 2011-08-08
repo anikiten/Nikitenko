@@ -4,7 +4,7 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void DiMuonAnalysis::setTDRStyle(Int_t xlog, Int_t ylog) {
+void DiMuonAnalysis::setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
 
   TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
 
@@ -128,7 +128,7 @@ void DiMuonAnalysis::setTDRStyle(Int_t xlog, Int_t ylog) {
 // Change for log plots:
   tdrStyle->SetOptLogx(xlog);
   tdrStyle->SetOptLogy(ylog);
-  tdrStyle->SetOptLogz(0);
+  tdrStyle->SetOptLogz(zlog);
 
 // Postscript options:
 
@@ -231,6 +231,19 @@ void DiMuonAnalysis::Loop()
    TH1F * hNtrk301  = new TH1F( "hNtrk301", "Ntrk301", 15, 0., 15);
    TH1F * hNtrk3g   = new TH1F( "hNtrk3g", "Ntrk3g", 15, 0., 15);
 
+   TH1F * hNtrkVtxG2 = new TH1F( "hNtrkVtxG2", "NtrkVtxG2", 15, 0., 15);
+   TH1F * hNtrkVtxL2 = new TH1F( "hNtrkVtxL2", "NtrkVtxL2", 15, 0., 15);
+
+   TH2F * hDzmuon1  = new TH2F( "hDzmuon1", "Dzmuon1", 200, 0., 2., 200, 0., 2.);
+   TH1F * hDZmin1   = new TH1F( "hDZmin1", "DZmin1", 80, 0., 2.);
+   TH1F * hDZmin2   = new TH1F( "hDZmin2", "DZmin2", 80, 0., 2.);
+   TH1F * hDZmin3   = new TH1F( "hDZmin3", "DZmin3", 80, 0., 2.);
+
+   TH1F * hNvtxL2      = new TH1F( "hNvtxL2", "NvtxL2", 16, 0., 16.);
+
+   TH1F * hNvtxjet20   = new TH1F( "hNvtxjet20", "Nvtxjet20", 16, 0., 16.);
+   TH1F * hNvtxjet25   = new TH1F( "hNvtxjet25", "Nvtxjet25", 16, 0., 16.);
+
    Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nbytes = 0, nb = 0;
 
@@ -244,20 +257,24 @@ void DiMuonAnalysis::Loop()
       nev++;
       Int_t ngoodjets = 0;
       Int_t nalljets = 0;
+      Int_t izmin = 0;
+      if(DZmin < 0.2) izmin = 1;
       // di muon mass
       hM2mu->Fill(mass_mumu);
       if(mass_mumu < 80. || mass_mumu > 100.) {continue;}
       Int_t smallbeta = 0;
+      Int_t jet25 = 0;
       Int_t njets = EtJPT->size();
       Int_t nmuon = PtMu->size();
       // muons
       Double_t PtZx = 0.;
       Double_t PtZy = 0.;
       Double_t DphiZJ = 0;
+      hDzmuon1->Fill((*dzmuon)[0],(*dzmuon)[1]);  
       for (unsigned int j = 0; j < nmuon; j++) {
 	if(j < 2) {
 	  PtZx += (*PtMu)[j] * cos((*PhiMu)[j]); 
-	  PtZy += (*PtMu)[j] * sin((*PhiMu)[j]); 
+	  PtZy += (*PtMu)[j] * sin((*PhiMu)[j]);
 	}
       }
       Double_t PtZ = sqrt(PtZx*PtZx + PtZy*PtZy);
@@ -280,6 +297,10 @@ void DiMuonAnalysis::Loop()
 	    hEtJ->Fill((*EtJPT)[i]); 
 	    hEtaJ->Fill((*EtaJPT)[i]);
 	    DphiZJ = deltaPhi(PhiZ, (*PhiJPT)[i]);
+
+	    if( (*beta)[i] > 0.1) {
+	      if(izmin == 1) {hNtrkVtxL2->Fill((*Ntrk)[i]);} else {hNtrkVtxG2->Fill((*Ntrk)[i]);}
+	    }
 	    /*
 	    if(run == 163301) {
 	      if((*beta)[i] < 0.1) cout <<" run " << run 
@@ -292,6 +313,10 @@ void DiMuonAnalysis::Loop()
 					<<" nvertex = " << nvertex << endl;
 	    }
 	    */
+	    if( (*EtJPT)[i] > 25.) {
+	      jet25 = 1;
+	    }
+
 	    if( (*beta)[i] < 0.1) {
 	      smallbeta = 1;
 	      hEtJ01->Fill((*EtJPT)[i]); 
@@ -313,26 +338,51 @@ void DiMuonAnalysis::Loop()
 	  }
 	}
       }
+
       if(nalljets == 0 && ngoodjets == 0) {hPtZ0->Fill(PtZ);}
+
       if(ngoodjets != 0) {
+
 	hNjets->Fill(1.*ngoodjets);
 	hNvtx->Fill(1.*nvertex);
+
+	if(smallbeta == 0) {
+	  hNvtxjet20->Fill(1.*nvertex);
+	  if(jet25 == 1) {hNvtxjet25->Fill(1.*nvertex);}
+	}
+
+	if(izmin == 1) {hNvtxL2->Fill(1.*nvertex);}
+
 	if(nalljets == 1 && ngoodjets == 1) {
 	  hPtZ->Fill(PtZ);
 	  hDphiZJ->Fill(DphiZJ);
 	}
+
 	if( smallbeta == 1) {
+
 	  hNvtx01->Fill(1.*nvertex);
 	  hNjets01->Fill(1.*ngoodjets);
+
 	  if(nalljets == 1 && ngoodjets == 1) {
 	    hPtZ01->Fill(PtZ);
 	    hDphiZJ01->Fill(DphiZJ);
 	  }
 	}
+
+	if(nvertex == 2) {
+	  hDZmin1->Fill(DZmin);
+	}  
+	if (nvertex == 5 || nvertex == 6) {
+	  hDZmin2->Fill(DZmin);
+	} 
+	if (nvertex > 7) {
+	  hDZmin3->Fill(DZmin);
+	} 
+
       }
    }
    /*
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    // ===> di muon mass: 
    TCanvas* c1 = new TCanvas("X","Y",1);
    hM2mu->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
@@ -340,10 +390,9 @@ void DiMuonAnalysis::Loop()
    hM2mu->Draw("hist");
    c1->SaveAs("M2mu.gif");
 
-   */
 
    // Et jet
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c2 = new TCanvas("X","Y",1);
    hEtJ->GetXaxis()->SetTitle("p_{T} of jets with |#eta|<2.0, GeV");
    hEtJ->GetYaxis()->SetTitle("Nev/5 GeV");
@@ -351,7 +400,7 @@ void DiMuonAnalysis::Loop()
    c2->SaveAs("EtJ.gif");
 
    // Et jet
-   setTDRStyle(0,1);
+   setTDRStyle(0,1,0);
    TCanvas* c21 = new TCanvas("X","Y",1);
    hEtJ->GetXaxis()->SetTitle("p_{T} of jets with |#eta|<2.0, GeV");
    hEtJ->GetYaxis()->SetTitle("Nev/5 GeV");
@@ -369,14 +418,14 @@ void DiMuonAnalysis::Loop()
    c21->SaveAs("EtJ01.gif");
 
    // Eta jet
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
    hEtaJ->GetXaxis()->SetTitle("#eta of jets with p_{T}>20 GeV");
    hEtaJ->GetYaxis()->SetTitle("Nev/0.2");
    hEtaJ->Draw("hist");
    c3->SaveAs("EtaJ.gif");
    // Eta jet
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c31 = new TCanvas("X","Y",1);
    hEtaJ->GetXaxis()->SetTitle("#eta of jets with p_{T}>20 GeV");
    hEtaJ->GetYaxis()->SetTitle("Nev/0.2");
@@ -393,14 +442,14 @@ void DiMuonAnalysis::Loop()
    c31->SaveAs("EtaJ01.gif");
 
    // N jets
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c4 = new TCanvas("X","Y",1);
    hNjets->GetXaxis()->SetTitle("N jets p_{T}> 20 GeV, |#eta| < 2.0");
    hNjets->GetYaxis()->SetTitle("Nev");
    hNjets->Draw("hist");
    c4->SaveAs("Njets.gif");
    // N jets
-   setTDRStyle(0,1);
+   setTDRStyle(0,1,0);
    TCanvas* c41 = new TCanvas("X","Y",1);
    hNjets->GetXaxis()->SetTitle("N jets p_{T}> 20 GeV, |#eta| < 2.0");
    hNjets->GetYaxis()->SetTitle("Nev");
@@ -417,9 +466,8 @@ void DiMuonAnalysis::Loop()
    leg->Draw();
    c41->SaveAs("Njets01.gif");
 
-   /*
    // Nvtx
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c5 = new TCanvas("X","Y",1);
    hNvtx->GetXaxis()->SetTitle("N reco vtx (ev.with p_{T}^{j}>20 GeV, |#eta^{j}|<2.0)");
    hNvtx->GetYaxis()->SetTitle("Nev");
@@ -427,7 +475,7 @@ void DiMuonAnalysis::Loop()
    c5->SaveAs("Nvtx.gif");
 
    // beta 1 or 2 vtx
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c6 = new TCanvas("X","Y",1);
    hbeta1->GetXaxis()->SetTitle("#beta for Nvtx = 1 or 2");
    hbeta1->GetYaxis()->SetTitle("Nev");
@@ -435,7 +483,7 @@ void DiMuonAnalysis::Loop()
    c6->SaveAs("beta1.gif");
 
    // beta 5 or 6 vtx
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c7 = new TCanvas("X","Y",1);
    hbeta2->GetXaxis()->SetTitle("#beta for Nvtx = 5 or 6");
    hbeta2->GetYaxis()->SetTitle("Nev");
@@ -443,7 +491,7 @@ void DiMuonAnalysis::Loop()
    c7->SaveAs("beta2.gif");
 
    // beta 5 or 6 vtx
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c8 = new TCanvas("X","Y",1);
    hbeta3->GetXaxis()->SetTitle("#beta for Nvtx > 7");
    hbeta3->GetYaxis()->SetTitle("Nev");
@@ -451,7 +499,7 @@ void DiMuonAnalysis::Loop()
    c8->SaveAs("beta3.gif");
 
    // Nvtx
-   setTDRStyle(0,1);
+   setTDRStyle(0,1,0);
    TCanvas* c9 = new TCanvas("X","Y",1);
    hNvtx01->GetXaxis()->SetTitle("N reco vtx");
    hNvtx01->GetYaxis()->SetTitle("At least one jet with #beta < 0.1");
@@ -464,7 +512,7 @@ void DiMuonAnalysis::Loop()
    c9->SaveAs("eff_smallbeta.gif");
 
    //pTz
-   setTDRStyle(0,1);
+   setTDRStyle(0,1,0);
    TCanvas* c10 = new TCanvas("X","Y",1);
    hPtZ->GetXaxis()->SetTitle("p_{T}^{#mu #mu}, GeV");
    hPtZ->GetYaxis()->SetTitle("Nev");
@@ -487,7 +535,7 @@ void DiMuonAnalysis::Loop()
    leg->Draw();
    c10->SaveAs("PtZ01.gif");
 
-   setTDRStyle(0,1);
+   setTDRStyle(0,1,0);
    TCanvas* c11 = new TCanvas("X","Y",1);
    hDphiZJ->GetXaxis()->SetTitle("#Delta #phi (Z-jet), rad");
    hDphiZJ->GetYaxis()->SetTitle("Nev");
@@ -505,7 +553,7 @@ void DiMuonAnalysis::Loop()
    c11->SaveAs("DphiZJ01.gif");
 
    //Ntrk1
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c12 = new TCanvas("X","Y",1);
    hNtrk1->GetXaxis()->SetTitle("N tracks in jet for Nvtx = 1 or 2");
    hNtrk1->GetYaxis()->SetTitle("Nev");
@@ -523,7 +571,7 @@ void DiMuonAnalysis::Loop()
    c12->SaveAs("Ntrk101.gif");
 
    //Ntrk3
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c13 = new TCanvas("X","Y",1);
    hNtrk3->GetXaxis()->SetTitle("N tracks in jet for Nvtx > 7");
    hNtrk3->GetYaxis()->SetTitle("Nev");
@@ -541,7 +589,7 @@ void DiMuonAnalysis::Loop()
    c13->SaveAs("Ntrk301.gif");
 
    //Ntrk13g
-   setTDRStyle(0,0);
+   setTDRStyle(0,0,0);
    TCanvas* c14 = new TCanvas("X","Y",1);
    hNtrk1g->GetXaxis()->SetTitle("N tracks in jets with #beta > 0.1");
    hNtrk1g->GetYaxis()->SetTitle("Nev");
@@ -562,5 +610,90 @@ void DiMuonAnalysis::Loop()
    leg->Draw();
    c14->SaveAs("Ntrk13g.gif");
    */
+
+   //Dzmuon
+   setTDRStyle(1,1,1);
+   TCanvas* c15 = new TCanvas("X","Y",1);
+   hDzmuon1->GetXaxis()->SetTitle("#Delta Z_{#mu 1} - SPV, cm");
+   hDzmuon1->GetYaxis()->SetTitle("#Delta Z_{#mu 2} - SPV, cm");
+   //   hDzmuon1->SetMaximum(100.);
+   //   hDzmuon1->SetMinimum(0.0);
+   hDzmuon1->Draw("LEGO1"); 
+   c15->SaveAs("Dzmuon1.gif");
+
+   //DZmin1
+   setTDRStyle(1,0,0);
+   TCanvas* c16 = new TCanvas("X","Y",1);
+   hDZmin1->GetXaxis()->SetTitle("#Delta Z_{min}^{vtx-vtx} for Nvtx = 2, cm");
+   hDZmin1->GetYaxis()->SetTitle("Nev / 250 #mu m");
+   hDZmin1->SetAxisRange(0.025, 2., "X");
+   hDZmin1->Draw("hist"); 
+   c16->SaveAs("DZmin1.gif");
+
+   //DZmin2
+   setTDRStyle(1,0,0);
+   TCanvas* c17 = new TCanvas("X","Y",1);
+   hDZmin2->GetXaxis()->SetTitle("#Delta Z_{min}^{vtx-vtx} for Nvtx = 5 or 6, cm");
+   hDZmin2->GetYaxis()->SetTitle("Nev / 250 #mu m");
+   hDZmin2->SetAxisRange(0.025, 2., "X");
+   hDZmin2->Draw("hist"); 
+   c17->SaveAs("DZmin2.gif");
+
+   //DZmin3
+   setTDRStyle(1,0,0);
+   TCanvas* c18 = new TCanvas("X","Y",1);
+   hDZmin3->GetXaxis()->SetTitle("#Delta Z_{min}^{vtx-vtx} for Nvtx > 7, cm");
+   hDZmin3->GetYaxis()->SetTitle("Nev / 250 #mu m");
+   hDZmin3->SetAxisRange(0.025, 2., "X");
+   hDZmin3->Draw("hist"); 
+   c18->SaveAs("DZmin3.gif");
+
+   //Ntrk
+   setTDRStyle(0,0,0);
+   TCanvas* c19 = new TCanvas("X","Y",1);
+   hNtrkVtxG2->GetXaxis()->SetTitle("N tracks in jets with #beta > 0.1");
+   hNtrkVtxG2->GetYaxis()->SetTitle("Nev");
+   Double_t scale = 1/hNtrkVtxG2->Integral();
+   hNtrkVtxG2->Scale(scale);
+   hNtrkVtxG2->SetMaximum(0.25);
+   hNtrkVtxG2->SetMinimum(0.00);
+   hNtrkVtxG2->Draw("hist"); 
+   scale = 1/hNtrkVtxL2->Integral();
+   hNtrkVtxL2->Scale(scale);
+   hNtrkVtxL2->SetLineStyle(2);
+   hNtrkVtxL2->SetLineWidth(3);
+   hNtrkVtxL2->Draw("same");
+   TLegend *leg = new TLegend(0.45,0.75,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hNtrkVtxG2,"#Delta Z_{min}^{vtx-vtx} > 2 mm","L");
+   leg->AddEntry(hNtrkVtxL2,"#Delta Z_{min}^{vtx-vtx} < 2 mm","L");
+   leg->Draw();
+   c19->SaveAs("NtrkVtxGL2.gif");
+
+   // NvtxL2
+   setTDRStyle(0,1,0);
+   TCanvas* c20 = new TCanvas("X","Y",1);
+   hNvtxL2->GetXaxis()->SetTitle("N reco vtx");
+   hNvtxL2->GetYaxis()->SetTitle("fraction #Delta Z_{min}^{vtx-vtx} < 2 mm");
+   hNvtxL2->Sumw2();
+   hNvtxL2->Divide(hNvtxL2,hNvtx,1.,1.,"B");
+   hNvtxL2->SetMaximum(0.600);
+   hNvtxL2->SetMinimum(0.005);
+   hNvtxL2->SetMarkerStyle(24);
+   hNvtxL2->Draw("PE1");
+   c20->SaveAs("NvtxL2.gif");
+
+   // NvtxL2
+   setTDRStyle(0,0,0);
+   TCanvas* c21 = new TCanvas("X","Y",1);
+   hNvtxjet25->GetXaxis()->SetTitle("N reco vtx");
+   hNvtxjet25->GetYaxis()->SetTitle("fract. of ev. p_{T jet} > 25 GeV, #beta > 0.1");
+   hNvtxjet25->Sumw2();
+   hNvtxjet25->Divide(hNvtxjet25,hNvtxjet20,1.,1.,"B");
+   hNvtxjet25->SetMaximum(1.1);
+   hNvtxjet25->SetMinimum(0.4);
+   hNvtxjet25->SetMarkerStyle(24);
+   hNvtxjet25->Draw("PE1");
+   c21->SaveAs("Nvtxjet25.gif");
 
 }
