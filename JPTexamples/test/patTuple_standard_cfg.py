@@ -19,7 +19,8 @@ process.ak5PFJets.doAreaFastjet = True
 # use proper tag. corresponding to CMSSW version !
 # process.GlobalTag.globaltag = cms.string('MC_42_V13::All')
 
-process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
+# process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
+process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
 
 ## ------------------------------------------------------
 #  NOTE: you can use a bunch of core tools of PAT to
