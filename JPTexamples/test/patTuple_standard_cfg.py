@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 
 # use proper tag. corresponding to CMSSW version !
-process.GlobalTag.globaltag = cms.string('MC_42_V9::All')
+process.GlobalTag.globaltag = cms.string('MC_42_V13::All')
 
 ## ------------------------------------------------------
 #  NOTE: you can use a bunch of core tools of PAT to
@@ -52,7 +52,7 @@ process.out.outputCommands+= ["keep *_selectedPatJets*_*_*"]  ##  (e.g. taken fr
 #      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo)
 #      connect = cms.string('frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS')
 #)
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+# process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 ################################################################################################################
 
 # uncomment next two lines for CMSSW_4_1_4 and 3_9_X
