@@ -597,7 +597,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     */
   }
   // fill tree
-  if( (mass_mumu >= 40.) && (pTjptIndex.size() != 0) ) t1->Fill();
+  if( (mass_mumu >= 70.) && (pTjptIndex.size() != 0) ) t1->Fill();
 }
 
 //define this as a plug-in
