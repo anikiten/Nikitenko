@@ -64,7 +64,8 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
 # '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
-  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_run161312_1_1_SQ6.root')
+#  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_run161312_1_1_SQ6.root')
+ '/store/data/Run2011A/Jet/RECO/PromptReco-v4/000/165/121/4C12EC82-7481-E011-8499-0030487C8CB8.root')
 )
 
 
@@ -75,6 +76,7 @@ process.myjetplustrack = cms.EDAnalyzer("JetPlusTrackAnalysis_Data",
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
+    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),	
     TriggerResults = cms.InputTag("TriggerResults","","HLT")	
 )
 

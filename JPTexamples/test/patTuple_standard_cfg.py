@@ -71,9 +71,8 @@ process.out.outputCommands+= ["keep *_selectedPatJets*_*_*"]  ##  (e.g. taken fr
 # process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 ################################################################################################################
 
-# uncomment next two lines for CMSSW_4_1_4 and 3_9_X
-# process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
-# process.load("RecoJets.Configuration.RecoJPTJets_cff")
+process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
+process.load("RecoJets.Configuration.RecoJPTJets_cff")
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
@@ -98,14 +97,11 @@ addJetCollection( process,
                            doJetID      = True,
                            jetIdLabel   = "ak5")
 ##
-## uncomment for CMSSW_4_1_4 and 3_9_X
-# process.p = cms.Path(
-#   process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.patDefaultSequence
-#    )
-
 process.p = cms.Path(process.rhoProcess
                     +process.kt6PFJets
                     +process.ak5PFJets   
+                    +process.ak5JTA
+                    +process.jetPlusTrackZSPCorJetAntiKt5
                     +process.patDefaultSequence)
 
 ## ------------------------------------------------------
