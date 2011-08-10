@@ -24,6 +24,7 @@ process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
 # process.GlobalTag.globaltag = cms.string('START42_V12::All')
 
 # data tags
+# GR_R_42_V19 does not work. Use FT_R_42_V13A
 # process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
 # process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
 

@@ -7,12 +7,8 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-# process.GlobalTag.globaltag = cms.string('START311_V2::All')
-# process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
-# process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
-# process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All')
- 
-process.GlobalTag.globaltag = cms.string('START42_V13::All') 
+process.GlobalTag.globaltag = cms.string('MC_42_V13::All') 
+# process.GlobalTag.globaltag = cms.string('START42_V13::All') 
 
 # process.load("Configuration.StandardSequences.Services_cff")
 # process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -60,13 +56,14 @@ process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(100)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
 # '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
-  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_run161312_1_1_SQ6.root')
+  '/store/relval/CMSSW_4_2_0/RelValTTbar/GEN-SIM-RECO/MC_42_V9-v1/0054/3CBCB401-935E-E011-8345-0026189437F8.root')
+#  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_run161312_1_1_SQ6.root')
 )
 
 
