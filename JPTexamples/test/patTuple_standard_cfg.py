@@ -1,4 +1,4 @@
-## import skeleton process
+# import skeleton process
 
 # process.load('PhysicsTools.PatAlgos.patSequences_cff')
 
@@ -17,10 +17,15 @@ process.kt6PFJets.doRhoFastjet = True
 process.ak5PFJets.doAreaFastjet = True
 
 # use proper tag. corresponding to CMSSW version !
-# process.GlobalTag.globaltag = cms.string('MC_42_V13::All')
 
+# MC tags
+# MC_42_V13 and START42_V13 do not work. Use MC_42_V12 or START42_V12
+process.GlobalTag.globaltag = cms.string('MC_42_V12::All')
+# process.GlobalTag.globaltag = cms.string('START42_V12::All')
+
+# data tags
 # process.GlobalTag.globaltag = cms.string('GR_R_42_V19::All')
-process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
+# process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
 
 ## ------------------------------------------------------
 #  NOTE: you can use a bunch of core tools of PAT to
@@ -98,12 +103,14 @@ addJetCollection( process,
                            doJetID      = True,
                            jetIdLabel   = "ak5")
 ##
+
 process.p = cms.Path(process.rhoProcess
                     +process.kt6PFJets
                     +process.ak5PFJets   
                     +process.ak5JTA
                     +process.jetPlusTrackZSPCorJetAntiKt5
                     +process.patDefaultSequence)
+
 
 ## ------------------------------------------------------
 #  In addition you usually want to change the following
@@ -112,8 +119,9 @@ process.p = cms.Path(process.rhoProcess
 #                                         ##
 process.source.fileNames = [          ##
 #    '/store/relval/CMSSW_4_1_3/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0037/648B6AA5-C751-E011-8208-001A928116C6.root'
-#    '/store/relval/CMSSW_4_2_0/RelValTTbar/GEN-SIM-RECO/MC_42_V9-v1/0054/3CBCB401-935E-E011-8345-0026189437F8.root'
-     '/store/data/Run2011A/Jet/RECO/PromptReco-v4/000/165/121/4C12EC82-7481-E011-8499-0030487C8CB8.root'
+    '/store/relval/CMSSW_4_2_0/RelValTTbar/GEN-SIM-RECO/MC_42_V9-v1/0054/3CBCB401-935E-E011-8345-0026189437F8.root'
+#     '/store/relval/CMSSW_4_2_0/RelValQCD_FlatPt_15_3000/GEN-SIM-RECO/MC_42_V9-v1/0054/72334203-985E-E011-93FD-003048D15DCA.root'
+#    '/store/data/Run2011A/Jet/RECO/PromptReco-v4/000/165/121/4C12EC82-7481-E011-8499-0030487C8CB8.root'
    ]                                     ##  (e.g. 'file:AOD.root')
 #                                         ##
 #   process.maxEvents.input = cms.untracked.int32(2)            ##  (e.g. -1 to run on all events)
