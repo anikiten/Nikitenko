@@ -294,8 +294,8 @@ void DiMuonAnalysis::Loop()
 	  nalljets = nalljets + 1;
 	  if(fabs((*EtaJPT)[i]) < 2.0) {
 	    ngoodjets = ngoodjets + 1;
-	    hEtJ->Fill((*EtJPT)[i]); 
 	    hEtaJ->Fill((*EtaJPT)[i]);
+	    hEtJ->Fill((*EtJPT)[i]); 
 	    DphiZJ = deltaPhi(PhiZ, (*PhiJPT)[i]);
 
 	    if( (*beta)[i] > 0.1) {
@@ -381,27 +381,38 @@ void DiMuonAnalysis::Loop()
 
       }
    }
-   /*
+
+   TFile efile("JPT_new.root","recreate");
+
    setTDRStyle(0,0,0);
    // ===> di muon mass: 
    TCanvas* c1 = new TCanvas("X","Y",1);
+
+   hM2mu->Write();
+
    hM2mu->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
    hM2mu->GetYaxis()->SetTitle("Nev/2 GeV");
    hM2mu->Draw("hist");
-   c1->SaveAs("M2mu.gif");
+   c1->SaveAs("M2mu.png");
 
 
    // Et jet
    setTDRStyle(0,0,0);
    TCanvas* c2 = new TCanvas("X","Y",1);
+
+   hEtJ->Write();
+
    hEtJ->GetXaxis()->SetTitle("p_{T} of jets with |#eta|<2.0, GeV");
    hEtJ->GetYaxis()->SetTitle("Nev/5 GeV");
    hEtJ->Draw("hist");
-   c2->SaveAs("EtJ.gif");
+   c2->SaveAs("EtJ.png");
 
    // Et jet
    setTDRStyle(0,1,0);
    TCanvas* c21 = new TCanvas("X","Y",1);
+
+   hEtJ01->Write();
+
    hEtJ->GetXaxis()->SetTitle("p_{T} of jets with |#eta|<2.0, GeV");
    hEtJ->GetYaxis()->SetTitle("Nev/5 GeV");
    hEtJ->SetMaximum(5000);
@@ -415,18 +426,25 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hEtJ,"all jets","L");
    leg->AddEntry(hEtJ01,"jets with #beta < 0.1","L");
    leg->Draw();
-   c21->SaveAs("EtJ01.gif");
+   c21->SaveAs("EtJ01.png");
 
    // Eta jet
    setTDRStyle(0,0,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
+
+   hEtaJ->Write();
+
    hEtaJ->GetXaxis()->SetTitle("#eta of jets with p_{T}>20 GeV");
    hEtaJ->GetYaxis()->SetTitle("Nev/0.2");
    hEtaJ->Draw("hist");
-   c3->SaveAs("EtaJ.gif");
+   c3->SaveAs("EtaJ.png");
+
    // Eta jet
    setTDRStyle(0,0,0);
    TCanvas* c31 = new TCanvas("X","Y",1);
+
+   hEtaJ01->Write();
+
    hEtaJ->GetXaxis()->SetTitle("#eta of jets with p_{T}>20 GeV");
    hEtaJ->GetYaxis()->SetTitle("Nev/0.2");
    hEtaJ->SetMaximum(450);
@@ -439,18 +457,25 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hEtaJ,"all jets","L");
    leg->AddEntry(hEtaJ01,"jets with #beta < 0.1","L");
    leg->Draw();
-   c31->SaveAs("EtaJ01.gif");
+   c31->SaveAs("EtaJ01.png");
 
    // N jets
    setTDRStyle(0,0,0);
    TCanvas* c4 = new TCanvas("X","Y",1);
+
+   hNjets->Write();
+
    hNjets->GetXaxis()->SetTitle("N jets p_{T}> 20 GeV, |#eta| < 2.0");
    hNjets->GetYaxis()->SetTitle("Nev");
    hNjets->Draw("hist");
-   c4->SaveAs("Njets.gif");
+   c4->SaveAs("Njets.png");
+
    // N jets
    setTDRStyle(0,1,0);
    TCanvas* c41 = new TCanvas("X","Y",1);
+
+   hNjets01->Write();
+
    hNjets->GetXaxis()->SetTitle("N jets p_{T}> 20 GeV, |#eta| < 2.0");
    hNjets->GetYaxis()->SetTitle("Nev");
    hNjets->SetMaximum(10000);
@@ -464,43 +489,58 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hNjets,"all jets","L");
    leg->AddEntry(hNjets01,"at least one with #beta < 0.1","L");
    leg->Draw();
-   c41->SaveAs("Njets01.gif");
+   c41->SaveAs("Njets01.png");
 
    // Nvtx
    setTDRStyle(0,0,0);
    TCanvas* c5 = new TCanvas("X","Y",1);
+
+   hNvtx->Write();
+
    hNvtx->GetXaxis()->SetTitle("N reco vtx (ev.with p_{T}^{j}>20 GeV, |#eta^{j}|<2.0)");
    hNvtx->GetYaxis()->SetTitle("Nev");
    hNvtx->Draw("hist");
-   c5->SaveAs("Nvtx.gif");
+   c5->SaveAs("Nvtx.png");
 
    // beta 1 or 2 vtx
    setTDRStyle(0,0,0);
    TCanvas* c6 = new TCanvas("X","Y",1);
+
+   hbeta1->Write();
+
    hbeta1->GetXaxis()->SetTitle("#beta for Nvtx = 1 or 2");
    hbeta1->GetYaxis()->SetTitle("Nev");
    hbeta1->Draw("hist");
-   c6->SaveAs("beta1.gif");
+   c6->SaveAs("beta1.png");
 
    // beta 5 or 6 vtx
    setTDRStyle(0,0,0);
    TCanvas* c7 = new TCanvas("X","Y",1);
+
+   hbeta2->Write();
+
    hbeta2->GetXaxis()->SetTitle("#beta for Nvtx = 5 or 6");
    hbeta2->GetYaxis()->SetTitle("Nev");
    hbeta2->Draw("hist");
-   c7->SaveAs("beta2.gif");
+   c7->SaveAs("beta2.png");
 
    // beta 5 or 6 vtx
    setTDRStyle(0,0,0);
    TCanvas* c8 = new TCanvas("X","Y",1);
+
+   hbeta3->Write();
+
    hbeta3->GetXaxis()->SetTitle("#beta for Nvtx > 7");
    hbeta3->GetYaxis()->SetTitle("Nev");
    hbeta3->Draw("hist");
-   c8->SaveAs("beta3.gif");
+   c8->SaveAs("beta3.png");
 
    // Nvtx
    setTDRStyle(0,1,0);
    TCanvas* c9 = new TCanvas("X","Y",1);
+
+   hNvtx01->Write();
+
    hNvtx01->GetXaxis()->SetTitle("N reco vtx");
    hNvtx01->GetYaxis()->SetTitle("At least one jet with #beta < 0.1");
    hNvtx01->Sumw2();
@@ -509,11 +549,15 @@ void DiMuonAnalysis::Loop()
    hNvtx01->SetMinimum(0.005);
    hNvtx01->SetMarkerStyle(24);
    hNvtx01->Draw("PE1");
-   c9->SaveAs("eff_smallbeta.gif");
+   c9->SaveAs("eff_smallbeta.png");
 
    //pTz
    setTDRStyle(0,1,0);
    TCanvas* c10 = new TCanvas("X","Y",1);
+
+   hPtZ->Write();
+   hPtZ01->Write();
+
    hPtZ->GetXaxis()->SetTitle("p_{T}^{#mu #mu}, GeV");
    hPtZ->GetYaxis()->SetTitle("Nev");
    hPtZ->SetMaximum(1000.);
@@ -533,10 +577,15 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hPtZ01,"Z + 1 jet #beta < 0.1","P");
    leg->AddEntry(hPtZ0,"Z + no jets (scaled)","L");
    leg->Draw();
-   c10->SaveAs("PtZ01.gif");
+   c10->SaveAs("PtZ01.png");
 
+   //
    setTDRStyle(0,1,0);
    TCanvas* c11 = new TCanvas("X","Y",1);
+
+   hDphiZJ->Write();
+   hDphiZJ01->Write();
+
    hDphiZJ->GetXaxis()->SetTitle("#Delta #phi (Z-jet), rad");
    hDphiZJ->GetYaxis()->SetTitle("Nev");
    hDphiZJ->SetMaximum(2000);
@@ -550,11 +599,15 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hDphiZJ,"Z + 1 jet","L");
    leg->AddEntry(hDphiZJ01,"Z + 1 jet #beta < 0.1","L");
    leg->Draw();
-   c11->SaveAs("DphiZJ01.gif");
+   c11->SaveAs("DphiZJ01.png");
 
    //Ntrk1
    setTDRStyle(0,0,0);
    TCanvas* c12 = new TCanvas("X","Y",1);
+
+   hNtrk1->Write();
+   hNtrk101->Write();
+
    hNtrk1->GetXaxis()->SetTitle("N tracks in jet for Nvtx = 1 or 2");
    hNtrk1->GetYaxis()->SetTitle("Nev");
    hNtrk1->SetMaximum(100.);
@@ -568,11 +621,15 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hNtrk1,"all jets","L");
    leg->AddEntry(hNtrk101,"jets with #beta < 0.1","L");
    leg->Draw();
-   c12->SaveAs("Ntrk101.gif");
+   c12->SaveAs("Ntrk101.png");
 
    //Ntrk3
    setTDRStyle(0,0,0);
    TCanvas* c13 = new TCanvas("X","Y",1);
+
+   hNtrk3->Write();
+   hNtrk301->Write();
+
    hNtrk3->GetXaxis()->SetTitle("N tracks in jet for Nvtx > 7");
    hNtrk3->GetYaxis()->SetTitle("Nev");
    hNtrk3->SetMaximum(100.);
@@ -586,11 +643,15 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hNtrk1,"all jets","L");
    leg->AddEntry(hNtrk101,"jets with #beta < 0.1","L");
    leg->Draw();
-   c13->SaveAs("Ntrk301.gif");
+   c13->SaveAs("Ntrk301.png");
 
    //Ntrk13g
    setTDRStyle(0,0,0);
    TCanvas* c14 = new TCanvas("X","Y",1);
+
+   hNtrk1g->Write();
+   hNtrk3g->Write();
+
    hNtrk1g->GetXaxis()->SetTitle("N tracks in jets with #beta > 0.1");
    hNtrk1g->GetYaxis()->SetTitle("Nev");
    Double_t scale = 1/hNtrk1g->Integral();
@@ -608,49 +669,64 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hNtrk1g,"Nvtx 1 or 2","L");
    leg->AddEntry(hNtrk3g,"Nvtx > 7","L");
    leg->Draw();
-   c14->SaveAs("Ntrk13g.gif");
-   */
+   c14->SaveAs("Ntrk13g.png");
 
    //Dzmuon
    setTDRStyle(1,1,1);
    TCanvas* c15 = new TCanvas("X","Y",1);
+
+   hDzmuon1->Write();
+
    hDzmuon1->GetXaxis()->SetTitle("#Delta Z_{#mu 1} - SPV, cm");
    hDzmuon1->GetYaxis()->SetTitle("#Delta Z_{#mu 2} - SPV, cm");
    //   hDzmuon1->SetMaximum(100.);
    //   hDzmuon1->SetMinimum(0.0);
    hDzmuon1->Draw("LEGO1"); 
-   c15->SaveAs("Dzmuon1.gif");
+   c15->SaveAs("Dzmuon1.png");
 
    //DZmin1
    setTDRStyle(1,0,0);
    TCanvas* c16 = new TCanvas("X","Y",1);
+
+   hDZmin1->Write();
+
    hDZmin1->GetXaxis()->SetTitle("#Delta Z_{min}^{vtx-vtx} for Nvtx = 2, cm");
    hDZmin1->GetYaxis()->SetTitle("Nev / 250 #mu m");
    hDZmin1->SetAxisRange(0.025, 2., "X");
    hDZmin1->Draw("hist"); 
-   c16->SaveAs("DZmin1.gif");
+   c16->SaveAs("DZmin1.png");
 
    //DZmin2
    setTDRStyle(1,0,0);
    TCanvas* c17 = new TCanvas("X","Y",1);
+
+   hDZmin2->Write();
+
    hDZmin2->GetXaxis()->SetTitle("#Delta Z_{min}^{vtx-vtx} for Nvtx = 5 or 6, cm");
    hDZmin2->GetYaxis()->SetTitle("Nev / 250 #mu m");
    hDZmin2->SetAxisRange(0.025, 2., "X");
    hDZmin2->Draw("hist"); 
-   c17->SaveAs("DZmin2.gif");
+   c17->SaveAs("DZmin2.png");
 
    //DZmin3
    setTDRStyle(1,0,0);
    TCanvas* c18 = new TCanvas("X","Y",1);
+
+   hDZmin3->Write();
+
    hDZmin3->GetXaxis()->SetTitle("#Delta Z_{min}^{vtx-vtx} for Nvtx > 7, cm");
    hDZmin3->GetYaxis()->SetTitle("Nev / 250 #mu m");
    hDZmin3->SetAxisRange(0.025, 2., "X");
    hDZmin3->Draw("hist"); 
-   c18->SaveAs("DZmin3.gif");
+   c18->SaveAs("DZmin3.png");
 
    //Ntrk
    setTDRStyle(0,0,0);
    TCanvas* c19 = new TCanvas("X","Y",1);
+
+   hNtrkVtxG2->Write();
+   hNtrkVtxL2->Write();
+
    hNtrkVtxG2->GetXaxis()->SetTitle("N tracks in jets with #beta > 0.1");
    hNtrkVtxG2->GetYaxis()->SetTitle("Nev");
    Double_t scale = 1/hNtrkVtxG2->Integral();
@@ -668,11 +744,14 @@ void DiMuonAnalysis::Loop()
    leg->AddEntry(hNtrkVtxG2,"#Delta Z_{min}^{vtx-vtx} > 2 mm","L");
    leg->AddEntry(hNtrkVtxL2,"#Delta Z_{min}^{vtx-vtx} < 2 mm","L");
    leg->Draw();
-   c19->SaveAs("NtrkVtxGL2.gif");
+   c19->SaveAs("NtrkVtxGL2.png");
 
    // NvtxL2
    setTDRStyle(0,1,0);
    TCanvas* c20 = new TCanvas("X","Y",1);
+
+   hNvtxL2->Write();
+
    hNvtxL2->GetXaxis()->SetTitle("N reco vtx");
    hNvtxL2->GetYaxis()->SetTitle("fraction #Delta Z_{min}^{vtx-vtx} < 2 mm");
    hNvtxL2->Sumw2();
@@ -681,11 +760,14 @@ void DiMuonAnalysis::Loop()
    hNvtxL2->SetMinimum(0.005);
    hNvtxL2->SetMarkerStyle(24);
    hNvtxL2->Draw("PE1");
-   c20->SaveAs("NvtxL2.gif");
+   c20->SaveAs("NvtxL2.png");
 
    // NvtxL2
    setTDRStyle(0,0,0);
    TCanvas* c21 = new TCanvas("X","Y",1);
+
+   hNvtxjet25->Write();
+
    hNvtxjet25->GetXaxis()->SetTitle("N reco vtx");
    hNvtxjet25->GetYaxis()->SetTitle("fract. of ev. p_{T jet} > 25 GeV, #beta > 0.1");
    hNvtxjet25->Sumw2();
@@ -694,6 +776,7 @@ void DiMuonAnalysis::Loop()
    hNvtxjet25->SetMinimum(0.4);
    hNvtxjet25->SetMarkerStyle(24);
    hNvtxjet25->Draw("PE1");
-   c21->SaveAs("Nvtxjet25.gif");
+   c21->SaveAs("Nvtxjet25.png");
 
+   efile.Close();
 }

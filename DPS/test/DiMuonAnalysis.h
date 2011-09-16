@@ -93,7 +93,7 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
 */
   if (tree == 0) {
     TChain * chain = new TChain("t1","");
-    chain->Add("DiMuAnalysis_Data_*.root");
+    chain->Add("/tmp/anikiten/TEST1/DiMuAnalysis_Data_*.root");
     tree = chain;
   }
    Init(tree);
