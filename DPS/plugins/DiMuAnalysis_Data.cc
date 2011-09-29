@@ -477,6 +477,31 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
     }
     
+    // fill muon variables
+    map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
+    map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
+    int imu = 0;
+    while (rmfirst != rmlast) {
+    
+      const Muon* muon = (*rmfirst).second;
+      
+      imu++;
+      math::XYZTLorentzVector muonc(muon->innerTrack()->px(),muon->innerTrack()->py(), muon->innerTrack()->pz(), muon->innerTrack()->p()); 
+      EtaMu->push_back(muon->innerTrack()->eta());
+      PhiMu->push_back(muon->innerTrack()->phi());
+      PtMu->push_back(muon->innerTrack()->pt());
+      double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
+      dzmuon->push_back(dzvtx);
+      if (imu == 1) muon1 = muonc; 
+      if (imu == 2) muon2 = muonc; 
+      rmfirst++;
+    }
+    
+    if(imu >= 2) {
+      math::XYZTLorentzVector twomuons = muon1 + muon2;
+      mass_mumu = twomuons.M();
+    }
+    
     // jets
     if(jptjetsl1l2l3->size() != 0) {
       
@@ -487,30 +512,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       }
     }
   }
-  // fill muon variables
-  map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
-  map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
-  int imu = 0;
-  while (rmfirst != rmlast) {
-    
-    const Muon* muon = (*rmfirst).second;
-    
-    imu++;
-    math::XYZTLorentzVector muonc(muon->innerTrack()->px(),muon->innerTrack()->py(), muon->innerTrack()->pz(), muon->innerTrack()->p()); 
-    EtaMu->push_back(muon->innerTrack()->eta());
-    PhiMu->push_back(muon->innerTrack()->phi());
-    PtMu->push_back(muon->innerTrack()->pt());
-    double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
-    dzmuon->push_back(dzvtx);
-    if (imu == 1) muon1 = muonc; 
-    if (imu == 2) muon2 = muonc; 
-    rmfirst++;
-  }
-    
-  if(imu >= 2) {
-    math::XYZTLorentzVector twomuons = muon1 + muon2;
-    mass_mumu = twomuons.M();
-  }
+
 
   // fill jet variables
   int jc = 0;
@@ -581,6 +583,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     Ntrk->push_back(npions);
     pTtrkMax->push_back(pTMax);
     beta->push_back(jptjet->getSpecific().Zch);
+
     //    NPxlMaxPtTrk->push_back(NLayersPxl);
     //    NSiIMaxPtTrk->push_back(NLayersSiI);
     //    NSiOMaxPtTrk->push_back(NLayersSiO);
@@ -597,7 +600,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     */
   }
   // fill tree
-  if( (mass_mumu >= 70.) && (pTjptIndex.size() != 0) ) t1->Fill();
+  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
 }
 
 //define this as a plug-in
