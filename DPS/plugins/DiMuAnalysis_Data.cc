@@ -154,6 +154,7 @@ private:
   std::vector<double> *PhiMu;
   std::vector<double> *PtMu;
   std::vector<double> *dzmuon;
+  std::vector<double> *muisol;
   // eta/phi/pt of raw calo jet from JPT
   std::vector<double> *EtaRaw;
   std::vector<double> *PhiRaw;
@@ -195,8 +196,9 @@ DiMuAnalysis_Data::beginJob()
   EtaMu        = new std::vector<double>();
   PhiMu        = new std::vector<double>();
   PtMu         = new std::vector<double>();
+  EtaRaw       = new std::vector<double>();  
   dzmuon       = new std::vector<double>();
-  EtaRaw       = new std::vector<double>();
+  muisol       = new std::vector<double>();
   PhiRaw       = new std::vector<double>();
   EtRaw        = new std::vector<double>();
   EtaJPT       = new std::vector<double>();
@@ -230,6 +232,7 @@ DiMuAnalysis_Data::beginJob()
   t1->Branch("PhiMu","vector<double>",&PhiMu);
   t1->Branch("PtMu" ,"vector<double>",&PtMu);
   t1->Branch("dzmuon" ,"vector<double>",&dzmuon);
+  t1->Branch("muisol" ,"vector<double>",&muisol);
 
   t1->Branch("EtaRaw","vector<double>",&EtaRaw);
   t1->Branch("PhiRaw","vector<double>",&PhiRaw);
@@ -385,6 +388,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   PhiMu->clear();
   PtMu->clear();
   dzmuon->clear();
+  muisol->clear();
 
   EtaRaw->clear();
   PhiRaw->clear();
@@ -481,11 +485,14 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     RecoMuons::const_iterator jmuon = reco_muons->end();
     for ( ; imuon != jmuon; ++imuon ) {
       if ( imuon->innerTrack().isNull() ||
+
 	   //	   !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
 	   !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
 	   imuon->innerTrack()->numberOfValidHits() > 10 ||
            imuon->innerTrack()->dxy(bs) < 0.2 ) { continue; }
+
       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
+
     }
     
     // fill muon variables
@@ -503,8 +510,11 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       PtMu->push_back(muon->innerTrack()->pt());
       double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
       dzmuon->push_back(dzvtx);
-      //      double muon_sumPt = muon->MuonIsolation().sumPt;
-      //      double muon_sumPt = muon->MuonIsolation().sumPt;
+      double muon_sumPt = muon->isolationR03().sumPt;
+      double muon_emEt  = muon->isolationR03().emEt;
+      double muon_hadEt = muon->isolationR03().hadEt;
+      double muon_isol  = (muon_sumPt + muon_emEt + muon_hadEt) / muon->innerTrack()->pt(); 
+      muisol->push_back(muon_isol);
       if (imu == 1) muon1 = muonc; 
       if (imu == 2) muon2 = muonc; 
       rmfirst++;
