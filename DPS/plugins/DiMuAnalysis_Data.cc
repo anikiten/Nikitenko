@@ -507,7 +507,12 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       
       for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
 	if(jptjet->pt() > 20.) {
-	  pTjptIndex[jptjet->pt()] = &(*jptjet);
+	  double DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());
+	  double DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());
+	  // do not count jets overlapped with muons
+	  if( (DR1 < 0.5) || (DR2 < 0.5) ) {
+	    pTjptIndex[jptjet->pt()] = &(*jptjet);
+	  }
 	}
       }
     }
