@@ -90,6 +90,9 @@
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
+// beam spot
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 //
 #include "TFile.h"
 #include "TTree.h"
@@ -392,6 +395,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   Ntrk->clear();
   pTtrkMax->clear(); 
   beta->clear(); 
+
   //  NPxlMaxPtTrk->clear();
   //  NSiIMaxPtTrk->clear();
   //  NSiOMaxPtTrk->clear();
@@ -424,6 +428,11 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // get vertex
   edm::Handle<reco::VertexCollection> recVtxs;
   iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
+
+  // get beam spot
+  edm::Handle<reco::BeamSpot> beamSpot_;
+  iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
+  const reco::BeamSpot& bs = *(beamSpot_.product());
 
   // reco vertex part
   int nvtx = 0;
@@ -472,8 +481,10 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     RecoMuons::const_iterator jmuon = reco_muons->end();
     for ( ; imuon != jmuon; ++imuon ) {
       if ( imuon->innerTrack().isNull() ||
-	   !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
-	   imuon->innerTrack()->pt() < 3.0 ) { continue; }
+	   //	   !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
+	   !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
+	   imuon->innerTrack()->numberOfValidHits() > 10 ||
+           imuon->innerTrack()->dxy(bs) < 0.2 ) { continue; }
       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
     }
     
@@ -492,6 +503,8 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       PtMu->push_back(muon->innerTrack()->pt());
       double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
       dzmuon->push_back(dzvtx);
+      //      double muon_sumPt = muon->MuonIsolation().sumPt;
+      //      double muon_sumPt = muon->MuonIsolation().sumPt;
       if (imu == 1) muon1 = muonc; 
       if (imu == 2) muon2 = muonc; 
       rmfirst++;
@@ -510,7 +523,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  double DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());
 	  double DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());
 	  // do not count jets overlapped with muons
-	  if( (DR1 < 0.5) || (DR2 < 0.5) ) {
+	  if( (DR1 > 0.5) && (DR2 > 0.5) ) {
 	    pTjptIndex[jptjet->pt()] = &(*jptjet);
 	  }
 	}
