@@ -260,12 +260,18 @@ void DiMuonAnalysis::Loop()
       Int_t izmin = 0;
       if(DZmin < 0.2) izmin = 1;
       // di muon mass
-      hM2mu->Fill(mass_mumu);
+      Int_t nmuon = PtMu->size();
+      if(nmuon >= 2) {
+	//	if( ((*PtMu)[0] > 20.) && ((*PtMu)[1] > 20.) ) {
+	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) {
+	  hM2mu->Fill(mass_mumu);
+	}
+	//	}
+      }
       if(mass_mumu < 80. || mass_mumu > 100.) {continue;}
       Int_t smallbeta = 0;
       Int_t jet25 = 0;
       Int_t njets = EtJPT->size();
-      Int_t nmuon = PtMu->size();
       // muons
       Double_t PtZx = 0.;
       Double_t PtZy = 0.;
