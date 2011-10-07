@@ -488,8 +488,8 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	   //	   !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
 	   !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
-	   imuon->innerTrack()->numberOfValidHits() > 10 ||
-           imuon->innerTrack()->dxy(bs) < 0.2 ) { continue; }
+	   imuon->innerTrack()->numberOfValidHits() <= 10 ||
+           imuon->innerTrack()->dxy(bs) > 0.2 ) { continue; }
 
       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
 
@@ -508,8 +508,15 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       EtaMu->push_back(muon->innerTrack()->eta());
       PhiMu->push_back(muon->innerTrack()->phi());
       PtMu->push_back(muon->innerTrack()->pt());
+      /*
+      cout <<" muon " << imu <<" pT / eta / phi = " << muon->innerTrack()->pt() 
+	   <<" "<< muon->innerTrack()->eta() 
+	   <<" "<< muon->innerTrack()->phi()
+	   << endl;
+      */
       double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
       dzmuon->push_back(dzvtx);
+      // muon isolation variables
       double muon_sumPt = muon->isolationR03().sumPt;
       double muon_emEt  = muon->isolationR03().emEt;
       double muon_hadEt = muon->isolationR03().hadEt;
@@ -527,11 +534,22 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     // jets
     if(jptjetsl1l2l3->size() != 0) {
-      
+
+      double DR1 = 10.;
+      double DR2 = 10.;
+
+      int ic = 0;
       for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
 	if(jptjet->pt() > 20.) {
-	  double DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());
-	  double DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());
+	  if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
+	  if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
+	  ic++;
+	  /*
+	  cout <<" jet = " << ic << " pTj / etaj / phij = " << jptjet->pt() <<" " << jptjet->eta() <<" " << jptjet->phi() 
+	       <<" DR1 = " << DR1 
+	       <<" DR2 = " 
+	       << DR2 << endl;
+	  */
 	  // do not count jets overlapped with muons
 	  if( (DR1 > 0.5) && (DR2 > 0.5) ) {
 	    pTjptIndex[jptjet->pt()] = &(*jptjet);
@@ -541,6 +559,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
   }
 
+  //  cout <<" Selected jet size = " << pTjptIndex.size() << endl;
 
   // fill jet variables
   int jc = 0;
@@ -627,8 +646,12 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	 <<" Zch = " << jptjet->getSpecific().Zch << endl; 
     */
   }
+
+  //  cout <<" mass mumu = " << mass_mumu <<" jc = " <<jc << endl; 
+
   // fill tree
-  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
+  //  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
+  if( mass_mumu >= 40. ) t1->Fill();
 }
 
 //define this as a plug-in

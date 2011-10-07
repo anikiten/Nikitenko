@@ -298,7 +298,7 @@ void DiMuonAnalysis::Loop()
 	    hEtJ->Fill((*EtJPT)[i]); 
 	    DphiZJ = deltaPhi(PhiZ, (*PhiJPT)[i]);
 
-	    if( (*beta)[i] > 0.1) {
+	    if( (*beta)[i] > 0.1 && nvertex > 7) {
 	      if(izmin == 1) {hNtrkVtxL2->Fill((*Ntrk)[i]);} else {hNtrkVtxG2->Fill((*Ntrk)[i]);}
 	    }
 	    /*

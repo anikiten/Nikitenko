@@ -30,6 +30,7 @@ public :
    vector<double>  *PhiMu;
    vector<double>  *PtMu;
    vector<double>  *dzmuon;
+   vector<double>  *muisol;
    vector<double>  *EtaRaw;
    vector<double>  *PhiRaw;
    vector<double>  *EtRaw;
@@ -53,6 +54,7 @@ public :
    TBranch        *b_PhiMu;   //!
    TBranch        *b_PtMu;   //!
    TBranch        *b_dzmuon;   //!
+   TBranch        *b_muisol;   //!
    TBranch        *b_EtaRaw;   //!
    TBranch        *b_PhiRaw;   //!
    TBranch        *b_EtRaw;   //!
@@ -141,6 +143,7 @@ void DiMuonAnalysis::Init(TTree *tree)
    PhiMu = 0;
    PtMu = 0;
    dzmuon = 0;
+   muisol = 0;
    EtaRaw = 0;
    PhiRaw = 0;
    EtRaw = 0;
@@ -168,6 +171,7 @@ void DiMuonAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("PhiMu", &PhiMu, &b_PhiMu);
    fChain->SetBranchAddress("PtMu", &PtMu, &b_PtMu);
    fChain->SetBranchAddress("dzmuon", &dzmuon, &b_dzmuon);
+   fChain->SetBranchAddress("muisol", &muisol, &b_muisol);
    fChain->SetBranchAddress("EtaRaw", &EtaRaw, &b_EtaRaw);
    fChain->SetBranchAddress("PhiRaw", &PhiRaw, &b_PhiRaw);
    fChain->SetBranchAddress("EtRaw", &EtRaw, &b_EtRaw);
