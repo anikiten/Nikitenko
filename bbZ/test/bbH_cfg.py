@@ -34,7 +34,7 @@ fileNames = cms.untracked.vstring(
 
 process.bbhanalysis = cms.EDAnalyzer("bbH",
     HistOutFile = cms.untracked.string('bbH.root'),
-#    Muons    = cms.InputTag("muons")
+    parton_jets = cms.InputTag("ak5PartonJets")
 )
 
 # JPTjetsL2L3 = cms.InputTag("ak5JPTJetsL2L3"),
@@ -50,6 +50,6 @@ process.dump = cms.EDAnalyzer("EventContentAnalyzer")
  
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
 
-process.p1 = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.dump*process.bbhanalysis)
+process.p1 = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.bbhanalysis)
 
 # process.p1 = cms.Path(process.dump)

@@ -19,6 +19,9 @@
 // gen particles
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+// parton jets
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 // MC info
 #include "CLHEP/Vector/LorentzVector.h"
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
@@ -62,7 +65,7 @@ private:
   // output root file
   string fOutputFileName ;
   // names of modules, producing object collections
-  edm::InputTag genjetsSrc; 
+  edm::InputTag partonjetsSrc; 
   // variables to store in ntpl
   int     jjpt;
   double  PVx;
@@ -124,9 +127,8 @@ bbH::bbH(const edm::ParameterSet& iConfig)
   // get name of output file with histogramms
   fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
   //
-  // get names of input object collections
-  //  genjetsSrc      = iConfig.getParameter<edm::InputTag>("genjets");
-  // calo jets
+  // get parton jets
+  partonjetsSrc      = iConfig.getParameter<edm::InputTag>("parton_jets");
 }
 
 
@@ -188,6 +190,19 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
       }
     }  
+
+  // parton jets
+  edm::Handle<GenJetCollection> partonjets;
+  iEvent.getByLabel(partonjetsSrc, partonjets);
+
+  if(partonjets->size() != 0) {
+    
+    for(GenJetCollection::const_iterator partonjet = partonjets->begin(); partonjet != partonjets->end(); ++partonjet ) { 
+      if(partonjet->pt() > 10.) {
+	cout <<" parton jet pt = " << partonjet->pt() << endl; 
+      }
+    }
+  }
 
   jjpt = 0;
   PVx = -1000.; 
