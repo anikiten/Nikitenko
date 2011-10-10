@@ -200,6 +200,11 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(GenJetCollection::const_iterator partonjet = partonjets->begin(); partonjet != partonjets->end(); ++partonjet ) { 
       if(partonjet->pt() > 10.) {
 	cout <<" parton jet pt = " << partonjet->pt() << endl; 
+	std::vector<const reco::Candidate*> partons = partonjet->getJetConstituentsQuick();
+	for (unsigned int i = 0; i < partons.size(); ++i) {
+	  const reco::Candidate* parton = partons[i];
+	  cout <<"   jet constituent i = " << i <<" ID " << parton->pdgId() << endl;
+	}
       }
     }
   }
