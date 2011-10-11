@@ -22,7 +22,7 @@ process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 process.GlobalTag.globaltag = cms.string('START42_V11::All')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(3)
+    input = cms.untracked.int32(1000)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",

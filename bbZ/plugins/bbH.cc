@@ -73,6 +73,11 @@ private:
   // output root file and tree
   TFile*      hOutputFile ;
   TTree*      t1;
+
+  int nbq0, nbq1, nbq2;
+  int nbj0, nbj1, nbj2;
+  int ntot;
+
 };
 
 //
@@ -89,6 +94,16 @@ void
 bbH::beginJob()
 {
   using namespace edm;
+
+  nbq0 = 0; 
+  nbq1 = 0;
+  nbq2 = 0;
+
+  nbj0 = 0; 
+  nbj1 = 0; 
+  nbj2 = 0;
+
+  ntot = 0;
 
   EtaRaw       = new std::vector<double>();
 
@@ -112,6 +127,23 @@ bbH::endJob() {
   hOutputFile->Write() ;
   hOutputFile->Close() ;
   
+  cout <<" Results for b quarks and jets " << endl;
+  cout <<" " << endl;
+
+  cout <<"   total number of events processed = " << ntot << endl;
+  cout <<" " << endl;
+  cout <<" b-quark / jet selections: pTb > 20 GeV , |eta| < 2.4 " << endl;
+  cout <<" " << endl;
+ 
+  cout <<" zero b quarks = " << nbq0 
+       <<"    >= 1 b quarks = " << nbq1 
+       <<"    = 2 b quarks = "  << nbq2 << endl;
+
+  cout <<" " << endl;
+  cout <<" zero b jets = " << nbj0 
+       <<"    >= 1 b jets = " << nbj1 
+       <<"    = 2 b jets = "  << nbj2 << endl;
+
   return ;
 }
 
@@ -170,44 +202,69 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //    const reco::Candidate& p = (*mctruth)[i];
   //  }
   
-  cout <<"  Event particles " << endl;
+
+
+  //  cout <<"  Event particles " << endl;
 
   edm::Handle<reco::GenParticleCollection> genparticles;
   iEvent.getByLabel("genParticles", genparticles);
+
+  int nbquarks = 0; 
 
   for( size_t i = 0; i < genparticles->size(); i++)
     {
       const reco::GenParticle & p = (*genparticles)[i];
       
-      cout <<" i = " << i 
-	   <<" id = " << p.pdgId() 
-	   <<" status = " << p.status() 
-	   <<" pt = " << p.pt() << endl;
-      if(p.status() == 2) {
-	const Candidate * moth = p.mother();
-	if(moth) {
-	  cout <<"         mother = " << moth->pdgId() << endl;
-	}
+      if( fabs(p.pdgId()) == 5 && p.status() == 3 && p.pt() > 20. &&  fabs(p.eta()) < 2.4 ) {
+	++nbquarks;
+	//	cout <<" good b quark i = " << i 
+	//     <<" id = " << p.pdgId() 
+	//    <<" status = " << p.status() 
+	//   <<" pt / eta = " << p.pt() <<" " << p.eta() << endl;
+	// if(p.status() == 2) {
+	//  const Candidate * moth = p.mother();
+	//  if(moth) {
+	//    cout <<"         mother = " << moth->pdgId() << endl;
+	//  }
       }
-    }  
+    }
+
+  if(nbquarks == 0) {++nbq0;}
+  if(nbquarks == 1) {++nbq1;}
+  if(nbquarks == 2) {++nbq2;}
 
   // parton jets
   edm::Handle<GenJetCollection> partonjets;
   iEvent.getByLabel(partonjetsSrc, partonjets);
 
-  if(partonjets->size() != 0) {
+  int nbjets = 0; 
+
+  ++ntot;
+
+  if( partonjets->size() != 0) {
     
-    for(GenJetCollection::const_iterator partonjet = partonjets->begin(); partonjet != partonjets->end(); ++partonjet ) { 
-      if(partonjet->pt() > 10.) {
-	cout <<" parton jet pt = " << partonjet->pt() << endl; 
-	std::vector<const reco::Candidate*> partons = partonjet->getJetConstituentsQuick();
-	for (unsigned int i = 0; i < partons.size(); ++i) {
-	  const reco::Candidate* parton = partons[i];
-	  cout <<"   jet constituent i = " << i <<" ID " << parton->pdgId() << endl;
-	}
+    for(GenJetCollection::const_iterator partonjet = partonjets->begin();  partonjet != partonjets->end(); ++partonjet ) { 
+      int nb = 0;
+      if( ( partonjet->pt() > 20. ) && ( fabs(partonjet->eta()) ) < 2.4 ) {
+	//	    cout <<" parton jet pt / eta = " << partonjet->pt() <<" "<< partonjet->eta() <<  endl; 
+	    std::vector<const reco::Candidate*> partons = partonjet->getJetConstituentsQuick();
+	    for (unsigned int i = 0; i < partons.size(); ++i) {
+	      const reco::Candidate* parton = partons[i];
+	      //	      cout <<"   jet constituent i = " << i <<" ID " << parton->pdgId() << endl;
+	      if( fabs(parton->pdgId()) == 5 ) {++nb; }
+	    }
+	    //	    cout <<"   n bquarks in jet = " << nb << endl;
+	    if( nb > 0 ) {++nbjets;}
       }
     }
   }
+	
+  if(nbjets == 0) {++nbj0;}
+  if(nbjets == 1) {++nbj1;}
+  if(nbjets == 2) {++nbj2;}
+
+  //  cout <<"    ---> n b-jets   counters nbj0, nbj1, nbj2 = " << nbj0 <<" " << nbj1 <<" "<< nbj2 << endl;
+  //  cout <<"    ---> n b-quarks counters nbq0, nbq1, nbq2 = " << nbq0 <<" " << nbq1 <<" "<< nbq2 << endl;
 
   jjpt = 0;
   PVx = -1000.; 
