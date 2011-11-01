@@ -22,13 +22,14 @@ process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 process.GlobalTag.globaltag = cms.string('START42_V11::All')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10000)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
 # '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
-  'rfio:/castor/cern.ch/user/a/anikiten/bbHMC/bbHMCevents_1_1_JAC.root')
+#  'rfio:/castor/cern.ch/user/a/anikiten/bbHMC/bbHMCevents_1_1_JAC.root')
+  'rfio:/castor/cern.ch/user/a/anikiten/bbHMC/bbHMCevents_1_1_Ywb.root')
 )
 
 
