@@ -204,6 +204,10 @@ void DiMuonAnalysis::Loop()
 
    TH1F * hM2mu   = new TH1F( "hM2mu", "M2mu", 60, 20., 140.);
    TH1F * hPtZ    = new TH1F( "hPtZ", "PtZ", 25, 0., 100.);
+   
+   TH1F * hZY           = new TH1F( "hZY", "ZY", 50, -5., 5.);
+   TH1F * hZY2J         = new TH1F( "hZY2J", "ZY2J", 50, -5., 5.);
+   TH1F * hZY2JDeta     = new TH1F( "hZY2JDeta", "ZY2JDeta", 50, -5., 5.);
 
    TH1F * hEtJ    = new TH1F( "hEtJ", "EtJ", 30, 0., 150.);
    TH1F * hEtaJ   = new TH1F( "hEtaJ", "EtaJ", 24, -2.4, 2.4);
@@ -249,6 +253,8 @@ void DiMuonAnalysis::Loop()
 
    Int_t nev = 0;
 
+   Double_t MZ = 91.2;
+
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
@@ -261,32 +267,48 @@ void DiMuonAnalysis::Loop()
       if(DZmin < 0.2) izmin = 1;
       // di muon mass
       Int_t nmuon = PtMu->size();
-      if(nmuon >= 2) {
-	//	if( ((*PtMu)[0] > 20.) && ((*PtMu)[1] > 20.) ) {
-	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) {
-	  hM2mu->Fill(mass_mumu);
-	}
-	//	}
-      }
-      if(mass_mumu < 80. || mass_mumu > 100.) {continue;}
+      // Selections
+
+      // 1. two muons
+      if(nmuon != 2) {continue;}
+
+      // pT mu > 20 GeV, |eta| < 2.1
+      if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
+      //	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) 
+      hM2mu->Fill(mass_mumu);
+
+      // M_mumu 75-97 GeV
+      if(mass_mumu < 75. || mass_mumu > 97.) {continue;}
       Int_t smallbeta = 0;
       Int_t jet25 = 0;
       Int_t njets = EtJPT->size();
       // muons
       Double_t PtZx = 0.;
       Double_t PtZy = 0.;
-      Double_t DphiZJ = 0;
+      Double_t PZz  = 0.;
+      Double_t DphiZJ = 0.;
       hDzmuon1->Fill((*dzmuon)[0],(*dzmuon)[1]);  
       for (unsigned int j = 0; j < nmuon; j++) {
 	if(j < 2) {
 	  PtZx += (*PtMu)[j] * cos((*PhiMu)[j]); 
 	  PtZy += (*PtMu)[j] * sin((*PhiMu)[j]);
+	  Double_t Eta = (*EtaMu)[j];
+	  Double_t theta = 2. * atan(exp(-Eta));
+	  PZz  += (*PtMu)[j] / tan(theta);
 	}
       }
-      Double_t PtZ = sqrt(PtZx*PtZx + PtZy*PtZy);
+
+      Double_t PtZ  = sqrt(PtZx*PtZx + PtZy*PtZy);
       Double_t PhiZ = atan2(PtZy, PtZx);
+      Double_t EZ = sqrt(MZ*MZ + PtZ*PtZ + PZz*PZz);
+      Double_t ZY   = 0.5 * log( (EZ+PZz) / (EZ-PZz));
+
+      hZY->Fill(ZY);
+
       // jets
       for (unsigned int i = 0; i < njets; i++) {
+
+	/*
 	Int_t muonmatch = 0;
 	// remove jets from muons
 	for (unsigned int j = 0; j < nmuon; j++) {
@@ -297,49 +319,63 @@ void DiMuonAnalysis::Loop()
 	  }
 	}
 	if(muonmatch == 0) {
-	  nalljets = nalljets + 1;
-	  if(fabs((*EtaJPT)[i]) < 2.0) {
-	    ngoodjets = ngoodjets + 1;
-	    hEtaJ->Fill((*EtaJPT)[i]);
-	    hEtJ->Fill((*EtJPT)[i]); 
-	    DphiZJ = deltaPhi(PhiZ, (*PhiJPT)[i]);
-
-	    if( (*beta)[i] > 0.1 && nvertex > 7) {
-	      if(izmin == 1) {hNtrkVtxL2->Fill((*Ntrk)[i]);} else {hNtrkVtxG2->Fill((*Ntrk)[i]);}
-	    }
-	    /*
+*/
+	nalljets = nalljets + 1;
+	if(fabs((*EtaJPT)[i]) < 2.0) {
+	  ngoodjets = ngoodjets + 1;
+	  hEtaJ->Fill((*EtaJPT)[i]);
+	  hEtJ->Fill((*EtJPT)[i]); 
+	  DphiZJ = deltaPhi(PhiZ, (*PhiJPT)[i]);
+	  
+	  if( (*beta)[i] > 0.1 && nvertex > 7) {
+	    if(izmin == 1) {hNtrkVtxL2->Fill((*Ntrk)[i]);} else {hNtrkVtxG2->Fill((*Ntrk)[i]);}
+	  }
+	  /*
 	    if(run == 163301) {
-	      if((*beta)[i] < 0.1) cout <<" run " << run 
-					<<" event " << event 
-					<<" beta = " << (*beta)[i]
-					<<" etaj = " << (*EtaJPT)[i]
-					<<" phij = " << (*PhiJPT)[i]
-					<<" et jpt = " << (*EtJPT)[i]
-					<<" ntrk = " << (*Ntrk)[i] 
-					<<" nvertex = " << nvertex << endl;
+	    if((*beta)[i] < 0.1) cout <<" run " << run 
+	    <<" event " << event 
+	    <<" beta = " << (*beta)[i]
+	    <<" etaj = " << (*EtaJPT)[i]
+	    <<" phij = " << (*PhiJPT)[i]
+	    <<" et jpt = " << (*EtJPT)[i]
+	    <<" ntrk = " << (*Ntrk)[i] 
+	    <<" nvertex = " << nvertex << endl;
 	    }
-	    */
-	    if( (*EtJPT)[i] > 25.) {
-	      jet25 = 1;
-	    }
-
-	    if( (*beta)[i] < 0.1) {
-	      smallbeta = 1;
-	      hEtJ01->Fill((*EtJPT)[i]); 
-	      hEtaJ01->Fill((*EtaJPT)[i]);
-	    }
-	    if(nvertex == 1 || nvertex == 2) {
-	      hbeta1->Fill((*beta)[i]);
-	      hNtrk1->Fill((*Ntrk)[i]);
-	      if((*beta)[i] < 0.1)  {hNtrk101->Fill((*Ntrk)[i]);} else {hNtrk1g->Fill((*Ntrk)[i]);}
-	    }
-	    if(nvertex == 5 || nvertex == 6) {
-	      hbeta2->Fill((*beta)[i]);
-	    }
-	    if(nvertex > 7) {
-	      hbeta3->Fill((*beta)[i]);
-	      hNtrk3->Fill((*Ntrk)[i]);
-	      if((*beta)[i] < 0.1) {hNtrk301->Fill((*Ntrk)[i]);} else {hNtrk3g->Fill((*Ntrk)[i]);}
+	  */
+	  if( (*EtJPT)[i] > 25.) {
+	    jet25 = 1;
+	  }
+	  
+	  if( (*beta)[i] < 0.1) {
+	    smallbeta = 1;
+	    hEtJ01->Fill((*EtJPT)[i]); 
+	    hEtaJ01->Fill((*EtaJPT)[i]);
+	  }
+	  if(nvertex == 1 || nvertex == 2) {
+	    hbeta1->Fill((*beta)[i]);
+	    hNtrk1->Fill((*Ntrk)[i]);
+	    if((*beta)[i] < 0.1)  {hNtrk101->Fill((*Ntrk)[i]);} else {hNtrk1g->Fill((*Ntrk)[i]);}
+	  }
+	  if(nvertex == 5 || nvertex == 6) {
+	    hbeta2->Fill((*beta)[i]);
+	  }
+	  if(nvertex > 7) {
+	    hbeta3->Fill((*beta)[i]);
+	    hNtrk3->Fill((*Ntrk)[i]);
+	    if((*beta)[i] < 0.1) {hNtrk301->Fill((*Ntrk)[i]);} else {hNtrk3g->Fill((*Ntrk)[i]);}
+	  }
+	}
+      }
+   
+      // VBF part
+      if(nvertex > 2 && nvertex < 12) {
+	if(nalljets >= 2) {
+	  if( ((*EtJPT)[0] > 25.) && ((*EtJPT)[1] > 25.) ) {
+	    hZY2J->Fill(ZY);
+	    if( (*EtaJPT)[0]*(*EtaJPT)[1] < 0.0 ) {
+	      if( fabs((*EtaJPT)[0]-(*EtaJPT)[1]) > 3.5) {
+		hZY2JDeta->Fill(ZY);
+	      }
 	    }
 	  }
 	}
@@ -390,6 +426,7 @@ void DiMuonAnalysis::Loop()
 
    TFile efile("JPT_new.root","recreate");
 
+   /*
    setTDRStyle(0,0,0);
    // ===> di muon mass: 
    TCanvas* c1 = new TCanvas("X","Y",1);
@@ -592,7 +629,7 @@ void DiMuonAnalysis::Loop()
    hDphiZJ->Write();
    hDphiZJ01->Write();
 
-   hDphiZJ->GetXaxis()->SetTitle("#Delta #phi (Z-jet), rad");
+   hDphiZJ->GetXaxis()->SetTitle("#Deta #phi (Z-jet), rad");
    hDphiZJ->GetYaxis()->SetTitle("Nev");
    hDphiZJ->SetMaximum(2000);
    hDphiZJ->SetMinimum(0.5);
@@ -783,6 +820,42 @@ void DiMuonAnalysis::Loop()
    hNvtxjet25->SetMarkerStyle(24);
    hNvtxjet25->Draw("PE1");
    c21->SaveAs("Nvtxjet25.png");
+
+   */
+
+   // NvtxL2
+   setTDRStyle(0,1,0);
+   TCanvas* c22 = new TCanvas("X","Y",1);
+
+   hZY->Write();
+   hZY2J->Write();
+   hZY2JDeta->Write();
+
+   hZY->GetXaxis()->SetTitle("Z rapidity");
+   hZY->GetYaxis()->SetTitle("Nev / 0.2");
+
+   hZY->SetMaximum(50000.);
+   hZY->SetMinimum(0.5);
+   hZY->SetLineStyle(1);
+   hZY->SetLineWidth(3);
+   hZY->Draw();
+
+   hZY2J->SetLineStyle(2);
+   hZY2J->SetLineWidth(3);
+   hZY2J->Draw("same");
+
+   hZY2JDeta->SetLineStyle(3);
+   hZY2JDeta->SetLineWidth(3);
+   hZY2JDeta->Draw("same");
+
+   TLegend *leg = new TLegend(0.2,0.75,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hZY,"MC Z inclusive","L");
+   leg->AddEntry(hZY2J,"MC Z+2jets, p_{T} > 30 GeV","L");
+   leg->AddEntry(hZY2JDeta,"MC Z+2jets, p_{T} > 30 GeV, #Delta #eta _{j1j2} > 3.5","L");
+   leg->Draw();
+
+   c22->SaveAs("ZY.png");
 
    efile.Close();
 }
