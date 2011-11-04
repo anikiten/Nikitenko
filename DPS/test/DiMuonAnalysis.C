@@ -368,14 +368,12 @@ void DiMuonAnalysis::Loop()
       }
    
       // VBF part
-      if(nvertex > 2 && nvertex < 12) {
-	if(nalljets >= 2) {
-	  if( ((*EtJPT)[0] > 25.) && ((*EtJPT)[1] > 25.) ) {
-	    hZY2J->Fill(ZY);
-	    if( (*EtaJPT)[0]*(*EtaJPT)[1] < 0.0 ) {
-	      if( fabs((*EtaJPT)[0]-(*EtaJPT)[1]) > 3.5) {
-		hZY2JDeta->Fill(ZY);
-	      }
+      if(nalljets >= 2) {
+	if( ((*EtJPT)[0] > 25.) && ((*EtJPT)[1] > 25.) ) {
+	  hZY2J->Fill(ZY);
+	  if( (*EtaJPT)[0]*(*EtaJPT)[1] < 0.0 ) {
+	    if( fabs((*EtaJPT)[0]-(*EtaJPT)[1]) > 3.5) {
+	      hZY2JDeta->Fill(ZY);
 	    }
 	  }
 	}
