@@ -369,7 +369,7 @@ void DiMuonAnalysis::Loop()
    
       // VBF part
       if(nalljets >= 2) {
-	if( ((*EtJPT)[0] > 25.) && ((*EtJPT)[1] > 25.) ) {
+	if( ((*EtJPT)[0] > 27.5) && ((*EtJPT)[1] > 27.5) ) {
 	  hZY2J->Fill(ZY);
 	  if( (*EtaJPT)[0]*(*EtaJPT)[1] < 0.0 ) {
 	    if( fabs((*EtaJPT)[0]-(*EtaJPT)[1]) > 3.5) {
@@ -849,8 +849,8 @@ void DiMuonAnalysis::Loop()
    TLegend *leg = new TLegend(0.2,0.75,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
    leg->AddEntry(hZY,"MC Z inclusive","L");
-   leg->AddEntry(hZY2J,"MC Z+2jets, p_{T} > 30 GeV","L");
-   leg->AddEntry(hZY2JDeta,"MC Z+2jets, p_{T} > 30 GeV, #Delta #eta _{j1j2} > 3.5","L");
+   leg->AddEntry(hZY2J,"MC Z+2jets, p_{T} > 25 GeV","L");
+   leg->AddEntry(hZY2JDeta,"MC Z+2jets, p_{T} > 25 GeV, #Delta #eta _{j1j2} > 3.5","L");
    leg->Draw();
 
    c22->SaveAs("ZY.png");
