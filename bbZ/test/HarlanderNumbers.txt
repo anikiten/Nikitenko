@@ -1,0 +1,121 @@
+From robert.harlander@uni-wuppertal.de Mon Nov  7 22:00:04 2011
+Date: Mon, 7 Nov 2011 22:00:00 +0100
+From: Robert Harlander <robert.harlander@uni-wuppertal.de>
+To: Alexandre Nikitenko <anikiten@mail.cern.ch>
+Cc: Marius Wiesemann <m.wiesemann@uni-wuppertal.de>
+Subject: Re: bbh
+
+
+Dear Sasha,
+
+Marius produced the numbers for Mh=400 GeV:
+
+#chan  m_H  sigma(pb)    rel_of_tot(%)   pert_err         PDF_err
+tot:   400  0.0012925       100.0       - 5.0  +2.8
+0-b:   400  0.0006710        51.9       - 7.2  +8.9     -6.7  +7.6 
+1-b:   400  0.0005514        42.6       - 8.9  +5.8     -6.4  +6.4
+2-b:   400  0.0000811         6.3       -28.4 +45.5     -4.5  +4.4
+
+and here is an update of the numbers for Mh=140 GeV 
+(the scale error changed a bit):
+#chan  m_H  sigma(pb)  rel_of_tot(%)     pert_err
+tot:   140  0.1088526       100.0       - 8.0  +3.3
+0-b:   140  0.0694588        63.81      -14.4  +8.8
+1-b:   140  0.0357700        32.86      - 6.9  +4.4
+2-b:   140  0.0045400         4.17      -33.1 +59.0
+
+We'll send you the distributions later this week.
+
+Cheers,
+Robert
+
+-- 
+Theoretische Physik
+Fachbereich C                                -   Phone: +49 202 439 2635
+Bergische Universitaet Wuppertal             -   Fax:   +49 202 439 3860
+D-42097 Wuppertal, Germany                   -   http://robert-harlander.de
+
+On Tue, 1 Nov 2011, Alexandre Nikitenko wrote:
+
+> Dear Robert, Marius,
+>
+> would it be possible to have the same numbers (as below) for MH=400 GeV ?
+>
+> Also, as we dicussed during last meeting, I am very much
+> interested to compare distributions:
+>
+> 1. pT/eta of leading pT b-jet with pTb > 20 GeV
+> 2. pT/eta of Higgs boson after cut on the leading pT b-jet:
+>   pTb > 20 GeV, |eta_b| < 2.4
+>
+> for me the best would be if you have histograms in root file.
+>
+> it was accepted that this small comparizon study will go to Vol2 of YR.
+>
+> Cheers, Sasha.
+>
+> On Thu, 13 Oct 2011, Robert Harlander wrote:
+>
+>> 
+>> Dear Sasha,
+>> 
+>> here are our numbers. The direct comparison with your numbers are shown in
+>> the 3rd column (rel_of_tot).  Note that "tot" and "0-b" are NNLO results,
+>> "1-b" is NLO, and "2-b" is LO.  That's why the central values of 0-, 1-, 
+>> and
+>> 2-b don't add up to the total exactly.  The difference is within the 
+>> errors. These numbers are preliminary, we are going to publish "official" 
+>> numbers
+>> soon.
+>> 
+>> #chan  m_H  sigma(pb)  rel_of_tot(%)     scale(%)
+>> tot:   140  0.1088526  100.00         -7.99  +3.28
+>> 0-b:   140  0.0694588   63.81        -12.76  +9.08
+>> 1-b:   140  0.0357700   32.86         -5.70  +4.74
+>> 2-b:   140  0.0045400    4.17        -33.06 +58.73
+>> 
+>> We'd be happy if you could include them in your presentation on Friday!  We
+>> can also give you numbers for other Higgs masses, without errors (the 
+>> errors
+>> will, however, not be too different from the ones above).
+>> 
+>> Cheers,
+>> Robert and Marius
+>> 
+>> -- 
+>> Theoretische Physik
+>> Fachbereich C                                -   Phone: +49 202 439 2635
+>> Bergische Universitaet Wuppertal             -   Fax:   +49 202 439 3860
+>> D-42097 Wuppertal, Germany                   -   http://robert-harlander.de
+>> 
+>> On Tue, 11 Oct 2011, Alexandre Nikitenko wrote:
+>> 
+>>> Hi Robert,
+>>> 
+>>> I got numbers from PYTHIA pp->bbH for MH=140 GeV about
+>>> fraction of b-jets with pTb > 20 GeV and |eta_b| < 2.4
+>>> If you are ready with your numbers I am very keen to compare
+>>> and probably we can show it this Friday on our LHC Xsection
+>>> H->2tau sub-group meeting what Markus Schumacher announced.
+>>> 
+>>> My numbers are:
+>>> 
+>>> Results for b quarks and b-jets
+>>>
+>>>   total number of events processed = 1000
+>>> 
+>>> b-quark / b-jet selections: pTb > 20 GeV , |eta| < 2.4
+>>> ======================================================
+>>> 
+>>> 
+>>> zero b quarks = 627    1 b quark = 330     2 b quarks = 43
+>>> 
+>>> zero b jets   = 621    1 b jet   = 332     2 b jets   = 47
+>>> 
+>>> 
+>>> I will process more events soon to get good stats for 2 b-jet numbers
+>>> 
+>>> Cheers, Sasha.
+>>> 
+>> 
+>
