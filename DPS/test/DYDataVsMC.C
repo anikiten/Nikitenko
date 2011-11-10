@@ -149,9 +149,18 @@ void setTDRStyle(Int_t xlog, Int_t ylog) {
 
 void Draw()
 {
+
+   /*
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.042);
+   t->DrawLatex(1.5,0.80,"CMSSW_1_6_12, |#eta|< 1.3");
+   t->DrawLatex(1.5,0.75,"no ZSP in HCAL");
+   t->DrawLatex(1.5,0.70,"no SR in ECAL");
+   */
+
    setTDRStyle(0,1);
 
-   TFile* file = new TFile("DYData9nov.root");
+   TFile* file = new TFile("DYData10nov.root");
 
    TCanvas* c1 = new TCanvas("X","Y",1);
    //   TAxis* xaxis = hprEH11x5->GetXaxis();
@@ -187,15 +196,7 @@ void Draw()
    leg->AddEntry(hZY2JDeta,"Z+2jets, p_{T} > 25 GeV, #Delta #eta _{j1j2} > 3.5","P");
    leg->Draw();
 
-   /*
-   TLatex *t = new TLatex();
-   t->SetTextSize(0.042);
-   t->DrawLatex(1.5,0.80,"CMSSW_1_6_12, |#eta|< 1.3");
-   t->DrawLatex(1.5,0.75,"no ZSP in HCAL");
-   t->DrawLatex(1.5,0.70,"no SR in ECAL");
-   */
-
-   TFile* file = new TFile("DYMC9nov.root");
+   TFile* file = new TFile("DYMC10nov.root");
 
    Double_t Nmc   = hZY->Integral();
    Double_t scale = Ndata/Nmc;
@@ -223,7 +224,7 @@ void Draw()
 
    setTDRStyle(0,1);
    TCanvas* c2 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData9nov.root");
+   TFile* file = new TFile("DYData10nov.root");
    hM2mu0->GetXaxis()->SetTitle("di-muon mass, GeV");
    hM2mu0->GetYaxis()->SetTitle("Nev");
 
@@ -238,7 +239,7 @@ void Draw()
    leg->SetFillColor(10);
    leg->AddEntry(hM2mu0,"data: p_{T}^{#mu}> 20 GeV, |#eta|<2.4","P");
 
-   TFile* file = new TFile("DYMC9nov.root");
+   TFile* file = new TFile("DYMC10nov.root");
    hM2mu0->Scale(scale);
    hM2mu0->SetLineStyle(1);
    hM2mu0->SetLineWidth(3);
@@ -250,7 +251,7 @@ void Draw()
 
    setTDRStyle(0,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData9nov.root");
+   TFile* file = new TFile("DYData10nov.root");
    hDeta0->GetXaxis()->SetTitle("#Delta #eta _{j1j2}");
    hDeta0->GetYaxis()->SetTitle("Nev");
 
@@ -269,8 +270,9 @@ void Draw()
    leg->AddEntry(hDeta0,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7","P");
    leg->AddEntry(hDeta1,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0 ","P");
 
-   TFile* file = new TFile("DYMC9nov.root");
+   TFile* file = new TFile("DYMC10nov.root");
    hDeta0->Scale(scale);
+   cout <<"  N MC predicted after two jet selection = " << hDeta0->Integral() << endl; 
    hDeta0->SetLineStyle(1);
    hDeta0->SetLineWidth(3);
    hDeta0->Draw("same");
@@ -286,7 +288,7 @@ void Draw()
 
    setTDRStyle(0,1);
    TCanvas* c4 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData9nov.root");
+   TFile* file = new TFile("DYData10nov.root");
    hMjj->GetXaxis()->SetTitle("M_{j1j2}, GeV");
    hMjj->GetYaxis()->SetTitle("Nev");
 
@@ -301,8 +303,9 @@ void Draw()
    leg->SetFillColor(10);
    leg->AddEntry(hMjj,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5 ","P");
 
-   TFile* file = new TFile("DYMC9nov.root");
+   TFile* file = new TFile("DYMC10nov.root");
    hMjj->Scale(scale);
+   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5 = " << hMjj->Integral() << endl; 
    hMjj->SetLineStyle(1);
    hMjj->SetLineWidth(3);
    hMjj->Draw("same");
