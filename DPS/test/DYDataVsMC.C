@@ -151,7 +151,7 @@ void Draw()
 {
    setTDRStyle(0,1);
 
-   TFile* file = new TFile("DYData.root");
+   TFile* file = new TFile("DYData9nov.root");
 
    TCanvas* c1 = new TCanvas("X","Y",1);
    //   TAxis* xaxis = hprEH11x5->GetXaxis();
@@ -167,7 +167,6 @@ void Draw()
    hZY->SetMarkerSize(0.7);
    hZY->Draw("PE");
    Double_t Ndata = hZY->Integral();
-
 
    hZY2J->SetLineStyle(1);
    hZY2J->SetLineWidth(3);
@@ -196,9 +195,13 @@ void Draw()
    t->DrawLatex(1.5,0.70,"no SR in ECAL");
    */
 
-   TFile* file = new TFile("DYMC.root");
+   TFile* file = new TFile("DYMC9nov.root");
 
-   Double_t scale = Ndata/hZY->Integral();
+   Double_t Nmc   = hZY->Integral();
+   Double_t scale = Ndata/Nmc;
+
+   cout <<" Ndata = " << Ndata <<" Nmc = " << Nmc <<" scale = " << scale << endl;
+
    hZY->Scale(scale);
    hZY->SetLineStyle(1);
    hZY->SetLineWidth(1);
@@ -217,6 +220,95 @@ void Draw()
 
    c1->SaveAs("ZYDataVsMC.png");
 
-   //   Double_t scale = 1./hH3_1_2GeV->Integral();
-   //   hH3_1_2GeV->Scale(scale);
+
+   setTDRStyle(0,1);
+   TCanvas* c2 = new TCanvas("X","Y",1);
+   TFile* file = new TFile("DYData9nov.root");
+   hM2mu0->GetXaxis()->SetTitle("di-muon mass, GeV");
+   hM2mu0->GetYaxis()->SetTitle("Nev");
+
+   hM2mu0->SetMaximum(500000.);
+   hM2mu0->SetMinimum(100);
+   hM2mu0->SetLineStyle(1);
+   hM2mu0->SetLineWidth(3);
+   hM2mu0->SetMarkerStyle(24);
+   //   hM2mu0->SetMarkerSize(0.7);
+   hM2mu0->Draw("PE");
+   TLegend *leg = new TLegend(0.15,0.8,0.8,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hM2mu0,"data: p_{T}^{#mu}> 20 GeV, |#eta|<2.4","P");
+
+   TFile* file = new TFile("DYMC9nov.root");
+   hM2mu0->Scale(scale);
+   hM2mu0->SetLineStyle(1);
+   hM2mu0->SetLineWidth(3);
+   hM2mu0->Draw("same");
+   leg->AddEntry(hM2mu0,"MC","L");
+   leg->Draw();
+
+   c2->SaveAs("mass_mumu0.png");
+
+   setTDRStyle(0,0);
+   TCanvas* c3 = new TCanvas("X","Y",1);
+   TFile* file = new TFile("DYData9nov.root");
+   hDeta0->GetXaxis()->SetTitle("#Delta #eta _{j1j2}");
+   hDeta0->GetYaxis()->SetTitle("Nev");
+
+   hDeta0->SetMaximum(900.);
+   hDeta0->SetLineStyle(1);
+   hDeta0->SetLineWidth(3);
+   hDeta0->SetMarkerStyle(24);
+   hDeta0->Draw("PE");
+   hDeta1->SetLineStyle(1);
+   hDeta1->SetLineWidth(3);
+   hDeta1->SetMarkerStyle(25);
+   hDeta1->Draw("samePE");
+
+   TLegend *leg = new TLegend(0.15,0.75,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hDeta0,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7","P");
+   leg->AddEntry(hDeta1,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0 ","P");
+
+   TFile* file = new TFile("DYMC9nov.root");
+   hDeta0->Scale(scale);
+   hDeta0->SetLineStyle(1);
+   hDeta0->SetLineWidth(3);
+   hDeta0->Draw("same");
+   hDeta1->Scale(scale);
+   hDeta1->SetLineStyle(3);
+   hDeta1->SetLineWidth(3);
+   hDeta1->Draw("same");
+   leg->AddEntry(hDeta0,"MC","L");
+   leg->AddEntry(hDeta1,"MC","L");
+   leg->Draw();
+
+   c3->SaveAs("Detaj1j2.png");
+
+   setTDRStyle(0,1);
+   TCanvas* c4 = new TCanvas("X","Y",1);
+   TFile* file = new TFile("DYData9nov.root");
+   hMjj->GetXaxis()->SetTitle("M_{j1j2}, GeV");
+   hMjj->GetYaxis()->SetTitle("Nev");
+
+   hMjj->SetMaximum(1000.);
+   hMjj->SetMinimum(0.5);
+   hMjj->SetLineStyle(1);
+   hMjj->SetLineWidth(3);
+   hMjj->SetMarkerStyle(24);
+   //   hMjj->SetMarkerSize(0.7);
+   hMjj->Draw("PE");
+   TLegend *leg = new TLegend(0.15,0.8,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hMjj,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5 ","P");
+
+   TFile* file = new TFile("DYMC9nov.root");
+   hMjj->Scale(scale);
+   hMjj->SetLineStyle(1);
+   hMjj->SetLineWidth(3);
+   hMjj->Draw("same");
+   leg->AddEntry(hMjj,"MC","L");
+   leg->Draw();
+
+   c4->SaveAs("mass_jj.png");
+
 }
