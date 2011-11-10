@@ -1,4 +1,4 @@
-data: 0.887 fb-1
+data: ~0.42 fb-1
 
 ===> Total number of events analysed - 343131
 ===--> passed muon pT/eta selections - 166228
@@ -18,10 +18,31 @@ DY MC  1.96 M events processed
 ===--> passed Mj1j2 cut              - 36
 ===--> passed CVJ                    - 36
 
+================================================================
+10 Nov
+data: ~0.42 fb-1
+
+===> Total number of events analysed - 343131
+===--> passed muon pT/eta selections - 171163
+===--> passed di-muon mass window    - 123852
+===--> passed two jet selections     - 7674
+===--> passed Detaj1j2 cut           - 596
+===--> passed Mj1j2 cut              - 55
+===--> passed CVJ                    - 55
+
+DY MC  1.96 M events processed
+
+===> Total number of events analysed - 302345
+===--> passed muon pT/eta selections - 260743
+===--> passed di-muon mass window    - 205816
+===--> passed two jet selections     - 14757
+===--> passed Detaj1j2 cut           - 1351
+===--> passed Mj1j2 cut              - 123
+===--> passed CVJ                    - 123
 
 
 
-Sasha Zhokin
+Sasha Zhokin  10 Nov 1
 Or only numbers here:
 =================================================================
 #pr.ev. / #Zmumu 70-110 GeV /after ntuple cuts/   Pt>27.5, eta < 5.0 / + eta_mult<0/+deta>3.7&Mjj>750/
@@ -33,3 +54,16 @@ DY
  2467410/  350596           /   120760       /    35365              /   15570      /    182  /
 VBFH
   197835/    -              /   178731       /   175288              /  126267      /  29358  /
+
+====================================================================================================
+
+10 Nov 2
+========
+
+#pr.ev. / #Zmumu / after ntuple cuts   /   Pt>27.5 / + eta_mult<0  / + deta>3.7 & Mjj>750 /
+
+DY
+2467410 / 350596   /   120760       /   35365      /    15570    /    182     /
+
+DY-Ptmuons>20GeV
+2467410 / 350596   /    96761       /   28846      /    12748    /    152     /
