@@ -202,12 +202,17 @@ void DiMuonAnalysis::Loop()
 //by  b_branchname->GetEntry(ientry); //read only this branch
    if (fChain == 0) return;
 
-   TH1F * hM2mu   = new TH1F( "hM2mu", "M2mu", 60, 20., 140.);
-   TH1F * hPtZ    = new TH1F( "hPtZ", "PtZ", 25, 0., 100.);
+   TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
+   TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
+   TH1F * hDeta0   = new TH1F( "hDeta0", "Deta0", 50, 0., 10.);
+   TH1F * hDeta1   = new TH1F( "hDeta1", "Deta1", 50, 0., 10.);
+   TH1F * hMjj     = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
+
+   TH1F * hPtZ     = new TH1F( "hPtZ", "PtZ", 25, 0., 100.);
    
    TH1F * hZY           = new TH1F( "hZY", "ZY", 50, -5., 5.);
    TH1F * hZY2J         = new TH1F( "hZY2J", "ZY2J", 50, -5., 5.);
-   TH1F * hZY2JDeta     = new TH1F( "hZY2JDeta", "ZY2JDeta", 50, -5., 5.);
+   TH1F * hZY2JDeta     = new TH1F( "hZY2JDeta", "ZY2JDeta", 25, -5., 5.);
 
    TH1F * hEtJ    = new TH1F( "hEtJ", "EtJ", 30, 0., 150.);
    TH1F * hEtaJ   = new TH1F( "hEtaJ", "EtaJ", 24, -2.4, 2.4);
@@ -255,12 +260,35 @@ void DiMuonAnalysis::Loop()
 
    Double_t MZ = 91.2;
 
+   // even selection counters
+   //
+   //  total number of events processed
+   Double_t N_total = 0;
+   // 1. pT mu > 20 GeV, eta < 2.4
+   Double_t N_muons = 0;
+   // 2. mumu mass window 85-97
+   Double_t N_mass2mu = 0;
+   // 3. two jets pT > 25 GeV, eta < 4.7
+   Double_t N_jets = 0;
+   // 4. Deta j1j2 > 3.5
+   Double_t N_deta = 0;
+   // 5. Mj1j2 > 700 GeV
+   Double_t N_massjj = 0;
+   // 6. CJV
+   Double_t N_cjv = 0;
+
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
+
+      //      cout <<" run number = " << run << endl;
+
       nev++;
+
+      N_total++;
+
       Int_t ngoodjets = 0;
       Int_t nalljets = 0;
       Int_t izmin = 0;
@@ -274,11 +302,17 @@ void DiMuonAnalysis::Loop()
 
       // pT mu > 20 GeV, |eta| < 2.1
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
-      //	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) 
-      hM2mu->Fill(mass_mumu);
+      N_muons++;
+      hM2mu0->Fill(mass_mumu);
 
-      // M_mumu 75-97 GeV
-      if(mass_mumu < 75. || mass_mumu > 97.) {continue;}
+      //	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) 
+
+      // M_mumu 85-97 GeV
+      if(mass_mumu < 85. || mass_mumu > 97.) {continue;}
+      N_mass2mu++;
+      hM2mu1->Fill(mass_mumu);
+
+
       Int_t smallbeta = 0;
       Int_t jet25 = 0;
       Int_t njets = EtJPT->size();
@@ -368,17 +402,44 @@ void DiMuonAnalysis::Loop()
       }
    
       // VBF part
-      if(nalljets >= 2) {
-	if( ((*EtJPT)[0] > 27.5) && ((*EtJPT)[1] > 27.5) ) {
-	  hZY2J->Fill(ZY);
-	  if( (*EtaJPT)[0]*(*EtaJPT)[1] < 0.0 ) {
-	    if( fabs((*EtaJPT)[0]-(*EtaJPT)[1]) > 3.5) {
-	      hZY2JDeta->Fill(ZY);
-	    }
-	  }
-	}
-      }
+      if(nalljets < 2) {continue;}
+      if( ( (*EtJPT)[0] < 25.0 ) || 
+          ( (*EtJPT)[1] < 25.0 ) || 
+	  ( fabs((*EtaJPT)[0]) > 4.7) || 
+	  ( fabs((*EtaJPT)[1]) > 4.7) ) {continue;}
+      N_jets++;
+      hZY2J->Fill(ZY);
+      Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
+      hDeta0->Fill(DetaJJ);
 
+      if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
+      hDeta1->Fill(DetaJJ);
+
+      if( DetaJJ < 3.5 ) {continue;}
+      N_deta++;
+      hZY2JDeta->Fill(ZY);
+
+      Double_t PJ1x = (*EtJPT)[0] * cos((*PhiJPT)[0]); 
+      Double_t PJ1y = (*EtJPT)[0] * sin((*PhiJPT)[0]);
+      Double_t Eta = (*EtaJPT)[0];
+      Double_t theta = 2. * atan(exp(-Eta));
+      Double_t PJ1z = (*EtJPT)[0] / tan(theta);
+      Double_t EJ1  = (*EtJPT)[0] / sin(theta);
+
+      Double_t PJ2x = (*EtJPT)[1] * cos((*PhiJPT)[1]); 
+      Double_t PJ2y = (*EtJPT)[1] * sin((*PhiJPT)[1]);
+      Eta = (*EtaJPT)[1];
+      theta = 2. * atan(exp(-Eta));
+      Double_t PJ2z = (*EtJPT)[1] / tan(theta);
+      Double_t EJ2  = (*EtJPT)[1] / sin(theta);
+
+      Double_t Mj1j2 = sqrt(EJ1*EJ2 - PJ1x*PJ2x - PJ1y*PJ2y - PJ1z*PJ2z); 
+      hMjj->Fill(Mj1j2);
+      if(Mj1j2 < 700.) {continue;}
+      N_massjj++;
+      N_cjv++;
+
+      // 
       if(nalljets == 0 && ngoodjets == 0) {hPtZ0->Fill(PtZ);}
 
       if(ngoodjets != 0) {
@@ -422,20 +483,34 @@ void DiMuonAnalysis::Loop()
       }
    }
 
-   TFile efile("JPT_new.root","recreate");
+   // selections summary
+   cout <<"===> Total number of events analysed - " << N_total << endl;
+   cout <<"===--> passed muon pT/eta selections - " << N_muons << endl;
+   cout <<"===--> passed di-muon mass window    - " << N_mass2mu << endl;
+   cout <<"===--> passed two jet selections     - " << N_jets << endl;
+   cout <<"===--> passed Detaj1j2 cut           - " << N_deta << endl;
+   cout <<"===--> passed Mj1j2 cut              - " << N_massjj << endl;
+   cout <<"===--> passed CVJ                    - " << N_cjv << endl;
 
-   /*
+   TFile efile("DY.root","recreate");
+
    setTDRStyle(0,0,0);
    // ===> di muon mass: 
    TCanvas* c1 = new TCanvas("X","Y",1);
 
-   hM2mu->Write();
+   hM2mu0->Write();
+   hM2mu1->Write();
+   hDeta0->Write();
+   hDeta1->Write();
+   hMjj->Write();
 
-   hM2mu->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
-   hM2mu->GetYaxis()->SetTitle("Nev/2 GeV");
-   hM2mu->Draw("hist");
+   hM2mu0->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
+   hM2mu0->GetYaxis()->SetTitle("Nev/2 GeV");
+   hM2mu0->Draw("hist");
+   hM2mu1->Draw("same");
    c1->SaveAs("M2mu.png");
 
+   /*
 
    // Et jet
    setTDRStyle(0,0,0);
@@ -832,7 +907,7 @@ void DiMuonAnalysis::Loop()
    hZY->GetXaxis()->SetTitle("Z rapidity");
    hZY->GetYaxis()->SetTitle("Nev / 0.2");
 
-   hZY->SetMaximum(50000.);
+   //   hZY->SetMaximum(50000.);
    hZY->SetMinimum(0.5);
    hZY->SetLineStyle(1);
    hZY->SetLineWidth(3);
