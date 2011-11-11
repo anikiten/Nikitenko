@@ -67,9 +67,10 @@ private:
   // names of modules, producing object collections
   edm::InputTag partonjetsSrc; 
   // variables to store in ntpl
-  int     jjpt;
-  double  PVx;
-  std::vector<double> *EtaRaw;
+  int    nbjets;
+  double pTH, yH;
+  double pTb, yb;
+  //  std::vector<double> *EtaRaw;
   // output root file and tree
   TFile*      hOutputFile ;
   TTree*      t1;
@@ -105,7 +106,7 @@ bbH::beginJob()
 
   ntot = 0;
 
-  EtaRaw       = new std::vector<double>();
+  //  EtaRaw       = new std::vector<double>();
 
   // creating a simple tree
 
@@ -113,9 +114,12 @@ bbH::beginJob()
 
   t1 = new TTree("t1","analysis tree");
 
-  t1->Branch("jjpt",&jjpt,"jjpt/I");
-  t1->Branch("PVx",&PVx,"PVx/D");
-  t1->Branch("EtaRaw","vector<double>",&EtaRaw);
+  t1->Branch("nbjets",&nbjets,"nbjets/I");
+  t1->Branch("pTH",&pTH,"pTH/D");
+  t1->Branch("yH",&yH,"yH/D");
+  t1->Branch("pTb",&pTb,"pTb/D");
+  t1->Branch("yb",&yb,"yb/D");
+  //  t1->Branch("EtaRaw","vector<double>",&EtaRaw);
 
   return ;
 }
@@ -215,7 +219,20 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     {
       const reco::GenParticle & p = (*genparticles)[i];
 
-      //      cout <<" i = " << i <<" ID = " << p.pdgId() <<" status = " << p.status() << endl;
+      /*
+      cout <<" i = " << i 
+	   <<" ID = " << p.pdgId() 
+	   <<" status = " << p.status() 
+	   <<" rapidity = " << p.y() 
+	   <<" eta = " << p.eta() << endl;
+      */
+      
+      if( p.pdgId() == 36 &&  p.status() == 2) {
+	pTH = p.pt();
+	yH  = p.y();
+	//	cout <<" Higgs ID = " << p.pdgId() <<" pTH = " << pTH <<" y = " << yH << endl;
+      }
+
       
       if( fabs(p.pdgId()) == 5 && p.status() == 3 && p.pt() > 20. &&  fabs(p.eta()) < 2.4 ) {
 	++nbquarks;
@@ -239,27 +256,39 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<GenJetCollection> partonjets;
   iEvent.getByLabel(partonjetsSrc, partonjets);
 
-  int nbjets = 0; 
-
   ++ntot;
+
+  double pTbmax = 0.;
+  yb  = 0.;
+  pTb = 0.;
+  nbjets = 0; 
 
   if( partonjets->size() != 0) {
     
     for(GenJetCollection::const_iterator partonjet = partonjets->begin();  partonjet != partonjets->end(); ++partonjet ) { 
       int nb = 0;
       if( ( partonjet->pt() > 20. ) && ( fabs(partonjet->eta()) ) < 2.4 ) {
-	//	    cout <<" parton jet pt / eta = " << partonjet->pt() <<" "<< partonjet->eta() <<  endl; 
 	    std::vector<const reco::Candidate*> partons = partonjet->getJetConstituentsQuick();
 	    for (unsigned int i = 0; i < partons.size(); ++i) {
 	      const reco::Candidate* parton = partons[i];
 	      //	      cout <<"   jet constituent i = " << i <<" ID " << parton->pdgId() << endl;
-	      if( fabs(parton->pdgId()) == 5 ) {++nb; }
+	      if( fabs(parton->pdgId()) == 5 ) {
+		++nb;
+		if(partonjet->pt() > pTbmax) {
+		  pTbmax = partonjet->pt();
+		  pTb    = partonjet->pt();
+		  yb     = partonjet->y();
+		}
+	      }
 	    }
 	    //	    cout <<"   n bquarks in jet = " << nb << endl;
 	    if( nb > 0 ) {++nbjets;}
+	    //	    cout <<" parton jet pt / eta = " << partonjet->pt() <<" "<< partonjet->eta() <<" nb = " << nb <<  endl; 
       }
     }
   }
+
+  //  cout <<" ===> nbjets = " << nbjets <<" pTb = " << pTb <<" yb = " << yb << endl;
 	
   if(nbjets == 0) {++nbj0;}
   if(nbjets == 1) {++nbj1;}
@@ -268,10 +297,8 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //  cout <<"    ---> n b-jets   counters nbj0, nbj1, nbj2 = " << nbj0 <<" " << nbj1 <<" "<< nbj2 << endl;
   //  cout <<"    ---> n b-quarks counters nbq0, nbq1, nbq2 = " << nbq0 <<" " << nbq1 <<" "<< nbq2 << endl;
 
-  jjpt = 0;
-  PVx = -1000.; 
-  EtaRaw->clear();
-  //  t1->Fill();
+  //  EtaRaw->clear();
+  t1->Fill();
 }
 
 //define this as a plug-in
