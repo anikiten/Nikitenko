@@ -350,7 +350,8 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
    //int printVerbosity = 0;
    //menu->print(std::cout, printVerbosity);
-   
+   */
+
    // HLT
    edm::Handle<TriggerResults> triggerResults;
    iEvent.getByLabel(srcTriggerResults_,triggerResults);
@@ -364,7 +365,6 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
 	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
    }
-  */
 
   //  std::map<double,int> pTjptIndex;
 
@@ -375,6 +375,8 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   run = iEvent.id().run();
   event = iEvent.id().event();
+
+  cout <<" run = " << run <<" event = " << event << endl;
 
   nvertex = 0;
 
