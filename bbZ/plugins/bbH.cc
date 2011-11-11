@@ -214,6 +214,8 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( size_t i = 0; i < genparticles->size(); i++)
     {
       const reco::GenParticle & p = (*genparticles)[i];
+
+      //      cout <<" i = " << i <<" ID = " << p.pdgId() <<" status = " << p.status() << endl;
       
       if( fabs(p.pdgId()) == 5 && p.status() == 3 && p.pt() > 20. &&  fabs(p.eta()) < 2.4 ) {
 	++nbquarks;
@@ -261,7 +263,7 @@ bbH::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
   if(nbjets == 0) {++nbj0;}
   if(nbjets == 1) {++nbj1;}
-  if(nbjets == 2) {++nbj2;}
+  if(nbjets >= 2) {++nbj2;}
 
   //  cout <<"    ---> n b-jets   counters nbj0, nbj1, nbj2 = " << nbj0 <<" " << nbj1 <<" "<< nbj2 << endl;
   //  cout <<"    ---> n b-quarks counters nbq0, nbq1, nbq2 = " << nbq0 <<" " << nbq1 <<" "<< nbq2 << endl;
