@@ -298,7 +298,7 @@ void DiMuonAnalysis::Loop()
       // Selections
 
       // 1. two muons
-      if(nmuon != 2) {continue;}
+      if(nmuon < 2) {continue;}
 
       // pT mu > 20 GeV, |eta| < 2.1
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
@@ -433,7 +433,7 @@ void DiMuonAnalysis::Loop()
       Double_t PJ2z = (*EtJPT)[1] / tan(theta);
       Double_t EJ2  = (*EtJPT)[1] / sin(theta);
 
-      Double_t Mj1j2 = sqrt(EJ1*EJ2 - PJ1x*PJ2x - PJ1y*PJ2y - PJ1z*PJ2z); 
+      Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
       hMjj->Fill(Mj1j2);
       if(Mj1j2 < 700.) {continue;}
       N_massjj++;
