@@ -186,8 +186,10 @@ void bbH::Loop()
    TH1F * hpTH140   = new TH1F( "hpTH140", "pTH140", 28, 0., 140.);
    TH1F * hyH140    = new TH1F( "hyH140 ", "yH140  ", 12, 0., 2.4);
 
-   TH1F * hpTb140   = new TH1F( "hpTb140", "pTb140", 24, 20., 140.);
-   TH1F * hyb140    = new TH1F( "hyb140 ", "yb140  ", 12, 0., 2.4);
+   TH1F * hpTb140    = new TH1F( "hpTb140", "pTb140", 24, 20., 140.);
+   TH1F * hpTb140NLO = new TH1F( "hpTb140NLO", "pTb140NLO", 24, 20., 140.);
+   TH1F * hyb140     = new TH1F( "hyb140 ", "yb140  ", 12, 0., 2.4);
+   TH1F * hyb140NLO  = new TH1F( "hyb140NLO", "yb140NLO", 12, 0., 2.4);
 
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -212,13 +214,31 @@ void bbH::Loop()
      Double_t y, xslo, xsnlo, kf;
      linestream>>y>>xslo>>xsnlo>>kf;
      cout <<" y = " << y <<" xslo " << xslo <<" xsnlo " << xsnlo <<" kf " << kf << endl;
+     hyb140NLO->Fill(y,xsnlo);
    }
+   Double_t scale = 1./ hyb140NLO->Integral(); 
+   hyb140NLO->Scale(scale);
+   
+
+   // read pT-b
+   std::ifstream in20("pT-bjet_numbers.dat");
+   line;
+   while( std::getline( in20, line)){
+     istringstream linestream(line);
+     Double_t pT, xslo, xsnlo, kf;
+     linestream>>pT>>xslo>>xsnlo>>kf;
+     cout <<" pT = " << pT <<" xslo " << xslo <<" xsnlo " << xsnlo <<" kf " << kf << endl;
+     hpTb140NLO->Fill(pT,xsnlo);
+   }
+   Double_t scale = 1./ hpTb140NLO->Integral(); 
+   hpTb140NLO->Scale(scale);
+
 
    setTDRStyle(0,1,0);
    TCanvas* c1 = new TCanvas("X","Y",1);
    hpTH140->GetXaxis()->SetTitle("p_{T}^{H}, GeV");
    hpTH140->GetYaxis()->SetTitle("");
-   Double_t scale = 1./ hpTH140->Integral();
+   scale = 1./ hpTH140->Integral();
    hpTH140->Scale(scale);
    hpTH140->Draw("hist");
    c1->SaveAs("pTH140.eps");
@@ -227,29 +247,60 @@ void bbH::Loop()
    TCanvas* c2 = new TCanvas("X","Y",1);
    hyH140->GetXaxis()->SetTitle("y^{H}, GeV");
    hyH140->GetYaxis()->SetTitle("");
-   Double_t scale = 1./ hyH140->Integral();
+   scale = 1./ hyH140->Integral();
    hyH140->Scale(scale);
    hyH140->Draw("hist");
    c2->SaveAs("yH140.eps");
 
+   // pTb
    setTDRStyle(0,1,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
    hpTb140->GetXaxis()->SetTitle("p_{T}^{b}, GeV");
    hpTb140->GetYaxis()->SetTitle("");
-   Double_t scale = 1./ hpTb140->Integral();
+   scale = 1./ hpTb140->Integral();
    hpTb140->Scale(scale);
+   hpTb140->SetMaximum(0.500);
+   hpTb140->SetMinimum(0.001);
+   hpTb140->SetLineStyle(1);
+   hpTb140->SetLineWidth(3);
    hpTb140->Draw("hist");
+
+   hpTb140NLO->SetLineStyle(2);
+   hpTb140NLO->SetLineWidth(3);
+   hpTb140NLO->Draw("same");
+
+   TLegend *leg = new TLegend(0.5,0.8,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hpTb140,"PYTHIA","L");
+   leg->AddEntry(hpTb140NLO,"NLO","L");
+   leg->Draw();
+
    c3->SaveAs("pTb140.eps");
 
+   /*
+   // y b
    setTDRStyle(0,0,0);
    TCanvas* c4 = new TCanvas("X","Y",1);
-   hyb140->GetXaxis()->SetTitle("y^{b}, GeV");
+   hyb140->GetXaxis()->SetTitle("y^{b}");
    hyb140->GetYaxis()->SetTitle("");
-   Double_t scale = 1./ hyb140->Integral();
+   scale = 1./ hyb140->Integral();
    hyb140->Scale(scale);
-   hyb140->SetMaximum(0.2);
-   hyb140->SetMinimum(0.);
+   hyb140->SetMaximum(0.16);
+   hyb140->SetMinimum(0.00);
+   hyb140->SetLineStyle(1);
+   hyb140->SetLineWidth(3);
    hyb140->Draw("hist");
-   c4->SaveAs("yb140.eps");
 
+   hyb140NLO->SetLineStyle(2);
+   hyb140NLO->SetLineWidth(3);
+   hyb140NLO->Draw("same");
+
+   TLegend *leg = new TLegend(0.5,0.8,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hyb140,"PYTHIA","L");
+   leg->AddEntry(hyb140NLO,"NLO","L");
+   leg->Draw();
+
+   c4->SaveAs("yb140.eps");
+   */
 }
