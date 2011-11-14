@@ -184,10 +184,12 @@ void bbH::Loop()
    Long64_t nentries = fChain->GetEntriesFast();
 
    TH1F * hpTH140   = new TH1F( "hpTH140", "pTH140", 28, 0., 140.);
+
    TH1F * hyH140    = new TH1F( "hyH140 ", "yH140  ", 12, 0., 2.4);
 
    TH1F * hpTb140    = new TH1F( "hpTb140", "pTb140", 24, 20., 140.);
    TH1F * hpTb140NLO = new TH1F( "hpTb140NLO", "pTb140NLO", 24, 20., 140.);
+
    TH1F * hyb140     = new TH1F( "hyb140 ", "yb140  ", 12, 0., 2.4);
    TH1F * hyb140NLO  = new TH1F( "hyb140NLO", "yb140NLO", 12, 0., 2.4);
 
@@ -207,28 +209,42 @@ void bbH::Loop()
    }
 
    // read y-b
-   std::ifstream in20("y-bjet_numbers.dat");
+   std::ifstream in20("yb-mH=140_numbers");
    std::string line;
+   Int_t n = 0;
    while( std::getline( in20, line)){
      istringstream linestream(line);
-     Double_t y, xslo, xsnlo, kf;
-     linestream>>y>>xslo>>xsnlo>>kf;
-     cout <<" y = " << y <<" xslo " << xslo <<" xsnlo " << xsnlo <<" kf " << kf << endl;
-     hyb140NLO->Fill(y,xsnlo);
+     if(n != 0) {
+       Double_t y, xslo, xsnlo, kf;
+       linestream>>y>>xslo>>xsnlo>>kf;
+       cout <<" y = " << y <<" xslo " << xslo <<" xsnlo " << xsnlo <<" kf " << kf << endl;
+       hyb140NLO->Fill(y,xsnlo);
+     } else {
+       std::string text;
+       linestream >> text;
+     }
+     n++;
    }
    Double_t scale = 1./ hyb140NLO->Integral(); 
    hyb140NLO->Scale(scale);
    
 
    // read pT-b
-   std::ifstream in20("pT-bjet_numbers.dat");
+   std::ifstream in20("pTb-mH=140_numbers");
+   n = 0;
    line;
    while( std::getline( in20, line)){
      istringstream linestream(line);
-     Double_t pT, xslo, xsnlo, kf;
-     linestream>>pT>>xslo>>xsnlo>>kf;
-     cout <<" pT = " << pT <<" xslo " << xslo <<" xsnlo " << xsnlo <<" kf " << kf << endl;
-     hpTb140NLO->Fill(pT,xsnlo);
+     if(n != 0) {
+       Double_t pT, xslo, xsnlo, kf;
+       linestream>>pT>>xslo>>xsnlo>>kf;
+       cout <<" pT = " << pT <<" xslo " << xslo <<" xsnlo " << xsnlo <<" kf " << kf << endl;
+       hpTb140NLO->Fill(pT,xsnlo);
+     } else {
+       std::string text;
+       linestream >> text;
+     }
+     n++;
    }
    Double_t scale = 1./ hpTb140NLO->Integral(); 
    hpTb140NLO->Scale(scale);
