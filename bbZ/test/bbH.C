@@ -285,13 +285,19 @@ void bbH::Loop()
    hpTb140NLO->SetLineWidth(3);
    hpTb140NLO->Draw("same");
 
-   TLegend *leg = new TLegend(0.5,0.8,0.9,0.9,NULL,"brNDC");
+   TLegend *leg = new TLegend(0.4,0.7,0.9,0.8,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hpTb140,"PYTHIA","L");
-   leg->AddEntry(hpTb140NLO,"NLO","L");
+   leg->AddEntry(hpTb140,"PYTHIA pp#rightarrow bbH","L");
+   leg->AddEntry(hpTb140NLO,"NLO, #mu_{F}=#mu_{R}=m_{H}/4","L");
    leg->Draw();
 
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.045);
+   t->DrawLatex(25.,0.30,"LHC 7 TeV, H+#geq1b, p_{T}^{b}>20 GeV, #eta^{b}<2.4");
+   t->DrawLatex(80.,0.03,"m_{H}=140 GeV");
+
    c3->SaveAs("pTb140.eps");
+   c3->SaveAs("pTb140.png");
 
    /*
    // y b
@@ -311,12 +317,18 @@ void bbH::Loop()
    hyb140NLO->SetLineWidth(3);
    hyb140NLO->Draw("same");
 
-   TLegend *leg = new TLegend(0.5,0.8,0.9,0.9,NULL,"brNDC");
+   TLegend *leg = new TLegend(0.4,0.7,0.9,0.8,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hyb140,"PYTHIA","L");
-   leg->AddEntry(hyb140NLO,"NLO","L");
+   leg->AddEntry(hyb140,"PYTHIA pp#rightarrow bbH","L");
+   leg->AddEntry(hyb140NLO,"NLO, #mu_{F}=#mu_{R}=m_{H}/4","L");
    leg->Draw();
 
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.045);
+   t->DrawLatex(0.2,0.145,"LHC 7 TeV, H+#geq1b, p_{T}^{b}>20 GeV, #eta^{b}<2.4");
+   t->DrawLatex(1.6,0.09,"m_{H}=140 GeV");
+
    c4->SaveAs("yb140.eps");
+   c4->SaveAs("yb140.png");
    */
 }
