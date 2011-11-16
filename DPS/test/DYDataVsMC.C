@@ -160,7 +160,37 @@ void Draw()
 
    setTDRStyle(0,1);
 
-   TFile* file = new TFile("DYData15nov.root");
+   TCanvas* c0 = new TCanvas("X","Y",1);
+
+   TFile* file = new TFile("DYData16nov.root");
+   hnvtx0->GetXaxis()->SetTitle("N reco vertices");
+   hnvtx0->GetYaxis()->SetTitle("");
+   hnvtx0->SetLineStyle(1);
+   hnvtx0->SetLineWidth(3);
+   hnvtx0->SetMarkerStyle(24);
+   hnvtx0->SetMarkerSize(1.0);
+   hnvtx0->SetMaximum(200000.);
+   hnvtx0->SetMinimum(0.5);
+   hnvtx0->Draw("PE");
+   TLegend *leg = new TLegend(0.35,0.75,0.9,0.85,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hnvtx0,"data: p_{T}^{#mu}> 20 GeV, |#eta|<2.4","P");
+   cout <<"  Vertexing: N data = " << hnvtx0->Integral() << endl;
+
+   TFile* file = new TFile("DYMC16novPUW.root");
+   hnvtx0->SetLineStyle(1);
+   hnvtx0->SetLineWidth(3);
+   hnvtx0->Draw("same");
+   leg->AddEntry(hnvtx0,"MC, DY#rightarrowll","L");
+   leg->Draw();
+   cout <<"  Vertexing: N MC = " << hnvtx0->Integral() << endl;
+
+   c0->SaveAs("nvtx0.png");
+
+   /*
+   setTDRStyle(0,1);
+
+   TFile* file = new TFile("DYData16nov.root");
 
    TCanvas* c1 = new TCanvas("X","Y",1);
    //   TAxis* xaxis = hprEH11x5->GetXaxis();
@@ -225,7 +255,7 @@ void Draw()
 
    setTDRStyle(0,1);
    TCanvas* c2 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData15nov.root");
+   TFile* file = new TFile("DYData16nov.root");
    hM2mu0->GetXaxis()->SetTitle("di-muon mass, GeV");
    hM2mu0->GetYaxis()->SetTitle("Nev");
 
@@ -253,7 +283,7 @@ void Draw()
 
    setTDRStyle(0,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData15nov.root");
+   TFile* file = new TFile("DYData16nov.root");
    hDeta0->GetXaxis()->SetTitle("#Delta #eta _{j1j2}");
    hDeta0->GetYaxis()->SetTitle("Nev");
 
@@ -291,7 +321,7 @@ void Draw()
 
    setTDRStyle(0,1);
    TCanvas* c4 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData15nov.root");
+   TFile* file = new TFile("DYData16nov.root");
    hMjj->GetXaxis()->SetTitle("M_{j1j2}, GeV");
    hMjj->GetYaxis()->SetTitle("Nev");
 
@@ -323,4 +353,5 @@ void Draw()
 
    hZY2JDetaMjjCJV->Scale(scale);   
    cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, Mjj > 700, CJV = " << hZY2JDetaMjjCJV->Integral() << endl; 
+   */
 }
