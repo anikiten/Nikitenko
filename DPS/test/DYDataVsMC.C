@@ -196,7 +196,8 @@ void Draw()
    leg->AddEntry(hZY2JDeta,"Z+2jets, p_{T} > 25 GeV, #Delta #eta _{j1j2} > 3.5","P");
    leg->Draw();
 
-   TFile* file = new TFile("DYMC15nov.root");
+   TFile* file = new TFile("DYMC16novPUW.root");
+   //   TFile* file = new TFile("DYMC15nov.root");
 
    Double_t Nmc   = hZY->Integral();
    Double_t scale = Ndata/Nmc;
@@ -239,7 +240,8 @@ void Draw()
    leg->SetFillColor(10);
    leg->AddEntry(hM2mu0,"data: p_{T}^{#mu}> 20 GeV, |#eta|<2.4","P");
 
-   TFile* file = new TFile("DYMC15nov.root");
+   TFile* file = new TFile("DYMC16novPUW.root");
+   //   TFile* file = new TFile("DYMC15nov.root");
    hM2mu0->Scale(scale);
    hM2mu0->SetLineStyle(1);
    hM2mu0->SetLineWidth(3);
@@ -270,7 +272,8 @@ void Draw()
    leg->AddEntry(hDeta0,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7","P");
    leg->AddEntry(hDeta1,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0 ","P");
 
-   TFile* file = new TFile("DYMC15nov.root");
+   TFile* file = new TFile("DYMC16novPUW.root");
+   //   TFile* file = new TFile("DYMC15nov.root");
    hDeta0->Scale(scale);
    cout <<"  N MC predicted after two jet selection = " << hDeta0->Integral() << endl; 
    hDeta0->SetLineStyle(1);
@@ -303,7 +306,8 @@ void Draw()
    leg->SetFillColor(10);
    leg->AddEntry(hMjj,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5 ","P");
 
-   TFile* file = new TFile("DYMC15nov.root");
+   TFile* file = new TFile("DYMC16novPUW.root");
+   //   TFile* file = new TFile("DYMC15nov.root");
    hMjj->Scale(scale);
    cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5 = " << hMjj->Integral() << endl; 
    hMjj->SetLineStyle(1);
@@ -313,4 +317,10 @@ void Draw()
    leg->Draw();
 
    c4->SaveAs("mass_jj.png");
+
+   hZY2JDetaMjj->Scale(scale);   
+   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, Mjj > 700 = " << hZY2JDetaMjj->Integral() << endl; 
+
+   hZY2JDetaMjjCJV->Scale(scale);   
+   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, Mjj > 700, CJV = " << hZY2JDetaMjjCJV->Integral() << endl; 
 }

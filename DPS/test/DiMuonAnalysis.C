@@ -202,6 +202,37 @@ void DiMuonAnalysis::Loop()
 //by  b_branchname->GetEntry(ientry); //read only this branch
    if (fChain == 0) return;
 
+   //   Double_t GetBinContent(Int_t bin) 
+
+   TFile* file = new TFile("DYData15nov.root");
+   hnvtx0->Draw();
+   Double_t nvtx_data[40];
+   Double_t nvtx_mc[40];
+   Double_t puweight[40];
+   for (Int_t id = 0; id < 40; id++) {
+     nvtx_data[id] = hnvtx0->GetBinContent(id+1);
+     cout <<" bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
+   }
+
+   TFile* file = new TFile("DYMC15nov.root");
+   hnvtx0->Draw();
+   for (Int_t im = 0; im < 40; im++) {
+     nvtx_mc[im] = hnvtx0->GetBinContent(im+1);
+     cout <<" bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
+   }
+
+   for (Int_t idm = 0; idm < 40; idm++) {
+     if(nvtx_mc[idm] != 0) {
+       puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
+     } else {
+       puweight[idm] = 0.;
+     }
+     cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
+   }
+
+  
+   TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
+
    TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
    TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
    TH1F * hDeta0   = new TH1F( "hDeta0", "Deta0", 50, 0., 10.);
@@ -209,10 +240,18 @@ void DiMuonAnalysis::Loop()
    TH1F * hMjj     = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
 
    TH1F * hPtZ     = new TH1F( "hPtZ", "PtZ", 25, 0., 100.);
+
+   TH1F * hPtZ1              = new TH1F( "hPtZ1", "PtZ1", 25, 0., 100.);
+   TH1F * hPtZ12J            = new TH1F( "hPtZ12J", "PtZ12J", 25, 0., 100.);
+   TH1F * hPtZ12JDeta        = new TH1F( "hPtZ12JDeta", "PtZ12JDeta", 25, 0., 100.);
+   TH1F * hPtZ12JDetaMjj     = new TH1F( "hPtZ12JDetaMjj", "PtZ12JDetaMjj", 25, 0., 100.);
+   TH1F * hPtZ12JDetaMjjCJV  = new TH1F( "hPtZ12JDetaMjjCJV", "PtZ12JDetaMjjCJV", 25, 0., 100.);
    
-   TH1F * hZY           = new TH1F( "hZY", "ZY", 50, -5., 5.);
-   TH1F * hZY2J         = new TH1F( "hZY2J", "ZY2J", 50, -5., 5.);
-   TH1F * hZY2JDeta     = new TH1F( "hZY2JDeta", "ZY2JDeta", 25, -5., 5.);
+   TH1F * hZY              = new TH1F( "hZY", "ZY", 50, -5., 5.);
+   TH1F * hZY2J            = new TH1F( "hZY2J", "ZY2J", 50, -5., 5.);
+   TH1F * hZY2JDeta        = new TH1F( "hZY2JDeta", "ZY2JDeta", 25, -5., 5.);
+   TH1F * hZY2JDetaMjj     = new TH1F( "hZY2JDetaMjj", "ZY2JDetaMjj", 25, -5., 5.);
+   TH1F * hZY2JDetaMjjCJV  = new TH1F( "hZY2JDetaMjjCJV", "ZY2JDetaMjjCJV", 25, -5., 5.);
 
    TH1F * hEtJ    = new TH1F( "hEtJ", "EtJ", 30, 0., 150.);
    TH1F * hEtaJ   = new TH1F( "hEtaJ", "EtaJ", 24, -2.4, 2.4);
@@ -279,6 +318,7 @@ void DiMuonAnalysis::Loop()
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
+      //      break;
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
@@ -303,14 +343,14 @@ void DiMuonAnalysis::Loop()
       // pT mu > 20 GeV, |eta| < 2.1
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
       N_muons++;
-      hM2mu0->Fill(mass_mumu);
-
+      hM2mu0->Fill(mass_mumu,puweight[nvertex]);
+      hnvtx0->Fill(1.*nvertex,puweight[nvertex]);
       //	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) 
 
       // M_mumu 85-97 GeV
       if(mass_mumu < 85. || mass_mumu > 97.) {continue;}
       N_mass2mu++;
-      hM2mu1->Fill(mass_mumu);
+      hM2mu1->Fill(mass_mumu,puweight[nvertex]);
 
 
       Int_t smallbeta = 0;
@@ -337,7 +377,7 @@ void DiMuonAnalysis::Loop()
       Double_t EZ = sqrt(MZ*MZ + PtZ*PtZ + PZz*PZz);
       Double_t ZY   = 0.5 * log( (EZ+PZz) / (EZ-PZz));
 
-      hZY->Fill(ZY);
+      hZY->Fill(ZY,puweight[nvertex]);
 
       // jets
       for (unsigned int i = 0; i < njets; i++) {
@@ -408,16 +448,16 @@ void DiMuonAnalysis::Loop()
 	  ( fabs((*EtaJPT)[0]) > 4.7) || 
 	  ( fabs((*EtaJPT)[1]) > 4.7) ) {continue;}
       N_jets++;
-      hZY2J->Fill(ZY);
+      hZY2J->Fill(ZY,puweight[nvertex]);
       Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
-      hDeta0->Fill(DetaJJ);
+      hDeta0->Fill(DetaJJ,puweight[nvertex]);
 
       if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
-      hDeta1->Fill(DetaJJ);
+      hDeta1->Fill(DetaJJ,puweight[nvertex]);
 
       if( DetaJJ < 3.5 ) {continue;}
       N_deta++;
-      hZY2JDeta->Fill(ZY);
+      hZY2JDeta->Fill(ZY,puweight[nvertex]);
 
       Double_t PJ1x = (*EtJPT)[0] * cos((*PhiJPT)[0]); 
       Double_t PJ1y = (*EtJPT)[0] * sin((*PhiJPT)[0]);
@@ -434,10 +474,31 @@ void DiMuonAnalysis::Loop()
       Double_t EJ2  = (*EtJPT)[1] / sin(theta);
 
       Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
-      hMjj->Fill(Mj1j2);
+      hMjj->Fill(Mj1j2,puweight[nvertex]);
       if(Mj1j2 < 700.) {continue;}
       N_massjj++;
+      hZY2JDetaMjj->Fill(ZY,puweight[nvertex]);
+      // VBF jets with max and min rapidity
+      Double_t eta_jmin = (*EtaJPT)[0]; 
+      Double_t eta_jmax = (*EtaJPT)[1]; 
+      if( (*EtaJPT)[0] > (*EtaJPT)[1] ) {
+	eta_jmin = (*EtaJPT)[1]; 
+	eta_jmax = (*EtaJPT)[0]; 
+      }
+
+      // CJV part
+      Int_t ncj = 0;
+      for (unsigned int i = 0; i < njets; i++) {
+	if(i < 2 ) {continue;}
+	if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
+	  if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
+	    ncj++;
+	  }
+	}
+      }
+      if(ncj != 0) {continue;}
       N_cjv++;
+      hZY2JDetaMjjCJV->Fill(ZY,puweight[nvertex]);
 
       // 
       if(nalljets == 0 && ngoodjets == 0) {hPtZ0->Fill(PtZ);}
@@ -492,7 +553,7 @@ void DiMuonAnalysis::Loop()
    cout <<"===--> passed Mj1j2 cut              - " << N_massjj << endl;
    cout <<"===--> passed CVJ                    - " << N_cjv << endl;
 
-   TFile efile("DY.root","recreate");
+   TFile efile("DYhistos.root","recreate");
 
    setTDRStyle(0,0,0);
    // ===> di muon mass: 
@@ -502,7 +563,16 @@ void DiMuonAnalysis::Loop()
    hM2mu1->Write();
    hDeta0->Write();
    hDeta1->Write();
+   hnvtx0->Write();   
    hMjj->Write();
+
+   hZY->Write();
+   hZY2J->Write();
+   hZY2JDeta->Write();
+   hZY2JDetaMjj->Write();
+   hZY2JDetaMjjCJV->Write();
+
+
 
    hM2mu0->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
    hM2mu0->GetYaxis()->SetTitle("Nev/2 GeV");
@@ -899,10 +969,6 @@ void DiMuonAnalysis::Loop()
    // NvtxL2
    setTDRStyle(0,1,0);
    TCanvas* c22 = new TCanvas("X","Y",1);
-
-   hZY->Write();
-   hZY2J->Write();
-   hZY2JDeta->Write();
 
    hZY->GetXaxis()->SetTitle("Z rapidity");
    hZY->GetYaxis()->SetTitle("Nev / 0.2");
