@@ -489,6 +489,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if ( imuon->innerTrack().isNull() ||
 
 	   //	   !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
+	   // (*imuon).charge()
 	   !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
 	   imuon->innerTrack()->numberOfValidHits() <= 10 ||
            imuon->innerTrack()->dxy(bs) > 0.2 ) { continue; }

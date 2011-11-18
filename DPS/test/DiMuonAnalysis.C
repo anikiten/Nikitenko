@@ -202,9 +202,8 @@ void DiMuonAnalysis::Loop()
 //by  b_branchname->GetEntry(ientry); //read only this branch
    if (fChain == 0) return;
 
-   //   Double_t GetBinContent(Int_t bin) 
-
-   TFile* file = new TFile("DYData15nov.root");
+   // vertex reweighting
+   TFile* file = new TFile("DYDataNvtx.root");
    hnvtx0->Draw();
    Double_t nvtx_data[40];
    Double_t nvtx_mc[40];
@@ -214,13 +213,14 @@ void DiMuonAnalysis::Loop()
      cout <<" bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
    }
 
-   TFile* file = new TFile("DYMC15nov.root");
+   TFile* file = new TFile("DYMCNvtx.root");
    hnvtx0->Draw();
    for (Int_t im = 0; im < 40; im++) {
      nvtx_mc[im] = hnvtx0->GetBinContent(im+1);
      cout <<" bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
    }
 
+   // for MC
    for (Int_t idm = 0; idm < 40; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
@@ -230,6 +230,11 @@ void DiMuonAnalysis::Loop()
      cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
 
+   // for data
+   for (Int_t idm = 0; idm < 40; idm++) {
+     puweight[idm] = 1.0;
+     cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
+   }
   
    TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
 
@@ -555,10 +560,6 @@ void DiMuonAnalysis::Loop()
 
    TFile efile("DYhistos.root","recreate");
 
-   setTDRStyle(0,0,0);
-   // ===> di muon mass: 
-   TCanvas* c1 = new TCanvas("X","Y",1);
-
    hM2mu0->Write();
    hM2mu1->Write();
    hDeta0->Write();
@@ -572,7 +573,11 @@ void DiMuonAnalysis::Loop()
    hZY2JDetaMjj->Write();
    hZY2JDetaMjjCJV->Write();
 
+   hnvtx0->Write();
 
+   setTDRStyle(0,0,0);
+   // ===> di muon mass: 
+   TCanvas* c1 = new TCanvas("X","Y",1);
 
    hM2mu0->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
    hM2mu0->GetYaxis()->SetTitle("Nev/2 GeV");
