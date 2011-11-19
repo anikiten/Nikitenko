@@ -162,7 +162,7 @@ void Draw()
 
    TCanvas* c0 = new TCanvas("X","Y",1);
 
-   TFile* file = new TFile("DYData16nov.root");
+   TFile* file = new TFile("DYData18nov.root");
    hnvtx0->GetXaxis()->SetTitle("N reco vertices");
    hnvtx0->GetYaxis()->SetTitle("");
    hnvtx0->SetLineStyle(1);
@@ -177,7 +177,7 @@ void Draw()
    leg->AddEntry(hnvtx0,"data: p_{T}^{#mu}> 20 GeV, |#eta|<2.4","P");
    cout <<"  Vertexing: N data = " << hnvtx0->Integral() << endl;
 
-   TFile* file = new TFile("DYMC16novPUW.root");
+   TFile* file = new TFile("DYMC18novPUW.root");
    hnvtx0->SetLineStyle(1);
    hnvtx0->SetLineWidth(3);
    hnvtx0->Draw("same");
@@ -187,10 +187,9 @@ void Draw()
 
    c0->SaveAs("nvtx0.png");
 
-   /*
    setTDRStyle(0,1);
 
-   TFile* file = new TFile("DYData16nov.root");
+   TFile* file = new TFile("DYData18nov.root");
 
    TCanvas* c1 = new TCanvas("X","Y",1);
    //   TAxis* xaxis = hprEH11x5->GetXaxis();
@@ -226,7 +225,7 @@ void Draw()
    leg->AddEntry(hZY2JDeta,"Z+2jets, p_{T} > 25 GeV, #Delta #eta _{j1j2} > 3.5","P");
    leg->Draw();
 
-   TFile* file = new TFile("DYMC16novPUW.root");
+   TFile* file = new TFile("DYMC18novPUW.root");
    //   TFile* file = new TFile("DYMC15nov.root");
 
    Double_t Nmc   = hZY->Integral();
@@ -255,7 +254,7 @@ void Draw()
 
    setTDRStyle(0,1);
    TCanvas* c2 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData16nov.root");
+   TFile* file = new TFile("DYData18nov.root");
    hM2mu0->GetXaxis()->SetTitle("di-muon mass, GeV");
    hM2mu0->GetYaxis()->SetTitle("Nev");
 
@@ -270,7 +269,7 @@ void Draw()
    leg->SetFillColor(10);
    leg->AddEntry(hM2mu0,"data: p_{T}^{#mu}> 20 GeV, |#eta|<2.4","P");
 
-   TFile* file = new TFile("DYMC16novPUW.root");
+   TFile* file = new TFile("DYMC18novPUW.root");
    //   TFile* file = new TFile("DYMC15nov.root");
    hM2mu0->Scale(scale);
    hM2mu0->SetLineStyle(1);
@@ -283,7 +282,7 @@ void Draw()
 
    setTDRStyle(0,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData16nov.root");
+   TFile* file = new TFile("DYData18nov.root");
    hDeta0->GetXaxis()->SetTitle("#Delta #eta _{j1j2}");
    hDeta0->GetYaxis()->SetTitle("Nev");
 
@@ -302,10 +301,10 @@ void Draw()
    leg->AddEntry(hDeta0,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7","P");
    leg->AddEntry(hDeta1,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0 ","P");
 
-   TFile* file = new TFile("DYMC16novPUW.root");
+   TFile* file = new TFile("DYMC18novPUW.root");
    //   TFile* file = new TFile("DYMC15nov.root");
    hDeta0->Scale(scale);
-   cout <<"  N MC predicted after two jet selection = " << hDeta0->Integral() << endl; 
+   cout <<"  Deta0 (events after two jets selection = " << hDeta0->Integral() << endl;
    hDeta0->SetLineStyle(1);
    hDeta0->SetLineWidth(3);
    hDeta0->Draw("same");
@@ -321,7 +320,7 @@ void Draw()
 
    setTDRStyle(0,1);
    TCanvas* c4 = new TCanvas("X","Y",1);
-   TFile* file = new TFile("DYData16nov.root");
+   TFile* file = new TFile("DYData18nov.root");
    hMjj->GetXaxis()->SetTitle("M_{j1j2}, GeV");
    hMjj->GetYaxis()->SetTitle("Nev");
 
@@ -334,24 +333,30 @@ void Draw()
    hMjj->Draw("PE");
    TLegend *leg = new TLegend(0.15,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hMjj,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5 ","P");
+   leg->AddEntry(hMjj,"data: Z peak, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5, CJV ","P");
 
-   TFile* file = new TFile("DYMC16novPUW.root");
+   hZY2JDetaCJV->Scale(scale);   
+
+   TFile* file = new TFile("DYMC18novPUW.root");
    //   TFile* file = new TFile("DYMC15nov.root");
    hMjj->Scale(scale);
-   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5 = " << hMjj->Integral() << endl; 
+   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, CJV = " << hMjj->Integral() << endl; 
    hMjj->SetLineStyle(1);
    hMjj->SetLineWidth(3);
    hMjj->Draw("same");
    leg->AddEntry(hMjj,"MC, DY#rightarrowll","L");
    leg->Draw();
 
+   hZY2J->Scale(scale);   
+   hZY2JDeta->Scale(scale);   
+   hZY2JDetaCJV->Scale(scale);   
+   hZY2JDetaCJVMjj->Scale(scale);   
+
+   cout <<"  ->N MC predicted after two jet selection = " << hZY2J->Integral() << endl; 
+   cout <<"  ->N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5 = " << hZY2JDeta->Integral() << endl; 
+   cout <<"  ->N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, CJV = " << hZY2JDetaCJV->Integral() << endl; 
+   cout <<"  ->N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, CJV, Mjj > 700, CJV = " << hZY2JDetaCJVMjj->Integral() << endl; 
+
    c4->SaveAs("mass_jj.png");
 
-   hZY2JDetaMjj->Scale(scale);   
-   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, Mjj > 700 = " << hZY2JDetaMjj->Integral() << endl; 
-
-   hZY2JDetaMjjCJV->Scale(scale);   
-   cout <<"  N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, Mjj > 700, CJV = " << hZY2JDetaMjjCJV->Integral() << endl; 
-   */
 }
