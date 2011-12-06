@@ -22,7 +22,7 @@ process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 process.GlobalTag.globaltag = cms.string('START42_V11::All')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10000)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -37,7 +37,7 @@ fileNames = cms.untracked.vstring(
 
 
 process.bbhanalysis = cms.EDAnalyzer("DYjets",
-    HistOutFile = cms.untracked.string('DYjets.root'),
+    HistOutFile = cms.untracked.string('dymadgraph.root'),
     parton_jets = cms.InputTag("ak5PartonJets")
 )
 

@@ -201,7 +201,7 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   int procid = (int) genEvt->signalProcessID();
   event_w = genEvt->weight();
 
-  cout <<"  proc ID = " << procid <<" event weight = " << event_w << endl;
+  //  cout <<"  proc ID = " << procid <<" event weight = " << event_w << endl;
 
   //  cout <<"  Event particles " << endl;
 
@@ -211,12 +211,27 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( size_t i = 0; i < genparticles->size(); i++)
     {
       const reco::GenParticle & p = (*genparticles)[i];
+      
+      if(p.pdgId() == 23 && p.status() == 2 ) {
+	pTZ = p.pt();
+	yZ  = p.y();
+      }
+      
+      if(i > 30 ) {continue;}
+      if( fabs(p.pdgId()) != 11 && fabs(p.pdgId()) != 13 && fabs(p.pdgId()) != 15 ) {continue;}
+      if(p.status() == 1 || (fabs(p.pdgId()) == 15 && p.status() == 2)) {
 
-      cout <<" i = " << i 
-	   <<" ID = " << p.pdgId() 
-	   <<" status = " << p.status() 
-	   <<" rapidity = " << p.y() 
+	EtaMu->push_back(p.eta());
+	PhiMu->push_back(p.phi());
+	PtMu->push_back(p.pt());
+	/*
+	cout <<" i = " << i 
+	     <<" ID = " << p.pdgId() 
+	     <<" status = " << p.status() 
+	     <<" rapidity = " << p.y() 
 	   <<" eta = " << p.eta() << endl;
+	*/
+      }
     }
 
   // parton jets
@@ -224,7 +239,7 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel(partonjetsSrc, partonjets);
 
   for(GenJetCollection::const_iterator partonjet = partonjets->begin();  partonjet != partonjets->end(); ++partonjet ) { 
-    if( ( partonjet->pt() > 20. ) && ( fabs(partonjet->eta()) ) < 5.0 ) {
+    if( partonjet->pt() > 20. && fabs(partonjet->eta()) < 4.7 ) {
 
 	/*
 	  std::vector<const reco::Candidate*> partons = partonjet->getJetConstituentsQuick();
