@@ -1,4 +1,4 @@
-<library   name="UserCodeNikitenkobbZPlugins" file="bbH.cc">
+<library   name="UserCodeNikitenkobbZPlugins" file="bbH.cc,DYjets.cc">
   <use   name="DataFormats/TauReco"/>
   <use   name="RecoTauTag/TauTagTools"/>
   <use   name="DataFormats/CaloTowers"/>
