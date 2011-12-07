@@ -205,34 +205,49 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   //  cout <<"  Event particles " << endl;
 
+  math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
+  math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
+
   edm::Handle<reco::GenParticleCollection> genparticles;
   iEvent.getByLabel("genParticles", genparticles);
+
+  int imu = 0.;
 
   for( size_t i = 0; i < genparticles->size(); i++)
     {
       const reco::GenParticle & p = (*genparticles)[i];
       
+      /*
+      cout <<" i = " << i 
+	   <<" ID = " << p.pdgId() 
+	   <<" status = " << p.status() 
+	   <<" rapidity = " << p.y() 
+	   <<" eta = " << p.eta() << endl;
+      */
+
       if(p.pdgId() == 23 && p.status() == 2 ) {
 	pTZ = p.pt();
 	yZ  = p.y();
       }
       
-      if(i > 30 ) {continue;}
+      if(i > 100 ) {continue;}
       if( fabs(p.pdgId()) != 11 && fabs(p.pdgId()) != 13 && fabs(p.pdgId()) != 15 ) {continue;}
       if(p.status() == 1 || (fabs(p.pdgId()) == 15 && p.status() == 2)) {
-
-	EtaMu->push_back(p.eta());
-	PhiMu->push_back(p.phi());
-	PtMu->push_back(p.pt());
-	/*
-	cout <<" i = " << i 
-	     <<" ID = " << p.pdgId() 
-	     <<" status = " << p.status() 
-	     <<" rapidity = " << p.y() 
-	   <<" eta = " << p.eta() << endl;
-	*/
+	imu++;
+	if(imu <= 2) {
+	  EtaMu->push_back(p.eta());
+	  PhiMu->push_back(p.phi());
+	  PtMu->push_back(p.pt());
+	}
+	math::XYZTLorentzVector muonc(p.px(),p.py(), p.pz(), p.p());
+	if (imu == 1) muon1 = muonc; 
+	if (imu == 2) muon2 = muonc; 
       }
     }
+
+  math::XYZTLorentzVector twomuons = muon1 + muon2;
+  pTZ = twomuons.pt();
+  yZ  = 0.5 * log( (twomuons.e()+twomuons.pz()) / (twomuons.e()-twomuons.pz()) ); 
 
   // parton jets
   edm::Handle<GenJetCollection> partonjets;
