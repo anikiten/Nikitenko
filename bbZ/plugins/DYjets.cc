@@ -248,6 +248,7 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   math::XYZTLorentzVector twomuons = muon1 + muon2;
   pTZ = twomuons.pt();
   yZ  = 0.5 * log( (twomuons.e()+twomuons.pz()) / (twomuons.e()-twomuons.pz()) ); 
+  double mumu_mass = twomuons.M();
 
   // parton jets
   edm::Handle<GenJetCollection> partonjets;
@@ -264,11 +265,25 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if( fabs(parton->pdgId()) == 5 ) {}
 	  }
 	*/
-      EtaJ->push_back(partonjet->eta());
-      PhiJ->push_back(partonjet->phi());
-      pTJ->push_back(partonjet->pt());
+      Double_t DR1 = deltaR(muon1.Eta(), muon1.Phi(), partonjet->eta(), partonjet->phi());
+      Double_t DR2 = deltaR(muon2.Eta(), muon2.Phi(), partonjet->eta(), partonjet->phi());
+      if( DR1 > 0.5 && DR2 > 0.5 ) {
+	EtaJ->push_back(partonjet->eta());
+	PhiJ->push_back(partonjet->phi());
+	pTJ->push_back(partonjet->pt());
+      }
     }
   }
+  /*
+  int njets = pTJ->size();
+  cout <<" muon1 = " << muon1.pt() <<" eta = " << muon1.eta() <<" phi = " << muon1.phi() << endl;
+  cout <<" muon2 = " << muon2.pt() <<" eta = " << muon2.eta() <<" phi = " << muon2.phi() << endl;
+  cout <<" mumu_mass = " << mumu_mass <<" njets = " << njets <<" event W = " << event_w <<  endl;
+  for(int ind = 0; ind < njets; ind++) {
+    cout <<"   jet N = " << ind <<" pTJ = " << (*pTJ)[ind] <<" eta = " << (*EtaJ)[ind] <<" phi = " << (*PhiJ)[ind] << endl;
+  }
+  */
+
   t1->Fill();
 }
 //define this as a plug-in

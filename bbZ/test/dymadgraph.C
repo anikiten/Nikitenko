@@ -197,12 +197,15 @@ void dymadgraph::Loop()
    TH1F * hMjj        = new TH1F( "hMjj", "Mjj", 20, 0., 1000.);
 
    Long64_t nbytes = 0, nb = 0;
+   Int_t nev = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
       Int_t njets = pTJ->size();
+      nev++;
+      //      cout <<" event = " << nev << " njets = " << njets <<" weight = " << event_w << endl;
       hnjets->Fill(1.*njets,event_w);
       // Z inclusive
       hpTZ->Fill(pTZ,event_w);
@@ -249,105 +252,140 @@ void dymadgraph::Loop()
       */
       
    }
+
+   TFile efile("DYsherpa_histos.root","recreate");
+
+   hpTZ->Write();
+   hpTZ1J->Write();
+   hpTZ2J->Write();
+   hpTZ2JDeta->Write();
+
+   hyZ->Write();       
+   hyZ1J->Write();     
+   hyZ2J->Write();     
+   hyZ2JDeta->Write(); 
+
+   hnjets->Write();    
+   hDetaJJ->Write();   
+   hMjj->Write();      
+
+   efile.Close();
+
    setTDRStyle(0,1,0);
    TCanvas* c1 = new TCanvas("X","Y",1);
    hpTZ->GetXaxis()->SetTitle("p_{T}^{Z}, GeV");
    hpTZ->GetYaxis()->SetTitle("");
-   hpTZ->SetMaximum(5000);
-   hpTZ->SetMinimum(1.0);
-   //   scale = 1./ hpTH140->Integral();
-   //   hpTH140->Scale(scale);
+   Double_t scale = 1./ hpTZ->Integral();
+   hpTZ->Scale(scale);
+   hpTZ->SetMaximum(1.0);
+   hpTZ->SetMinimum(0.001);
    hpTZ->Draw("hist");
+
+   scale = 1./ hpTZ1J->Integral();
+   hpTZ1J->Scale(scale);
    hpTZ1J->SetLineStyle(2);
    hpTZ1J->SetLineWidth(3);
    hpTZ1J->Draw("same");
+
+   scale = 1./ hpTZ2J->Integral();
+   hpTZ2J->Scale(scale);
    hpTZ2J->SetLineStyle(3);
    hpTZ2J->SetLineWidth(3);
    hpTZ2J->Draw("same");
-   //   hpTZ2JDeta->SetLineStyle(1);
-   //   hpTZ2JDeta->SetLineWidth(3);
-   //   hpTZ2JDeta->Draw("same");
+
    TLegend *leg = new TLegend(0.35,0.7,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
+   /*
    leg->AddEntry(hpTZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hpTZ1J,"MadGraph Z+#geq 1J","L");
    leg->AddEntry(hpTZ2J,"MagGraph Z+#geq 2J","L");
+   */
+   leg->AddEntry(hpTZ,"MadGraph Z inclusive","L");
+   leg->AddEntry(hpTZ1J,"MadGraph Z+#geq 1J","L");
+   leg->AddEntry(hpTZ2J,"MadGraph Z+#geq 2J","L");
    leg->Draw();
-   c1->SaveAs("pTZmadgraph.gif");
-
+   c1->SaveAs("pTZ_madgrapg.gif");
 
    setTDRStyle(0,1,0);
    TCanvas* c2 = new TCanvas("X","Y",1);
    hyZ->GetXaxis()->SetTitle("y^{Z}");
    hyZ->GetYaxis()->SetTitle("");
-   hyZ->SetMaximum(10000);
-   hyZ->SetMinimum(1.0);
-   //   scale = 1./ hpTH140->Integral();
-   //   hpTH140->Scale(scale);
+   Double_t scale = 1./ hyZ->Integral();
+   hyZ->Scale(scale);
+   hyZ->SetMaximum(0.3);
+   hyZ->SetMinimum(0.01);
    hyZ->Draw("hist");
+
+   scale = 1./ hyZ1J->Integral();
+   hyZ1J->Scale(scale);
    hyZ1J->SetLineStyle(2);
    hyZ1J->SetLineWidth(3);
    hyZ1J->Draw("same");
+
+   scale = 1./ hyZ2J->Integral();
+   hyZ2J->Scale(scale);
    hyZ2J->SetLineStyle(3);
    hyZ2J->SetLineWidth(3);
    hyZ2J->Draw("same");
-   //   hyZ2JDeta->SetLineStyle(1);
-   //   hyZ2JDeta->SetLineWidth(3);
-   //   hyZ2JDeta->Draw("same");
-   TLegend *leg = new TLegend(0.35,0.75,0.9,0.95,NULL,"brNDC");
+
+   TLegend *leg = new TLegend(0.35,0.70,0.9,0.90,NULL,"brNDC");
    leg->SetFillColor(10);
+   /*
    leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hyZ1J,"MadGraph Z+#geq 1J","L");
    leg->AddEntry(hyZ2J,"MagGraph Z+#geq 2J","L");
+   */
+   leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
+   leg->AddEntry(hyZ1J,"MadGraph Z+#geq 1J","L");
+   leg->AddEntry(hyZ2J,"MadGraph Z+#geq 2J","L");
    leg->Draw();
-   c2->SaveAs("yZmadgraph.gif");
+   c2->SaveAs("yZ_madgrapg.gif");
 
    setTDRStyle(0,1,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
    hnjets->GetXaxis()->SetTitle("N jets p_{T}>20 GeV, |#eta|<4.7");
    hnjets->GetYaxis()->SetTitle("");
-   hnjets->SetMaximum(50000);
-   hnjets->SetMinimum(1.0);
    hnjets->SetLineWidth(3);
-   //   scale = 1./ hpTH140->Integral();
-   //   hpTH140->Scale(scale);
+   scale = 1./ hnjets->Integral();
+   hnjets->Scale(scale);
+   hnjets->SetMaximum(2.);
+   hnjets->SetMinimum(0.01);
    hnjets->Draw("hist");
    TLegend *leg = new TLegend(0.35,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
    leg->AddEntry(hnjets,"MadGraph, Z+jets","L");
    leg->Draw();
-   c3->SaveAs("njets.gif");
-
+   c3->SaveAs("njets_madgrapg.gif");
 
    setTDRStyle(0,0,0);
    TCanvas* c4 = new TCanvas("X","Y",1);
    hDetaJJ->GetXaxis()->SetTitle("#Delta #eta _{j1j2}");
    hDetaJJ->GetYaxis()->SetTitle("");
-   hDetaJJ->SetMaximum(150);
-   //   hDetaJJ->SetMinimum(1.0);
    hDetaJJ->SetLineWidth(3);
-   //   scale = 1./ hpTH140->Integral();
-   //   hpTH140->Scale(scale);
+   scale = 1./ hDetaJJ->Integral();
+   hDetaJJ->Scale(scale);
+   hDetaJJ->SetMaximum(0.2);
+   //   hDetaJJ->SetMinimum(1.0);
    hDetaJJ->Draw("hist");
    TLegend *leg = new TLegend(0.35,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
    leg->AddEntry(hDetaJJ,"MadGraph, Z+jets","L");
    leg->Draw();
-   c4->SaveAs("DetaJJ.gif");
+   c4->SaveAs("DetaJJ_madgrapg.gif");
 
    setTDRStyle(0,1,0);
    TCanvas* c5 = new TCanvas("X","Y",1);
-   hMjj->GetXaxis()->SetTitle("M_{j1j2}");
+   hMjj->GetXaxis()->SetTitle("M_{j1j2}, GeV");
    hMjj->GetYaxis()->SetTitle("");
-   //   hMjj->SetMaximum(50000);
-   //   hMjj->SetMinimum(1.0);
    hMjj->SetLineWidth(3);
-   //   scale = 1./ hpTH140->Integral();
-   //   hpTH140->Scale(scale);
+   scale = 1./ hMjj->Integral();
+   hMjj->Scale(scale);
+   hMjj->SetMaximum(1.0);
+   hMjj->SetMinimum(0.001);
    hMjj->Draw("hist");
    TLegend *leg = new TLegend(0.35,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
    leg->AddEntry(hMjj,"MadGraph, Z+jets","L");
    leg->Draw();
-   c5->SaveAs("Mjj.gif");
+   c5->SaveAs("Mjj_madgrapg.gif");
 }

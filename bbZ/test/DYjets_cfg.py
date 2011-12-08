@@ -27,18 +27,19 @@ process.maxEvents = cms.untracked.PSet(
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
-# '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
-#  'rfio:/castor/cern.ch/user/a/anikiten/bbHMC/bbHMCevents_1_1_JAC.root')
-#  'rfio:/castor/cern.ch/user/a/anikiten/bbHMC/bbHMCevents140GeV.root')
-#  'rfio:/castor/cern.ch/user/a/anikiten/bbHMC/bbHMCevents400GeV.root')
-#  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dymadgraph_1_1_xn5.root')
-   'file:/tmp/anikiten/dymadgraph_1_1_xn5.root')
+  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dymadgraph_1_1_xn5.root')
+#  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dysherpa_1_1_pMD.root',
+#  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dysherpa_2_1_IRW.root',
+#  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dysherpa_3_1_rBk.root',
+#  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dysherpa_4_1_gl5.root')
 )
 
 
 process.bbhanalysis = cms.EDAnalyzer("DYjets",
     HistOutFile = cms.untracked.string('dymadgraph.root'),
-    parton_jets = cms.InputTag("ak5PartonJets")
+#    HistOutFile = cms.untracked.string('dysherpa.root'),
+#    parton_jets = cms.InputTag("ak5PartonJets")
+    parton_jets = cms.InputTag("ak5GenJets")
 )
 
 # JPTjetsL2L3 = cms.InputTag("ak5JPTJetsL2L3"),
@@ -48,12 +49,8 @@ process.bbhanalysis = cms.EDAnalyzer("DYjets",
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
-# process.p1 = cms.Path(process.dump)
+# process.p1 = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.bbhanalysis)
 
-# process.p1 = cms.Path(process.recoJPTJets*process.myjetplustrack)
- 
-# process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
-
-process.p1 = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.bbhanalysis)
+process.p1 = cms.Path(process.bbhanalysis)
 
 # process.p1 = cms.Path(process.dump)
