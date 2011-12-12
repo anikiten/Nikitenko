@@ -190,10 +190,10 @@ void dymadgraph::Loop()
    TH1F * hyZ         = new TH1F( "hyZ", "yZ", 20, 0., 4.);
    TH1F * hyZ1J       = new TH1F( "hyZ1J", "yZ1J", 20, 0., 4.);
    TH1F * hyZ2J       = new TH1F( "hyZ2J", "yZ2J", 20, 0., 4.);
-   TH1F * hyZ2JDeta   = new TH1F( "hyZ2JDeta", "yZ2JDeta", 40, 0., 4.);
+   TH1F * hyZ2JDeta   = new TH1F( "hyZ2JDeta", "yZ2JDeta", 20, 0., 4.);
 
    TH1F * hnjets      = new TH1F( "hnjets", "njets", 5, 0., 5.);
-   TH1F * hDetaJJ     = new TH1F( "hDetaJJ", "DetaJJ", 25, 0., 10.);
+   TH1F * hDetaJJ     = new TH1F( "hDetaJJ", "DetaJJ", 5, 0., 5.);
    TH1F * hMjj        = new TH1F( "hMjj", "Mjj", 20, 0., 1000.);
 
    Long64_t nbytes = 0, nb = 0;
@@ -203,6 +203,12 @@ void dymadgraph::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
+
+      // muon acceptance
+
+      if( (*PtMu)[0] < 20 || (*PtMu)[1] < 20 ) {continue;}
+      if( fabs((*EtaMu)[0]) > 2.4 || fabs((*EtaMu)[1]) > 2.4 ) {continue;}
+
       Int_t njets = pTJ->size();
       nev++;
       //      cout <<" event = " << nev << " njets = " << njets <<" weight = " << event_w << endl;
@@ -216,31 +222,33 @@ void dymadgraph::Loop()
 	hyZ1J->Fill(fabs(yZ),event_w);
       }
       if(njets >= 2 ) {
-	hpTZ2J->Fill(pTZ,event_w);
-	hyZ2J->Fill(fabs(yZ),event_w);
-	Double_t DetaJJ = fabs((*EtaJ)[0]-(*EtaJ)[1]);
-	hDetaJJ->Fill(DetaJJ,event_w);
-	// Mjj
-	Double_t PJ1x = (*pTJ)[0] * cos((*PhiJ)[0]); 
-	Double_t PJ1y = (*pTJ)[0] * sin((*PhiJ)[0]);
-	Double_t Eta = (*EtaJ)[0];
-	Double_t theta = 2. * atan(exp(-Eta));
-	Double_t PJ1z = (*pTJ)[0] / tan(theta);
-	Double_t EJ1  = (*pTJ)[0] / sin(theta);
+	if( (*pTJ)[0] > 25. && (*pTJ)[1] > 25.0 ) {
+	  hpTZ2J->Fill(pTZ,event_w);
+	  hyZ2J->Fill(fabs(yZ),event_w);
+	  Double_t DetaJJ = fabs((*EtaJ)[0]-(*EtaJ)[1]);
+	  hDetaJJ->Fill(DetaJJ,event_w);
+	  // Mjj
+	  Double_t PJ1x = (*pTJ)[0] * cos((*PhiJ)[0]); 
+	  Double_t PJ1y = (*pTJ)[0] * sin((*PhiJ)[0]);
+	  Double_t Eta = (*EtaJ)[0];
+	  Double_t theta = 2. * atan(exp(-Eta));
+	  Double_t PJ1z = (*pTJ)[0] / tan(theta);
+	  Double_t EJ1  = (*pTJ)[0] / sin(theta);
 	
-	Double_t PJ2x = (*pTJ)[1] * cos((*PhiJ)[1]); 
-	Double_t PJ2y = (*pTJ)[1] * sin((*PhiJ)[1]);
-	Eta = (*EtaJ)[1];
-	theta = 2. * atan(exp(-Eta));
-	Double_t PJ2z = (*pTJ)[1] / tan(theta);
-	Double_t EJ2  = (*pTJ)[1] / sin(theta);
+	  Double_t PJ2x = (*pTJ)[1] * cos((*PhiJ)[1]); 
+	  Double_t PJ2y = (*pTJ)[1] * sin((*PhiJ)[1]);
+	  Eta = (*EtaJ)[1];
+	  theta = 2. * atan(exp(-Eta));
+	  Double_t PJ2z = (*pTJ)[1] / tan(theta);
+	  Double_t EJ2  = (*pTJ)[1] / sin(theta);
 	
-	Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
-	hMjj->Fill(Mj1j2,event_w);
-
-	if(DetaJJ > 3.5) {
-	  hpTZ2JDeta->Fill(pTZ,event_w);
-	  hyZ2JDeta->Fill(fabs(yZ),event_w);
+	  Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
+	  if(DetaJJ > 3.5) {
+	    hpTZ2JDeta->Fill(pTZ,event_w);
+	    hyZ2JDeta->Fill(fabs(yZ),event_w);
+	    hMjj->Fill(Mj1j2,event_w);
+	    
+	  }
 	}
       }
       
@@ -279,6 +287,8 @@ void dymadgraph::Loop()
    hpTZ->Scale(scale);
    hpTZ->SetMaximum(1.0);
    hpTZ->SetMinimum(0.001);
+   hpTZ->SetLineStyle(1);
+   hpTZ->SetLineWidth(1);
    hpTZ->Draw("hist");
 
    scale = 1./ hpTZ1J->Integral();
@@ -293,6 +303,13 @@ void dymadgraph::Loop()
    hpTZ2J->SetLineWidth(3);
    hpTZ2J->Draw("same");
 
+
+   scale = 1./ hpTZ2JDeta->Integral();
+   hpTZ2JDeta->Scale(scale);
+   hpTZ2JDeta->SetLineStyle(1);
+   hpTZ2JDeta->SetLineWidth(3);
+   hpTZ2JDeta->Draw("same");
+
    TLegend *leg = new TLegend(0.35,0.7,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
    /*
@@ -303,17 +320,20 @@ void dymadgraph::Loop()
    leg->AddEntry(hpTZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hpTZ1J,"MadGraph Z+#geq 1J","L");
    leg->AddEntry(hpTZ2J,"MadGraph Z+#geq 2J","L");
+   leg->AddEntry(hpTZ2JDeta,"MadGraph Z+#geq 2J, #Delta #eta _{J1J2} > 3.5","L");
    leg->Draw();
-   c1->SaveAs("pTZ_madgrapg.gif");
+   c1->SaveAs("pTZ_madgraph.gif");
 
-   setTDRStyle(0,1,0);
+   setTDRStyle(0,0,0);
    TCanvas* c2 = new TCanvas("X","Y",1);
    hyZ->GetXaxis()->SetTitle("y^{Z}");
    hyZ->GetYaxis()->SetTitle("");
    Double_t scale = 1./ hyZ->Integral();
    hyZ->Scale(scale);
-   hyZ->SetMaximum(0.3);
-   hyZ->SetMinimum(0.01);
+   hyZ->SetMaximum(0.2);
+   //   hyZ->SetMinimum(0.01);
+   hyZ1J->SetLineStyle(1);
+   hyZ1J->SetLineWidth(1);
    hyZ->Draw("hist");
 
    scale = 1./ hyZ1J->Integral();
@@ -328,6 +348,12 @@ void dymadgraph::Loop()
    hyZ2J->SetLineWidth(3);
    hyZ2J->Draw("same");
 
+   scale = 1./ hyZ2JDeta->Integral();
+   hyZ2JDeta->Scale(scale);
+   hyZ2JDeta->SetLineStyle(4);
+   hyZ2JDeta->SetLineWidth(3);
+   hyZ2JDeta->Draw("same");
+
    TLegend *leg = new TLegend(0.35,0.70,0.9,0.90,NULL,"brNDC");
    leg->SetFillColor(10);
    /*
@@ -338,9 +364,11 @@ void dymadgraph::Loop()
    leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hyZ1J,"MadGraph Z+#geq 1J","L");
    leg->AddEntry(hyZ2J,"MadGraph Z+#geq 2J","L");
+   leg->AddEntry(hyZ2JDeta,"MadGraph Z+#geq 2J, #Delta #eta > 3.5","L");
    leg->Draw();
-   c2->SaveAs("yZ_madgrapg.gif");
+   c2->SaveAs("yZ_madgraph.gif");
 
+   /*
    setTDRStyle(0,1,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
    hnjets->GetXaxis()->SetTitle("N jets p_{T}>20 GeV, |#eta|<4.7");
@@ -388,4 +416,5 @@ void dymadgraph::Loop()
    leg->AddEntry(hMjj,"MadGraph, Z+jets","L");
    leg->Draw();
    c5->SaveAs("Mjj_madgrapg.gif");
+   */
 }
