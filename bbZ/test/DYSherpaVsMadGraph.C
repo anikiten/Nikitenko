@@ -166,28 +166,29 @@ void Draw()
 
    hpTZ->GetXaxis()->SetTitle("p_{T}^{Z}, GeV");
    hpTZ->GetYaxis()->SetTitle("");
-   hpTZ->SetMaximum(50000);
-   hpTZ->SetMinimum(1.);
+   hpTZ->SetMaximum(10000000.);
+   hpTZ->SetMinimum(10.);
    hpTZ->SetLineStyle(1);
    hpTZ->SetLineWidth(2);
    Double_t nm = hpTZ->Integral();
    hpTZ->Draw("hist");
 
-   hpTZ1J->SetLineStyle(1);
-   hpTZ1J->SetLineWidth(3);
-   Double_t nm1J = hpTZ1J->Integral();
-   hpTZ1J->Draw("same");
-
    hpTZ2J->SetLineStyle(1);
-   hpTZ2J->SetLineWidth(4);
+   hpTZ2J->SetLineWidth(3);
    Double_t nm2J = hpTZ2J->Integral();
    hpTZ2J->Draw("same");
 
-   TLegend *leg = new TLegend(0.3,0.65,0.9,0.95,NULL,"brNDC");
+
+   hpTZ2JDeta->SetLineStyle(1);
+   hpTZ2JDeta->SetLineWidth(4);
+   Double_t nm2JDeta = hpTZ2JDeta->Integral();
+   hpTZ2JDeta->Draw("same");
+
+   TLegend *leg = new TLegend(0.3,0.75,0.95,0.95,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hpTZ,"MadGraph Z inclusive","L");
-   leg->AddEntry(hpTZ1J,"MadGraph Z+#geq1jet","L");
-   leg->AddEntry(hpTZ2J,"MadGraph Z+#geq2jet","L");
+   leg->AddEntry(hpTZ,"MadGraph, Z inclusive","L");
+   leg->AddEntry(hpTZ2J,"Z+#geq2jet","L");
+   leg->AddEntry(hpTZ2JDeta,"Z+#geq2jet, #Delta#eta_{J1J2}>3.5","L");
 
    TFile* file = new TFile("DYsherpa_histos.root");
 
@@ -197,24 +198,30 @@ void Draw()
    hpTZ->SetLineWidth(2);
    hpTZ->Draw("same");
 
-   scale = nm1J/hpTZ1J->Integral();
-   hpTZ1J->Scale(scale);
-   hpTZ1J->SetLineStyle(2);
-   hpTZ1J->SetLineWidth(3);
-   hpTZ1J->Draw("same");
-
    scale = nm2J/hpTZ2J->Integral();
    hpTZ2J->Scale(scale);
    hpTZ2J->SetLineStyle(2);
-   hpTZ2J->SetLineWidth(4);
+   hpTZ2J->SetLineWidth(3);
    hpTZ2J->Draw("same");
 
-   leg->AddEntry(hpTZ,"Sherpa Z inclusive","L");
-   leg->AddEntry(hpTZ1J,"Sherpa Z+#geq1jet","L");
-   leg->AddEntry(hpTZ2J,"Sherpa Z+#geq2jet","L");
+   scale = nm2JDeta/hpTZ2JDeta->Integral();
+   hpTZ2JDeta->Scale(scale);
+   hpTZ2JDeta->SetLineStyle(2);
+   hpTZ2JDeta->SetLineWidth(4);
+   hpTZ2JDeta->Draw("same");
+
+   leg->AddEntry(hpTZ,"Sherpa","L");
+   //   leg->AddEntry(hpTZ2J,"Sherpa Z+#geq2jet","L");
+   //   leg->AddEntry(hpTZ2JDeta,"Sherpa Z+#geq2jet, #Delta#eta_{J1J2}>3.5","L");
    leg->Draw();
 
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.04);
+   t->DrawLatex(50,100000,"85<m_{ll}<97 GeV, p_{T}^{l}>20 GeV, #eta_{l}<2.4");
+   t->DrawLatex(70,40000,"p_{T}^{jet}>25 GeV, #eta_{jet}<4.7");
+
    c1->SaveAs("pTZ.png");
+
 
    setTDRStyle(0,1);
 
@@ -222,57 +229,157 @@ void Draw()
 
    TFile* file = new TFile("DYmadgraph_histos.root");
 
-   hyZ->GetXaxis()->SetTitle("Z rapidity");
-   hyZ->GetYaxis()->SetTitle("");
-   hyZ->SetMaximum(100000);
-   hyZ->SetMinimum(1.);
-   hyZ->SetLineStyle(1);
-   hyZ->SetLineWidth(2);
-   Double_t nm = hyZ->Integral();
-   hyZ->Draw("hist");
-
-   hyZ1J->SetLineStyle(1);
-   hyZ1J->SetLineWidth(3);
-   Double_t nm1J = hyZ1J->Integral();
-   hyZ1J->Draw("same");
-
+   hyZ2J->GetXaxis()->SetTitle("Z rapidity");
+   hyZ2J->GetYaxis()->SetTitle("");
    hyZ2J->SetLineStyle(1);
-   hyZ2J->SetLineWidth(4);
+   hyZ2J->SetLineWidth(2);
+   hyZ2J->SetMaximum(1000000.);
+   hyZ2J->SetMinimum(10.);
    Double_t nm2J = hyZ2J->Integral();
-   hyZ2J->Draw("same");
+   hyZ2J->Draw("hist");
 
-   TLegend *leg = new TLegend(0.3,0.65,0.9,0.95,NULL,"brNDC");
+
+   hyZ2JDeta->SetLineStyle(1);
+   hyZ2JDeta->SetLineWidth(4);
+   Double_t nm2JDeta = hyZ2JDeta->Integral();
+   hyZ2JDeta->Draw("same");
+
+   TLegend *leg = new TLegend(0.3,0.8,0.9,0.95,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
-   leg->AddEntry(hyZ1J,"MadGraph Z+#geq1jet","L");
+   //   leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hyZ2J,"MadGraph Z+#geq2jet","L");
+   leg->AddEntry(hyZ2JDeta,"Z+#geq2jet, #Delta#eta_{J1J2}>3.5","L");
 
    TFile* file = new TFile("DYsherpa_histos.root");
-
-   Double_t scale = nm/hyZ->Integral();
-   hyZ->Scale(scale);
-   hyZ->SetLineStyle(2);
-   hyZ->SetLineWidth(2);
-   hyZ->Draw("same");
-
-   scale = nm1J/hyZ1J->Integral();
-   hyZ1J->Scale(scale);
-   hyZ1J->SetLineStyle(2);
-   hyZ1J->SetLineWidth(3);
-   hyZ1J->Draw("same");
 
    scale = nm2J/hyZ2J->Integral();
    hyZ2J->Scale(scale);
    hyZ2J->SetLineStyle(2);
-   hyZ2J->SetLineWidth(4);
+   hyZ2J->SetLineWidth(2);
    hyZ2J->Draw("same");
 
-   leg->AddEntry(hyZ,"Sherpa Z inclusive","L");
-   leg->AddEntry(hyZ1J,"Sherpa Z+#geq1jet","L");
-   leg->AddEntry(hyZ2J,"Sherpa Z+#geq2jet","L");
+   scale = nm2JDeta/hyZ2JDeta->Integral();
+   hyZ2JDeta->Scale(scale);
+   hyZ2JDeta->SetLineStyle(2);
+   hyZ2JDeta->SetLineWidth(4);
+   hyZ2JDeta->Draw("same");
+
+   //   leg->AddEntry(hyZ,"Sherpa Z inclusive","L");
+   leg->AddEntry(hyZ2J,"Sherpa","L");
+   //   leg->AddEntry(hyZ2JDeta,"Sherpa Z+#geq2jet, #Delta#eta_{J1J2}>3.5","L");
    leg->Draw();
+
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.04);
+   t->DrawLatex(1.0,40000,"85<m_{ll}<97 GeV, p_{T}^{l}>20 GeV, #eta_{l}<2.4");
+   t->DrawLatex(2.0,20000,"p_{T}^{jet}>25 GeV, #eta_{jet}<4.7");
 
    c2->SaveAs("yZ.png");
 
+   setTDRStyle(0,1);
 
+   TCanvas* c3 = new TCanvas("X","Y",1);
+
+   TFile* file = new TFile("DYmadgraph_histos.root");
+
+   hnjets->GetXaxis()->SetTitle("N gen jets p_{T}> 20 GeV, |#eta|<4.7");
+   hnjets->GetYaxis()->SetTitle("");
+   hnjets->SetMaximum(10000000.);
+   hnjets->SetMinimum(1000.);
+   hnjets->SetLineStyle(1);
+   hnjets->SetLineWidth(2);
+   nm = hnjets->Integral();
+   hnjets->Draw("hist");
+
+   TLegend *leg = new TLegend(0.3,0.8,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hnjets,"MadGraph Z+jets","L");
+
+   TFile* file = new TFile("DYsherpa_histos.root");
+
+   scale = nm/hnjets->Integral();
+   hnjets->Scale(scale);
+   hnjets->SetLineStyle(2);
+   hnjets->SetLineWidth(4);
+   hnjets->Draw("same");
+   hnjets->SetLineStyle(2);
+   hnjets->SetLineWidth(2);
+
+   leg->AddEntry(hnjets,"Sherpa Z+jets","L");
+   leg->Draw();
+
+   t->DrawLatex(1.5,1000000,"85<m_{ll}<97 GeV, p_{T}^{l}>20 GeV, #eta_{l}<2.4");
+   t->DrawLatex(2.5,500000,"p_{T}^{jet}>25 GeV, #eta_{jet}<4.7");
+
+   c3->SaveAs("njets.png");
+
+/*
+   setTDRStyle(0,0);
+
+   TCanvas* c4 = new TCanvas("X","Y",1);
+
+   TFile* file = new TFile("DYmadgraph_histos.root");
+
+   hDetaJJ->GetXaxis()->SetTitle("#Delta #eta _{J1J2}");
+   hDetaJJ->GetYaxis()->SetTitle("");
+   //   hDetaJJ->SetMaximum(50000);
+   //   hDetaJJ->SetMinimum(10.);
+   hDetaJJ->SetLineStyle(1);
+   hDetaJJ->SetLineWidth(3);
+   nm = hDetaJJ->Integral();
+   hDetaJJ->Draw("hist");
+
+   TLegend *leg = new TLegend(0.3,0.85,0.9,0.95,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hDetaJJ,"MadGraph Z+jets","L");
+
+   TFile* file = new TFile("DYsherpa_histos.root");
+
+   scale = nm/hDetaJJ->Integral();
+   hDetaJJ->Scale(scale);
+   hDetaJJ->SetLineStyle(2);
+   hDetaJJ->SetLineWidth(4);
+   hDetaJJ->Draw("same");
+   hDetaJJ->SetLineStyle(2);
+   hDetaJJ->SetLineWidth(3);
+
+   leg->AddEntry(hDetaJJ,"Sherpa Z+jets","L");
+   leg->Draw();
+
+   c4->SaveAs("DetaJJ.png");
+
+   setTDRStyle(0,1);
+
+   TCanvas* c5 = new TCanvas("X","Y",1);
+
+   TFile* file = new TFile("DYmadgraph_histos.root");
+
+   hMjj->GetXaxis()->SetTitle("M_{J1J2}, GeV");
+   hMjj->GetYaxis()->SetTitle("");
+   //   hMjj->SetMaximum(50000);
+   //   hMjj->SetMinimum(10.);
+   hMjj->SetLineStyle(1);
+   hMjj->SetLineWidth(3);
+   nm = hMjj->Integral();
+   hMjj->Draw("hist");
+
+   TLegend *leg = new TLegend(0.3,0.85,0.9,0.95,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hMjj,"MadGraph Z+jets","L");
+
+   TFile* file = new TFile("DYsherpa_histos.root");
+
+   scale = nm/hMjj->Integral();
+   hMjj->Scale(scale);
+   hMjj->SetLineStyle(2);
+   hMjj->SetLineWidth(4);
+   hMjj->Draw("same");
+   hMjj->SetLineStyle(2);
+   hMjj->SetLineWidth(3);
+
+   leg->AddEntry(hMjj,"Sherpa Z+jets","L");
+   leg->Draw();
+
+   c5->SaveAs("Mjj.png");
+   */
 }
