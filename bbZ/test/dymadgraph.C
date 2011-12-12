@@ -193,8 +193,8 @@ void dymadgraph::Loop()
    TH1F * hyZ2JDeta   = new TH1F( "hyZ2JDeta", "yZ2JDeta", 20, 0., 4.);
 
    TH1F * hnjets      = new TH1F( "hnjets", "njets", 5, 0., 5.);
-   TH1F * hDetaJJ     = new TH1F( "hDetaJJ", "DetaJJ", 5, 0., 5.);
-   TH1F * hMjj        = new TH1F( "hMjj", "Mjj", 20, 0., 1000.);
+   TH1F * hDetaJJ     = new TH1F( "hDetaJJ", "DetaJJ", 50, 0., 10.);
+   TH1F * hMjj        = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
 
    Long64_t nbytes = 0, nb = 0;
    Int_t nev = 0;
@@ -261,7 +261,8 @@ void dymadgraph::Loop()
       
    }
 
-   TFile efile("DYsherpa_histos.root","recreate");
+   //   TFile efile("DYsherpa_histos.root","recreate");
+   TFile efile("DYmadgraph_histos.root","recreate");
 
    hpTZ->Write();
    hpTZ1J->Write();
