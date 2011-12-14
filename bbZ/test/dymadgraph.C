@@ -183,12 +183,10 @@ void dymadgraph::Loop()
    Long64_t nentries = fChain->GetEntriesFast();
 
    TH1F * hpTZ         = new TH1F( "hpTZ", "pTZ", 30, 0., 150.);
-   TH1F * hpTZ1J       = new TH1F( "hpTZ1J", "pTZ1J", 30, 0., 150.);
    TH1F * hpTZ2J       = new TH1F( "hpTZ2J", "pTZ2J", 30, 0., 150.);
    TH1F * hpTZ2JDeta   = new TH1F( "hpTZ2JDeta", "pTZ2JDeta", 30, 0., 150.);
 
    TH1F * hyZ         = new TH1F( "hyZ", "yZ", 20, 0., 4.);
-   TH1F * hyZ1J       = new TH1F( "hyZ1J", "yZ1J", 20, 0., 4.);
    TH1F * hyZ2J       = new TH1F( "hyZ2J", "yZ2J", 20, 0., 4.);
    TH1F * hyZ2JDeta   = new TH1F( "hyZ2JDeta", "yZ2JDeta", 20, 0., 4.);
 
@@ -196,81 +194,114 @@ void dymadgraph::Loop()
    TH1F * hDetaJJ     = new TH1F( "hDetaJJ", "DetaJJ", 50, 0., 10.);
    TH1F * hMjj        = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
 
+   Double_t xsect = 395100.;
+
+   Double_t    n0            = 0.;
+   Double_t    ntot          = 0.;
+   Double_t    n2j           = 0.;
+   Double_t    n2jDeta       = 0.;
+   Double_t    n2jDetaCJV    = 0.;
+   Double_t    n2jDetaCJVMjj = 0.;
+
    Long64_t nbytes = 0, nb = 0;
-   Int_t nev = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
 
+      n0 = n0 + event_w;
       // muon acceptance
 
       if( (*PtMu)[0] < 20 || (*PtMu)[1] < 20 ) {continue;}
       if( fabs((*EtaMu)[0]) > 2.4 || fabs((*EtaMu)[1]) > 2.4 ) {continue;}
+      
+      ntot = ntot + event_w;
 
       Int_t njets = pTJ->size();
-      nev++;
-      //      cout <<" event = " << nev << " njets = " << njets <<" weight = " << event_w << endl;
       hnjets->Fill(1.*njets,event_w);
-      // Z inclusive
       hpTZ->Fill(pTZ,event_w);
       hyZ->Fill(fabs(yZ),event_w);
-      // Z + >=1 jet
-      if(njets != 0 ) {
-	hpTZ1J->Fill(pTZ,event_w);
-	hyZ1J->Fill(fabs(yZ),event_w);
+
+      if(njets < 2 ) {continue;}
+      if( (*pTJ)[0] < 25. || (*pTJ)[1] < 25.0 ) {continue;}
+      n2j = n2j + event_w;
+
+      hpTZ2J->Fill(pTZ,event_w);
+      hyZ2J->Fill(fabs(yZ),event_w);
+      Double_t DetaJJ = fabs((*EtaJ)[0]-(*EtaJ)[1]);
+      hDetaJJ->Fill(DetaJJ,event_w);
+
+      // Mjj
+      Double_t PJ1x = (*pTJ)[0] * cos((*PhiJ)[0]); 
+      Double_t PJ1y = (*pTJ)[0] * sin((*PhiJ)[0]);
+      Double_t Eta = (*EtaJ)[0];
+      Double_t theta = 2. * atan(exp(-Eta));
+      Double_t PJ1z = (*pTJ)[0] / tan(theta);
+      Double_t EJ1  = (*pTJ)[0] / sin(theta);
+      
+      Double_t PJ2x = (*pTJ)[1] * cos((*PhiJ)[1]); 
+      Double_t PJ2y = (*pTJ)[1] * sin((*PhiJ)[1]);
+      Eta = (*EtaJ)[1];
+      theta = 2. * atan(exp(-Eta));
+      Double_t PJ2z = (*pTJ)[1] / tan(theta);
+      Double_t EJ2  = (*pTJ)[1] / sin(theta);
+      Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
+
+      if( ( (*EtaJ)[0] * (*EtaJ)[1] > 0.0 ) ) {continue;} 
+      if(DetaJJ < 3.5) {continue;}
+      n2jDeta = n2jDeta + event_w;
+
+     // VBF jets with max and min rapidity
+      Double_t eta_jmin = (*EtaJ)[0]; 
+      Double_t eta_jmax = (*EtaJ)[1]; 
+      if( (*EtaJ)[0] > (*EtaJ)[1] ) {
+	eta_jmin = (*EtaJ)[1]; 
+	eta_jmax = (*EtaJ)[0]; 
       }
-      if(njets >= 2 ) {
-	if( (*pTJ)[0] > 25. && (*pTJ)[1] > 25.0 ) {
-	  hpTZ2J->Fill(pTZ,event_w);
-	  hyZ2J->Fill(fabs(yZ),event_w);
-	  Double_t DetaJJ = fabs((*EtaJ)[0]-(*EtaJ)[1]);
-	  hDetaJJ->Fill(DetaJJ,event_w);
-	  // Mjj
-	  Double_t PJ1x = (*pTJ)[0] * cos((*PhiJ)[0]); 
-	  Double_t PJ1y = (*pTJ)[0] * sin((*PhiJ)[0]);
-	  Double_t Eta = (*EtaJ)[0];
-	  Double_t theta = 2. * atan(exp(-Eta));
-	  Double_t PJ1z = (*pTJ)[0] / tan(theta);
-	  Double_t EJ1  = (*pTJ)[0] / sin(theta);
-	
-	  Double_t PJ2x = (*pTJ)[1] * cos((*PhiJ)[1]); 
-	  Double_t PJ2y = (*pTJ)[1] * sin((*PhiJ)[1]);
-	  Eta = (*EtaJ)[1];
-	  theta = 2. * atan(exp(-Eta));
-	  Double_t PJ2z = (*pTJ)[1] / tan(theta);
-	  Double_t EJ2  = (*pTJ)[1] / sin(theta);
-	
-	  Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
-	  if(DetaJJ > 3.5) {
-	    hpTZ2JDeta->Fill(pTZ,event_w);
-	    hyZ2JDeta->Fill(fabs(yZ),event_w);
-	    hMjj->Fill(Mj1j2,event_w);
-	    
-	  }
+
+      // CJV part
+      Int_t ncj = 0;
+      for (unsigned int i = 0; i < njets; i++) {
+	if(i < 2 ) {continue;}
+	if( ((eta_jmin+0.5) < (*EtaJ)[i]) && ( (*EtaJ)[i]) < (eta_jmax-0.5) ) {
+	//	if( (eta_jmin < (*EtaJ)[i]) && ((*EtaJ)[i] < eta_jmax) ) {
+	  ncj++;
+	  //	  cout <<" ncj = " << ncj <<" pTj = " << (*pTJ)[i] <<" etaj = " << (*EtaJ)[i] <<" etamin/etamax " << eta_jmin <<" " << eta_jmax << endl;
 	}
       }
-      
-      /*
-	if( ( (*EtJPT)[0] < 25.0 ) || 
-	( (*EtJPT)[1] < 25.0 ) || 
-	( fabs((*EtaJPT)[0]) > 4.7) || 
-	  ( fabs((*EtaJPT)[1]) > 4.7) ) {continue;}
-      */
-      
+
+      //      cout <<"  n2jDeta = " << n2jDeta <<" DetaJJ = " << DetaJJ <<" ncj = " << ncj << endl;
+
+      if(ncj != 0) {continue;}
+      n2jDetaCJV = n2jDetaCJV + event_w;
+
+      //      cout <<"      n2jDetaCJV = " << n2jDetaCJV <<" ncj = " << ncj << endl;
+
+      hpTZ2JDeta->Fill(pTZ,event_w);
+      hyZ2JDeta->Fill(fabs(yZ),event_w);
+      hMjj->Fill(Mj1j2,event_w);
+      if(Mj1j2 < 700.) {continue;}
+      n2jDetaCJVMjj = n2jDetaCJVMjj + event_w;
    }
 
-   //   TFile efile("DYsherpa_histos.root","recreate");
-   TFile efile("DYmadgraph_histos.root","recreate");
+   // selections summary
+   cout <<"===> Total number of events analysed - " << n0 << endl;
+   cout <<"===--> passed di-muon mass window, muon pT/eta selections - " << ntot <<" xsect = " << xsect << endl;
+   cout <<"===--> passed two jet selections     - " << n2j <<" xsect = " << xsect*(n2j/ntot) <<" eff = " << n2j/ntot << endl;
+   cout <<"===--> passed Detaj1j2 cut           - " << n2jDeta <<" xsect = " << xsect*(n2jDeta/ntot) <<" eff = " << n2jDeta/n2j << endl;
+   cout <<"===--> passed CVJ                    - " << n2jDetaCJV <<" xsect = " << xsect*(n2jDetaCJV/ntot) <<" eff = " << n2jDetaCJV/n2jDeta << endl;
+   cout <<"===--> passed Mj1j2 cut              - " << n2jDetaCJVMjj <<" xsect = " << xsect*(n2jDetaCJVMjj/ntot) <<" eff = " << n2jDetaCJVMjj/n2jDetaCJV << endl;
+
+   /*
+   TFile efile("DYsherpa_histos.root","recreate");
+   //   TFile efile("DYmadgraph_histos.root","recreate");
 
    hpTZ->Write();
-   hpTZ1J->Write();
    hpTZ2J->Write();
    hpTZ2JDeta->Write();
 
    hyZ->Write();       
-   hyZ1J->Write();     
    hyZ2J->Write();     
    hyZ2JDeta->Write(); 
 
@@ -279,7 +310,10 @@ void dymadgraph::Loop()
    hMjj->Write();      
 
    efile.Close();
+   */
 
+   /*
+ 
    setTDRStyle(0,1,0);
    TCanvas* c1 = new TCanvas("X","Y",1);
    hpTZ->GetXaxis()->SetTitle("p_{T}^{Z}, GeV");
@@ -313,11 +347,6 @@ void dymadgraph::Loop()
 
    TLegend *leg = new TLegend(0.35,0.7,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
-   /*
-   leg->AddEntry(hpTZ,"MadGraph Z inclusive","L");
-   leg->AddEntry(hpTZ1J,"MadGraph Z+#geq 1J","L");
-   leg->AddEntry(hpTZ2J,"MagGraph Z+#geq 2J","L");
-   */
    leg->AddEntry(hpTZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hpTZ1J,"MadGraph Z+#geq 1J","L");
    leg->AddEntry(hpTZ2J,"MadGraph Z+#geq 2J","L");
@@ -357,11 +386,6 @@ void dymadgraph::Loop()
 
    TLegend *leg = new TLegend(0.35,0.70,0.9,0.90,NULL,"brNDC");
    leg->SetFillColor(10);
-   /*
-   leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
-   leg->AddEntry(hyZ1J,"MadGraph Z+#geq 1J","L");
-   leg->AddEntry(hyZ2J,"MagGraph Z+#geq 2J","L");
-   */
    leg->AddEntry(hyZ,"MadGraph Z inclusive","L");
    leg->AddEntry(hyZ1J,"MadGraph Z+#geq 1J","L");
    leg->AddEntry(hyZ2J,"MadGraph Z+#geq 2J","L");
@@ -369,7 +393,6 @@ void dymadgraph::Loop()
    leg->Draw();
    c2->SaveAs("yZ_madgraph.gif");
 
-   /*
    setTDRStyle(0,1,0);
    TCanvas* c3 = new TCanvas("X","Y",1);
    hnjets->GetXaxis()->SetTitle("N jets p_{T}>20 GeV, |#eta|<4.7");
