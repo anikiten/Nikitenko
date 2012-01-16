@@ -27,6 +27,8 @@ process.GlobalTag.globaltag = cms.string('MC_44_V10::All')
 
 from CondCore.DBCommon.CondDBSetup_cfi import *
 
+
+#### add JES from DB #####
 process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
                            connect =
    #         cms.string("sqlite:Jec11_V12_20111220.db"),
@@ -63,6 +65,7 @@ cms.string("JetCorrectorParametersCollection_Jec11_V13_AK5JPT"),
 process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
 
 process.ak5JPTL1Offset.algorithm = 'AK5JPT'
+###### end #######
 
 process.ak5JetTracksAssociatorAtVertex.useAssigned = cms.bool(True)
 process.ak5JetTracksAssociatorAtVertex.pvSrc = cms.InputTag("offlinePrimaryVertices")
