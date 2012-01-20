@@ -90,6 +90,8 @@
 #include "DataFormats/EcalDetId/interface/EcalSubdetector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+// PU summary info
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 // candidates
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -412,6 +414,19 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //  NSiIMaxPtTrk->clear();
   //  NSiOMaxPtTrk->clear();
   
+  // PU info
+
+  edm::InputTag PileupSrc_("addPileupInfo");
+  Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+  iEvent.getByLabel(PileupSrc_, PupInfo);
+  // const float getTrueNumInteractions() - the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled for
+  // Fall 11 MC (CMSSW 4_2_8 and later)
+
+  std::vector<PileupSummaryInfo>::const_iterator PVI;
+  for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+  }
+
   // muons
   edm::Handle<RecoMuons> reco_muons;
   iEvent.getByLabel(muonsSrc, reco_muons );
