@@ -60,6 +60,10 @@
 #include "DataFormats/JetReco/interface/JPTJet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
 // #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 // #include "JetMETCorrections/Algorithms/interface/JetPlusTrackCorrector.h"
 #include "DataFormats/JetReco/interface/JetExtendedAssociation.h"
@@ -428,6 +432,9 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // JPT jets L1L2L3
   edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
   iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
+
+  // JES uncertainty
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("GR_R_42_V23_AK5JPT_Uncertainty.txt");
   
   // Calo jets
   edm::Handle<CaloJetCollection> calojets;
@@ -625,7 +632,13 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
       }
     }
-    
+
+    jecUnc->setJetEta(jptjet->eta());
+    jecUnc->setJetPt (jptjet->pt() ); 
+    double unc = jecUnc->getUncertainty(true);
+   
+    cout <<" jet pT = " << jptjet->pt() <<" eta = " << jptjet->eta() <<" unc = " << unc << endl;
+
     EtaRaw->push_back(jptjetRef->eta());
     PhiRaw->push_back(jptjetRef->phi());
     EtRaw->push_back(jptjetRef->pt());

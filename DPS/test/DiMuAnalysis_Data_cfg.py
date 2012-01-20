@@ -16,46 +16,47 @@ process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 # process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
 # process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
 
-process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
-
+# process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
 # process.GlobalTag.globaltag = cms.string('GR_R_44_V4::All')
 
+process.GlobalTag.globaltag = cms.string('GR_R_42_V23::All') 
+
+
 ####################################################################################
-from CondCore.DBCommon.CondDBSetup_cfi import *
-
-process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-                           connect =
-cms.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
-                   toGet =  cms.VPSet(
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5Calo"),
-                                label=cms.untracked.string("AK5Calo")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PF"),
-                                label=cms.untracked.string("AK5PF")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PFchs"),
-                                label=cms.untracked.string("AK5PFchs")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5JPT"),
-                                label=cms.untracked.string("AK5JPT")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Jec11_V3_KT4Calo"),
-                                label=cms.untracked.string("KT4Calo")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Jec11_V3_AK7Calo"),
-                                label=cms.untracked.string("AK7Calo")),
-                       )
-
-                   )
-process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
-process.ak5JPTL1Offset.algorithm = 'AK5JPT'
+#from CondCore.DBCommon.CondDBSetup_cfi import *
+#process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
+#                           connect =
+#cms.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
+#                   toGet =  cms.VPSet(
+#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                                tag =
+#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5Calo"),
+#                                label=cms.untracked.string("AK5Calo")),
+#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                                tag =
+#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PF"),
+#                                label=cms.untracked.string("AK5PF")),
+#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                                tag =
+#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PFchs"),
+#                                label=cms.untracked.string("AK5PFchs")),
+#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                                tag =
+#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5JPT"),
+#                                label=cms.untracked.string("AK5JPT")),
+#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                                tag =
+#cms.string("JetCorrectorParametersCollection_Jec11_V3_KT4Calo"),
+#                                label=cms.untracked.string("KT4Calo")),
+#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                                tag =
+#cms.string("JetCorrectorParametersCollection_Jec11_V3_AK7Calo"),
+#                                label=cms.untracked.string("AK7Calo")),
+#                       )
+#
+#                   )
+#process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
+#process.ak5JPTL1Offset.algorithm = 'AK5JPT'
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
@@ -64,8 +65,9 @@ process.maxEvents = cms.untracked.PSet(
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
- '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
+# '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
 #  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_1_1_ggY.root')
+  'file:di_muon_data.root')
 )
 
 
