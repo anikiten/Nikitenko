@@ -12,7 +12,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 # process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
 # process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All')
  
-process.GlobalTag.globaltag = cms.string('START42_V13::All') 
+process.GlobalTag.globaltag = cms.string('START42_V17::All') 
 
 # process.load("Configuration.StandardSequences.Services_cff")
 # process.load("Configuration.StandardSequences.Reconstruction_cff")
@@ -66,13 +66,14 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
 # '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
-  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_run161312_1_1_SQ6.root')
+#  'rfio:/castor/cern.ch/user/a/anikiten/dy_sherpa_madgraph/dymadgraph_1_1_xn5.root')
+  'file:/tmp/anikiten/dymadgraph.root')	
 )
 
 
 process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
-#    HistOutFile = cms.untracked.string('DiMuAnalysis_Data.root'),
     HistOutFile = cms.untracked.string('DiMuAnalysis_MC.root'),
+    DataOrMC = cms.untracked.int32(1),
     Muons    = cms.InputTag("muons"),	
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
