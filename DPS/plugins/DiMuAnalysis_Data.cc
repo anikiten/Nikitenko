@@ -132,6 +132,8 @@ private:
   // ----------member data ---------------------------
   // output root file
   string fOutputFileName ;
+  // data or MC
+  int DataOrMCSrc;
   // names of modules, producing object collections
   // raw calo jet ID map
   edm::InputTag muonsSrc;
@@ -151,7 +153,7 @@ private:
   edm:: InputTag srcTriggerResults_;
 
   // variables to store in ntpl
-  int     run, event, nvertex;
+  int     run, event, nvertex, nsimvertex;
   double  DZmin, PVx, PVy, PVz;
   // di muon pass
   double  mass_mumu;
@@ -172,7 +174,7 @@ private:
   // N in-vertex-cone tracks
   std::vector<int>    *Ntrk;
   // in-cone-in vertex track with max pT
-  std::vector<double> *pTtrkMax;
+  std::vector<double> *jesunc;
   // beta
   std::vector<double> *beta;
   // number of Pxl and silicon inner and outer layers used for trk. measurement
@@ -211,7 +213,7 @@ DiMuAnalysis_Data::beginJob()
   PhiJPT       = new std::vector<double>();
   EtJPT        = new std::vector<double>();
   Ntrk         = new std::vector<int>();
-  pTtrkMax     = new std::vector<double>();
+  jesunc       = new std::vector<double>();
   beta         = new std::vector<double>();;
   //  NPxlMaxPtTrk = new std::vector<int>();
   //  NSiIMaxPtTrk = new std::vector<int>();
@@ -227,6 +229,7 @@ DiMuAnalysis_Data::beginJob()
   t1->Branch("event",&event,"event/I");
 
   t1->Branch("nvertex",&nvertex,"nvertex/I");
+  t1->Branch("nsimvertex",&nsimvertex,"nsimvertex/I");
   t1->Branch("DZmin",&DZmin,"DZmin/D");
 
   t1->Branch("PVx",&PVx,"PVx/D");
@@ -247,7 +250,7 @@ DiMuAnalysis_Data::beginJob()
   t1->Branch("PhiJPT","vector<double>",&PhiJPT);
   t1->Branch("EtJPT" ,"vector<double>",&EtJPT);
   t1->Branch("Ntrk","vector<int>",&Ntrk);
-  t1->Branch("pTtrkMax" ,"vector<double>",&pTtrkMax);
+  t1->Branch("jesunc" ,"vector<double>",&jesunc);
   t1->Branch("beta" ,"vector<double>",&beta);
   //  t1->Branch("NPxlMaxPtTrk","vector<int>",&NPxlMaxPtTrk);
   //  t1->Branch("NSiIMaxPtTrk","vector<int>",&NSiIMaxPtTrk);
@@ -277,6 +280,8 @@ DiMuAnalysis_Data::DiMuAnalysis_Data(const edm::ParameterSet& iConfig)
   // 
   // get name of output file with histogramms
   fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
+  // DataOrMC
+  DataOrMCSrc     = iConfig.getUntrackedParameter<int>("DataOrMC");
   //
   // get names of input object collections
   // muons
@@ -387,6 +392,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   cout <<" run = " << run <<" event = " << event << endl;
 
   nvertex = 0;
+  nsimvertex = 0;
 
   DZmin =   0.;
   PVx = -1000.; 
@@ -407,7 +413,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   PhiJPT->clear();
   EtJPT->clear();
   Ntrk->clear();
-  pTtrkMax->clear(); 
+  jesunc->clear(); 
   beta->clear(); 
 
   //  NPxlMaxPtTrk->clear();
@@ -415,16 +421,19 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //  NSiOMaxPtTrk->clear();
   
   // PU info
+  if(DataOrMCSrc == 1) {
 
-  edm::InputTag PileupSrc_("addPileupInfo");
-  Handle<std::vector< PileupSummaryInfo > >  PupInfo;
-  iEvent.getByLabel(PileupSrc_, PupInfo);
-  // const float getTrueNumInteractions() - the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled for
-  // Fall 11 MC (CMSSW 4_2_8 and later)
-
-  std::vector<PileupSummaryInfo>::const_iterator PVI;
-  for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+    edm::InputTag PileupSrc_("addPileupInfo");
+    Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+    iEvent.getByLabel(PileupSrc_, PupInfo);
+    // const float getTrueNumInteractions() - the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled for
+    // Fall 11 MC (CMSSW 4_2_8 and later)
+    
+    std::vector<PileupSummaryInfo>::const_iterator PVI;
+    for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+      std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+      if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
+    }
   }
 
   // muons
@@ -661,7 +670,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     PhiJPT->push_back(jptjet->phi());
     EtJPT->push_back(jptjet->pt());
     Ntrk->push_back(npions);
-    pTtrkMax->push_back(pTMax);
+    jesunc->push_back(unc);
     beta->push_back(jptjet->getSpecific().Zch);
 
     //    NPxlMaxPtTrk->push_back(NLayersPxl);
