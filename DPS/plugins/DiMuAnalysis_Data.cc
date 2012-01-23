@@ -431,7 +431,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     std::vector<PileupSummaryInfo>::const_iterator PVI;
     for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-      std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+      //      std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
     }
   }
@@ -661,7 +661,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     jecUnc->setJetPt (jptjet->pt() ); 
     double unc = jecUnc->getUncertainty(true);
    
-    cout <<" jet pT = " << jptjet->pt() <<" eta = " << jptjet->eta() <<" unc = " << unc << endl;
+    //    cout <<" jet pT = " << jptjet->pt() <<" eta = " << jptjet->eta() <<" unc = " << unc << endl;
 
     EtaRaw->push_back(jptjetRef->eta());
     PhiRaw->push_back(jptjetRef->phi());
