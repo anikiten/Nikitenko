@@ -352,6 +352,7 @@ void DiMuonAnalysis::Loop()
       // pT mu > 20 GeV, |eta| < 2.1
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
       N_muons++;
+
       hM2mu0->Fill(mass_mumu,puweight[nvertex]);
       hnvtx0->Fill(1.*nvertex,puweight[nvertex]);
       pileup->Fill(1.*nsimvertex,puweight[nvertex]);
@@ -360,8 +361,6 @@ void DiMuonAnalysis::Loop()
       // M_mumu 85-97 GeV
       if(mass_mumu < 85. || mass_mumu > 97.) {continue;}
       N_mass2mu++;
-      hM2mu1->Fill(mass_mumu,puweight[nvertex]);
-
 
       Int_t smallbeta = 0;
       Int_t jet25 = 0;
@@ -387,6 +386,7 @@ void DiMuonAnalysis::Loop()
       Double_t EZ = sqrt(MZ*MZ + PtZ*PtZ + PZz*PZz);
       Double_t ZY   = 0.5 * log( (EZ+PZz) / (EZ-PZz));
 
+      hM2mu1->Fill(mass_mumu,puweight[nvertex]);
       hZY->Fill(ZY,puweight[nvertex]);
 
       // jets
@@ -403,8 +403,10 @@ void DiMuonAnalysis::Loop()
 	  }
 	}
 	if(muonmatch == 0) {
-*/
+	*/
+
 	nalljets = nalljets + 1;
+	/*
 	if(fabs((*EtaJPT)[i]) < 2.0) {
 	  ngoodjets = ngoodjets + 1;
 	  hEtaJ->Fill((*EtaJPT)[i]);
@@ -414,18 +416,6 @@ void DiMuonAnalysis::Loop()
 	  if( (*beta)[i] > 0.1 && nvertex > 7) {
 	    if(izmin == 1) {hNtrkVtxL2->Fill((*Ntrk)[i]);} else {hNtrkVtxG2->Fill((*Ntrk)[i]);}
 	  }
-	  /*
-	    if(run == 163301) {
-	    if((*beta)[i] < 0.1) cout <<" run " << run 
-	    <<" event " << event 
-	    <<" beta = " << (*beta)[i]
-	    <<" etaj = " << (*EtaJPT)[i]
-	    <<" phij = " << (*PhiJPT)[i]
-	    <<" et jpt = " << (*EtJPT)[i]
-	    <<" ntrk = " << (*Ntrk)[i] 
-	    <<" nvertex = " << nvertex << endl;
-	    }
-	  */
 	  if( (*EtJPT)[i] > 25.) {
 	    jet25 = 1;
 	  }
@@ -449,19 +439,30 @@ void DiMuonAnalysis::Loop()
 	    if((*beta)[i] < 0.1) {hNtrk301->Fill((*Ntrk)[i]);} else {hNtrk3g->Fill((*Ntrk)[i]);}
 	  }
 	}
+	*/
       }
    
       // VBF part
+      double pTj1 = 0.;
+      double pTj2 = 0.;
+
       if(nalljets < 2) {continue;}
-      if( ( (*EtJPT)[0] < 25.0 ) || 
-          ( (*EtJPT)[1] < 25.0 ) || 
+
+      pTj1 = (*EtJPT)[0] + (*jesunc)[0]*(*EtJPT)[0];
+      pTj2 = (*EtJPT)[1] + (*jesunc)[1]*(*EtJPT)[1];
+
+      cout <<"  Etj1 = " << (*EtJPT)[0] <<" jesunc1 = " << (*jesunc)[0] <<" pTj1 = " << pTj1 << endl;
+      cout <<"  Etj2 = " << (*EtJPT)[1] <<" jesunc2 = " << (*jesunc)[1] <<" pTj2 = " << pTj2 << endl;
+
+      if( ( pTj1 < 25.0 ) || 
+          ( pTj2 < 25.0 ) || 
 	  ( fabs((*EtaJPT)[0]) > 4.7) || 
 	  ( fabs((*EtaJPT)[1]) > 4.7) ) {continue;}
       N_jets++;
       hZY2J->Fill(ZY,puweight[nvertex]);
+
       Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
       hDeta0->Fill(DetaJJ,puweight[nvertex]);
-
       if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
       hDeta1->Fill(DetaJJ,puweight[nvertex]);
 
@@ -489,31 +490,30 @@ void DiMuonAnalysis::Loop()
       }
       if(ncj != 0) {continue;}
       N_cjv++;
-
       hZY2JDetaCJV->Fill(ZY,puweight[nvertex]);
 
-      Double_t PJ1x = (*EtJPT)[0] * cos((*PhiJPT)[0]); 
-      Double_t PJ1y = (*EtJPT)[0] * sin((*PhiJPT)[0]);
+      Double_t PJ1x = pTj1 * cos((*PhiJPT)[0]); 
+      Double_t PJ1y = pTj1 * sin((*PhiJPT)[0]);
       Double_t Eta = (*EtaJPT)[0];
       Double_t theta = 2. * atan(exp(-Eta));
-      Double_t PJ1z = (*EtJPT)[0] / tan(theta);
-      Double_t EJ1  = (*EtJPT)[0] / sin(theta);
+      Double_t PJ1z = pTj1 / tan(theta);
+      Double_t EJ1  = pTj1 / sin(theta);
 
-      Double_t PJ2x = (*EtJPT)[1] * cos((*PhiJPT)[1]); 
-      Double_t PJ2y = (*EtJPT)[1] * sin((*PhiJPT)[1]);
+      Double_t PJ2x = pTj2 * cos((*PhiJPT)[1]); 
+      Double_t PJ2y = pTj2 * sin((*PhiJPT)[1]);
       Eta = (*EtaJPT)[1];
       theta = 2. * atan(exp(-Eta));
-      Double_t PJ2z = (*EtJPT)[1] / tan(theta);
-      Double_t EJ2  = (*EtJPT)[1] / sin(theta);
+      Double_t PJ2z = pTj2 / tan(theta);
+      Double_t EJ2  = pTj2 / sin(theta);
 
       Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
       hMjj->Fill(Mj1j2,puweight[nvertex]);
 
       if(Mj1j2 < 700.) {continue;}
       N_massjj++;
-
       hZY2JDetaCJVMjj->Fill(ZY,puweight[nvertex]);
 
+      /*
       // 
       if(nalljets == 0 && ngoodjets == 0) {hPtZ0->Fill(PtZ);}
 
@@ -557,6 +557,7 @@ void DiMuonAnalysis::Loop()
 
       }
    }
+      */
 
    // selections summary
    cout <<"===> Total number of events analysed - " << N_total << endl;
@@ -1011,4 +1012,5 @@ void DiMuonAnalysis::Loop()
    c22->SaveAs("ZY.png");
 
    */
+   }
 }

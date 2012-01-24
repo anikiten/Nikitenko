@@ -236,9 +236,7 @@ void Draw()
    hZY->Scale(scale);
    hZY->SetLineStyle(1);
    hZY->SetLineWidth(1);
-   hZY->Draw("same");
-
-
+   hZY->Draw("hist");
    hZY2J->Scale(scale);
    hZY2J->SetLineStyle(1);
    hZY2J->SetLineWidth(1);
