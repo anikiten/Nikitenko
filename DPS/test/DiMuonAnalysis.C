@@ -221,6 +221,8 @@ void DiMuonAnalysis::Loop()
    }
 
    // for MC
+   /*
+
    for (Int_t idm = 0; idm < 40; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
@@ -229,16 +231,16 @@ void DiMuonAnalysis::Loop()
      }
      cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
+   */
 
    // for data
-   /*
    for (Int_t idm = 0; idm < 40; idm++) {
      puweight[idm] = 1.0;
      cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
-   */
 
    TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
+   TH1F * pileup   = new TH1F( "pileup", "pileup", 36, -0.5, 35.5);
 
    TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
    TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
@@ -352,6 +354,7 @@ void DiMuonAnalysis::Loop()
       N_muons++;
       hM2mu0->Fill(mass_mumu,puweight[nvertex]);
       hnvtx0->Fill(1.*nvertex,puweight[nvertex]);
+      pileup->Fill(1.*nsimvertex,puweight[nvertex]);
       //	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) 
 
       // M_mumu 85-97 GeV
@@ -567,6 +570,7 @@ void DiMuonAnalysis::Loop()
    TFile efile("DYhistos.root","recreate");
 
    hnvtx0->Write();   
+   pileup->Write();   
    hM2mu0->Write();
    hM2mu1->Write();
    hDeta0->Write();
@@ -581,11 +585,11 @@ void DiMuonAnalysis::Loop()
 
    efile.Close();
 
+   /*
    setTDRStyle(0,0,0);
    // ===> di muon mass: 
    TCanvas* c1 = new TCanvas("X","Y",1);
 
-   /*
    hM2mu0->GetXaxis()->SetTitle("M_{#mu #mu}, GeV");
    hM2mu0->GetYaxis()->SetTitle("Nev/2 GeV");
    hM2mu0->Draw("hist");
@@ -975,7 +979,6 @@ void DiMuonAnalysis::Loop()
    hNvtxjet25->Draw("PE1");
    c21->SaveAs("Nvtxjet25.png");
 
-   */
 
    // NvtxL2
    setTDRStyle(0,1,0);
@@ -1007,4 +1010,5 @@ void DiMuonAnalysis::Loop()
 
    c22->SaveAs("ZY.png");
 
+   */
 }
