@@ -324,6 +324,8 @@ void DiMuonAnalysis::Loop()
    Double_t N_massjj = 0;
    // 6. CJV
    Double_t N_cjv = 0;
+   // scale
+   Double_t jescale = 0.;
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
@@ -447,12 +449,12 @@ void DiMuonAnalysis::Loop()
       double pTj2 = 0.;
 
       if(nalljets < 2) {continue;}
+      
+      pTj1 = (*EtJPT)[0] + jescale*(*jesunc)[0]*(*EtJPT)[0];
+      pTj2 = (*EtJPT)[1] + jescale*(*jesunc)[1]*(*EtJPT)[1];
 
-      pTj1 = (*EtJPT)[0] + (*jesunc)[0]*(*EtJPT)[0];
-      pTj2 = (*EtJPT)[1] + (*jesunc)[1]*(*EtJPT)[1];
-
-      cout <<"  Etj1 = " << (*EtJPT)[0] <<" jesunc1 = " << (*jesunc)[0] <<" pTj1 = " << pTj1 << endl;
-      cout <<"  Etj2 = " << (*EtJPT)[1] <<" jesunc2 = " << (*jesunc)[1] <<" pTj2 = " << pTj2 << endl;
+      //      cout <<"  Etj1 = " << (*EtJPT)[0] <<" jesunc1 = " << (*jesunc)[0] <<" pTj1 = " << pTj1 << endl;
+      //      cout <<"  Etj2 = " << (*EtJPT)[1] <<" jesunc2 = " << (*jesunc)[1] <<" pTj2 = " << pTj2 << endl;
 
       if( ( pTj1 < 25.0 ) || 
           ( pTj2 < 25.0 ) || 
@@ -556,9 +558,8 @@ void DiMuonAnalysis::Loop()
 	} 
 
       }
-   }
       */
-
+   }
    // selections summary
    cout <<"===> Total number of events analysed - " << N_total << endl;
    cout <<"===--> passed muon pT/eta selections - " << N_muons << endl;
@@ -1012,5 +1013,4 @@ void DiMuonAnalysis::Loop()
    c22->SaveAs("ZY.png");
 
    */
-   }
 }
