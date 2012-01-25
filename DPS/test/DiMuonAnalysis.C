@@ -203,27 +203,27 @@ void DiMuonAnalysis::Loop()
    if (fChain == 0) return;
 
    // vertex reweighting
-   TFile* file = new TFile("DYDataNvtx.root");
-   hnvtx0->Draw();
-   Double_t nvtx_data[40];
-   Double_t nvtx_mc[40];
-   Double_t puweight[40];
-   for (Int_t id = 0; id < 40; id++) {
-     nvtx_data[id] = hnvtx0->GetBinContent(id+1);
-     cout <<" bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
+
+   TFile* file = new TFile("DataAObservedPU.root");
+   pileup->Draw();
+   Double_t nvtx_data[36];
+   Double_t nvtx_mc[36];
+   Double_t puweight[36];
+   for (Int_t id = 0; id < 36; id++) {
+     nvtx_data[id] = pileup->GetBinContent(id+1);
+     cout <<" data bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
    }
 
-   TFile* file = new TFile("DYMCNvtx.root");
-   hnvtx0->Draw();
-   for (Int_t im = 0; im < 40; im++) {
-     nvtx_mc[im] = hnvtx0->GetBinContent(im+1);
-     cout <<" bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
+   TFile* file = new TFile("MCSummer11ObservedPU.root");
+   pileup->Draw();
+   for (Int_t im = 0; im < 36; im++) {
+     nvtx_mc[im] = pileup->GetBinContent(im+1);
+     cout <<" MC bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
    }
 
    // for MC
-   /*
 
-   for (Int_t idm = 0; idm < 40; idm++) {
+   for (Int_t idm = 0; idm < 36; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
      } else {
@@ -231,13 +231,15 @@ void DiMuonAnalysis::Loop()
      }
      cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
-   */
 
    // for data
-   for (Int_t idm = 0; idm < 40; idm++) {
+   /*
+   for (Int_t idm = 0; idm < 36; idm++) {
      puweight[idm] = 1.0;
      cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
+   */
+
 
    TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
    TH1F * pileup   = new TH1F( "pileup", "pileup", 36, -0.5, 35.5);
@@ -327,6 +329,9 @@ void DiMuonAnalysis::Loop()
    // scale
    Double_t jescale = 0.;
 
+   // protection against large nsimvertex
+   if(nsimvertex >= 35) nsimvertex = 35;
+
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       //      break;
@@ -355,9 +360,9 @@ void DiMuonAnalysis::Loop()
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
       N_muons++;
 
-      hM2mu0->Fill(mass_mumu,puweight[nvertex]);
-      hnvtx0->Fill(1.*nvertex,puweight[nvertex]);
-      pileup->Fill(1.*nsimvertex,puweight[nvertex]);
+      hM2mu0->Fill(mass_mumu,puweight[nsimvertex]);
+      hnvtx0->Fill(1.*nvertex,puweight[nsimvertex]);
+      pileup->Fill(1.*nsimvertex,puweight[nsimvertex]);
       //	if( ((*muisol)[0] < 0.1) && ((*muisol)[1] < 0.1) ) 
 
       // M_mumu 85-97 GeV
@@ -388,8 +393,8 @@ void DiMuonAnalysis::Loop()
       Double_t EZ = sqrt(MZ*MZ + PtZ*PtZ + PZz*PZz);
       Double_t ZY   = 0.5 * log( (EZ+PZz) / (EZ-PZz));
 
-      hM2mu1->Fill(mass_mumu,puweight[nvertex]);
-      hZY->Fill(ZY,puweight[nvertex]);
+      hM2mu1->Fill(mass_mumu,puweight[nsimvertex]);
+      hZY->Fill(ZY,puweight[nsimvertex]);
 
       // jets
       for (unsigned int i = 0; i < njets; i++) {
@@ -461,16 +466,16 @@ void DiMuonAnalysis::Loop()
 	  ( fabs((*EtaJPT)[0]) > 4.7) || 
 	  ( fabs((*EtaJPT)[1]) > 4.7) ) {continue;}
       N_jets++;
-      hZY2J->Fill(ZY,puweight[nvertex]);
+      hZY2J->Fill(ZY,puweight[nsimvertex]);
 
       Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
-      hDeta0->Fill(DetaJJ,puweight[nvertex]);
+      hDeta0->Fill(DetaJJ,puweight[nsimvertex]);
       if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
-      hDeta1->Fill(DetaJJ,puweight[nvertex]);
+      hDeta1->Fill(DetaJJ,puweight[nsimvertex]);
 
       if( DetaJJ < 3.5 ) {continue;}
       N_deta++;
-      hZY2JDeta->Fill(ZY,puweight[nvertex]);
+      hZY2JDeta->Fill(ZY,puweight[nsimvertex]);
 
       // VBF jets with max and min rapidity
       Double_t eta_jmin = (*EtaJPT)[0]; 
@@ -492,7 +497,7 @@ void DiMuonAnalysis::Loop()
       }
       if(ncj != 0) {continue;}
       N_cjv++;
-      hZY2JDetaCJV->Fill(ZY,puweight[nvertex]);
+      hZY2JDetaCJV->Fill(ZY,puweight[nsimvertex]);
 
       Double_t PJ1x = pTj1 * cos((*PhiJPT)[0]); 
       Double_t PJ1y = pTj1 * sin((*PhiJPT)[0]);
@@ -509,11 +514,11 @@ void DiMuonAnalysis::Loop()
       Double_t EJ2  = pTj2 / sin(theta);
 
       Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
-      hMjj->Fill(Mj1j2,puweight[nvertex]);
+      hMjj->Fill(Mj1j2,puweight[nsimvertex]);
 
       if(Mj1j2 < 700.) {continue;}
       N_massjj++;
-      hZY2JDetaCJVMjj->Fill(ZY,puweight[nvertex]);
+      hZY2JDetaCJVMjj->Fill(ZY,puweight[nsimvertex]);
 
       /*
       // 
