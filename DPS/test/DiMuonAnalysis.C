@@ -206,24 +206,32 @@ void DiMuonAnalysis::Loop()
 
    TFile* file = new TFile("DataAObservedPU.root");
    pileup->Draw();
-   Double_t nvtx_data[36];
-   Double_t nvtx_mc[36];
-   Double_t puweight[36];
-   for (Int_t id = 0; id < 36; id++) {
-     nvtx_data[id] = pileup->GetBinContent(id+1);
+   Double_t nvtx_data[100];
+   Double_t nvtx_mc[100];
+   Double_t puweight[100];
+   for (Int_t id = 0; id < 100; id++) {
+     if(id < 36) {
+       nvtx_data[id] = pileup->GetBinContent(id+1);
+     } else {
+       nvtx_data[id] = 0.;
+     }
      cout <<" data bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
    }
 
    TFile* file = new TFile("MCSummer11ObservedPU.root");
    pileup->Draw();
-   for (Int_t im = 0; im < 36; im++) {
-     nvtx_mc[im] = pileup->GetBinContent(im+1);
+   for (Int_t im = 0; im < 100; im++) {
+     if(im < 36) {
+       nvtx_mc[im] = pileup->GetBinContent(im+1);
+     } else {
+       nvtx_mc[im] = 0.;
+     }
      cout <<" MC bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
    }
 
    // for MC
 
-   for (Int_t idm = 0; idm < 36; idm++) {
+   for (Int_t idm = 0; idm < 100; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
      } else {
@@ -328,9 +336,6 @@ void DiMuonAnalysis::Loop()
    Double_t N_cjv = 0;
    // scale
    Double_t jescale = 0.;
-
-   // protection against large nsimvertex
-   if(nsimvertex >= 35) nsimvertex = 35;
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
