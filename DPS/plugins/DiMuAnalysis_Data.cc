@@ -458,7 +458,9 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
 
   // JES uncertainty
-  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("GR_R_42_V23_AK5JPT_Uncertainty.txt");
+  std::string JEC_PATH("CondFormats/JetMETObjects/data/");
+  edm::FileInPath fip(JEC_PATH+"GR_R_42_V23_AK5JPT_Uncertainty.txt");
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fip.fullPath());
   
   // Calo jets
   edm::Handle<CaloJetCollection> calojets;
