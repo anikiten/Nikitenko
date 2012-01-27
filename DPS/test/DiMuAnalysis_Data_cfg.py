@@ -78,7 +78,7 @@ process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
-    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),
+    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
     TriggerResults = cms.InputTag("TriggerResults","","HLT")	
 )
 
@@ -95,6 +95,6 @@ process.dump = cms.EDAnalyzer("EventContentAnalyzer")
  
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
 
-process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
+process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3Residual*process.myjetplustrack)
 
 # process.p1 = cms.Path(process.dump)
