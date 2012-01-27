@@ -60,7 +60,7 @@ process.GlobalTag.globaltag = cms.string('GR_R_42_V23::All')
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(100)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -73,7 +73,7 @@ fileNames = cms.untracked.vstring(
 
 process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
     HistOutFile = cms.untracked.string('DiMuAnalysis_Data.root'),
-#    HistOutFile = cms.untracked.string('DiMuAnalysis_MC.root'),
+    DataOrMC = cms.untracked.int32(0),
     Muons    = cms.InputTag("muons"),	
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
