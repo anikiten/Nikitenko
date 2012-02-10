@@ -154,6 +154,8 @@ private:
 
   // variables to store in ntpl
   int     run, event, nvertex, nsimvertex;
+  int     DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
+
   double  DZmin, PVx, PVy, PVz;
   // di muon pass
   double  mass_mumu;
@@ -227,11 +229,15 @@ DiMuAnalysis_Data::beginJob()
 
   t1->Branch("run",&run,"run/I");
   t1->Branch("event",&event,"event/I");
-
   t1->Branch("nvertex",&nvertex,"nvertex/I");
   t1->Branch("nsimvertex",&nsimvertex,"nsimvertex/I");
-  t1->Branch("DZmin",&DZmin,"DZmin/D");
 
+  t1->Branch("DoubleMu7",&DoubleMu7,"DoubleMu7/I");
+  t1->Branch("Mu13_Mu8",&Mu13_Mu8,"Mu13_Mu8/I");
+  t1->Branch("Mu17_Mu8",&Mu17_Mu8,"Mu17_Mu8/I");
+  t1->Branch("Mu17_TkMu8",&Mu17_TkMu8,"Mu17_TkMu8/I");
+
+  t1->Branch("DZmin",&DZmin,"DZmin/D");
   t1->Branch("PVx",&PVx,"PVx/D");
   t1->Branch("PVy",&PVy,"PVy/D");
   t1->Branch("PVz",&PVz,"PVz/D");
@@ -322,6 +328,40 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 {
   using namespace edm;
 
+  run = iEvent.id().run();
+  event = iEvent.id().event();
+  nvertex = 0;
+  nsimvertex = 0;
+  DoubleMu7  = 0;
+  Mu13_Mu8   = 0;
+  Mu17_Mu8   = 0;
+  Mu17_TkMu8 = 0;;
+
+  DZmin =   0.;
+  PVx = -1000.; 
+  PVy = -1000.; 
+  PVz = -1000.;
+
+  mass_mumu = 0.;
+  EtaMu->clear();
+  PhiMu->clear();
+  PtMu->clear();
+  dzmuon->clear();
+  muisol->clear();
+
+  EtaRaw->clear();
+  PhiRaw->clear();
+  EtJPT->clear();
+  EtaJPT->clear();
+  PhiJPT->clear();
+  EtJPT->clear();
+  Ntrk->clear();
+  jesunc->clear(); 
+  beta->clear(); 
+
+  //  NPxlMaxPtTrk->clear();
+  //  NSiIMaxPtTrk->clear();
+  //  NSiOMaxPtTrk->clear();
   /*
   // L1
    edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
@@ -364,7 +404,6 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    */
 
    // HLT
-  /*
    edm::Handle<TriggerResults> triggerResults;
    iEvent.getByLabel(srcTriggerResults_,triggerResults);
 
@@ -374,329 +413,301 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    bool physdecl= (index<triggerNames.size()&&triggerResults->accept(index)) ? 1 : 0;
 
    for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
-     std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+
+     if( (int)(triggerNames.triggerName(ihlt)).find("DoubleMu7")  > 0 ) {DoubleMu7  = triggerResults->accept(ihlt);}
+     if( (int)(triggerNames.triggerName(ihlt)).find("Mu13_Mu8")   > 0 ) {Mu13_Mu8   = triggerResults->accept(ihlt);}
+     if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_Mu8")   > 0 ) {Mu17_Mu8   = triggerResults->accept(ihlt);}
+     if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_TkMu8") > 0 ) {Mu17_TkMu8 = triggerResults->accept(ihlt);}
+
+     //       std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
+     //		 <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
    }
-  */
 
   //  std::map<double,int> pTjptIndex;
 
-  std::map<double,const JPTJet*> pTjptIndex;
-  std::map<double,const Muon*> pTMuonIndex;
-  math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
-  math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
-
-  run = iEvent.id().run();
-  event = iEvent.id().event();
-
-  cout <<" run = " << run <<" event = " << event << endl;
-
-  nvertex = 0;
-  nsimvertex = 0;
-
-  DZmin =   0.;
-  PVx = -1000.; 
-  PVy = -1000.; 
-  PVz = -1000.;
-
-  mass_mumu = 0.;
-  EtaMu->clear();
-  PhiMu->clear();
-  PtMu->clear();
-  dzmuon->clear();
-  muisol->clear();
-
-  EtaRaw->clear();
-  PhiRaw->clear();
-  EtJPT->clear();
-  EtaJPT->clear();
-  PhiJPT->clear();
-  EtJPT->clear();
-  Ntrk->clear();
-  jesunc->clear(); 
-  beta->clear(); 
-
-  //  NPxlMaxPtTrk->clear();
-  //  NSiIMaxPtTrk->clear();
-  //  NSiOMaxPtTrk->clear();
+   std::map<double,const JPTJet*> pTjptIndex;
+   std::map<double,const Muon*> pTMuonIndex;
+   math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
+   math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
+   
   
   // PU info
-  if(DataOrMCSrc == 1) {
+   if(DataOrMCSrc == 1) {
 
-    edm::InputTag PileupSrc_("addPileupInfo");
-    Handle<std::vector< PileupSummaryInfo > >  PupInfo;
-    iEvent.getByLabel(PileupSrc_, PupInfo);
-    // const float getTrueNumInteractions() - the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled for
-    // Fall 11 MC (CMSSW 4_2_8 and later)
-    
-    std::vector<PileupSummaryInfo>::const_iterator PVI;
-    for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+     edm::InputTag PileupSrc_("addPileupInfo");
+     Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+     iEvent.getByLabel(PileupSrc_, PupInfo);
+     // const float getTrueNumInteractions() - the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled for
+     // Fall 11 MC (CMSSW 4_2_8 and later)
+     
+     std::vector<PileupSummaryInfo>::const_iterator PVI;
+     for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
       //      std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
-      if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
-    }
-  }
+       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
+     }
+   }
 
   // muons
-  edm::Handle<RecoMuons> reco_muons;
-  iEvent.getByLabel(muonsSrc, reco_muons );
-
-  // get jet ID map
-  edm::Handle<ValueMap<reco::JetID> > jetsID;
-  iEvent.getByLabel(jetsIDSrc,jetsID);
-  // 'ak5JetID'
-
-   // pf jets
-  edm::Handle<PFJetCollection> pfjetsakt5;
-  iEvent.getByLabel("ak5PFJets", pfjetsakt5);
+   edm::Handle<RecoMuons> reco_muons;
+   iEvent.getByLabel(muonsSrc, reco_muons );
    
-  // JPT jets raw
-  edm::Handle<reco::JPTJetCollection> jptjets;
-  iEvent.getByLabel(JPTjetsSrc, jptjets);
-
+   // get jet ID map
+   edm::Handle<ValueMap<reco::JetID> > jetsID;
+   iEvent.getByLabel(jetsIDSrc,jetsID);
+   // 'ak5JetID'
+   
+   // pf jets
+   edm::Handle<PFJetCollection> pfjetsakt5;
+   iEvent.getByLabel("ak5PFJets", pfjetsakt5);
+   
+   // JPT jets raw
+   edm::Handle<reco::JPTJetCollection> jptjets;
+   iEvent.getByLabel(JPTjetsSrc, jptjets);
+   
   // JPT jets L1L2L3
-  edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
-  iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
+   edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
+   iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
 
   // JES uncertainty
-  std::string JEC_PATH("CondFormats/JetMETObjects/data/");
-  edm::FileInPath fip(JEC_PATH+"GR_R_42_V23_AK5JPT_Uncertainty.txt");
-  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fip.fullPath());
+   std::string JEC_PATH("CondFormats/JetMETObjects/data/");
+   edm::FileInPath fip(JEC_PATH+"GR_R_42_V23_AK5JPT_Uncertainty.txt");
+   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fip.fullPath());
   
   // Calo jets
-  edm::Handle<CaloJetCollection> calojets;
-  iEvent.getByLabel(calojetsSrc, calojets);
+   edm::Handle<CaloJetCollection> calojets;
+   iEvent.getByLabel(calojetsSrc, calojets);
 
   // get vertex
-  edm::Handle<reco::VertexCollection> recVtxs;
-  iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
+   edm::Handle<reco::VertexCollection> recVtxs;
+   iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
 
   // get beam spot
-  edm::Handle<reco::BeamSpot> beamSpot_;
-  iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
-  const reco::BeamSpot& bs = *(beamSpot_.product());
-
-  // reco vertex part
-  int nvtx = 0;
-  unsigned ntrkV = 0;
-  double cDVZmin = 1000.;
-  for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
-    {
-      if ( !((*recVtxs)[ind].isFake()) && ((*recVtxs)[ind].ndof() > 4) )
-	{
-
-	  nvtx = nvtx + 1;
-
-	  double cPVx  = (*recVtxs)[ind].x();
-	  double cPVy  = (*recVtxs)[ind].y();
-	  double cPVz  = (*recVtxs)[ind].z();
-
-	  if(nvtx == 1) {
-	    PVx  = cPVx;
-	    PVy  = cPVy;
-	    PVz  = cPVz;
-	    //      ndof(PV)>=5.0
-	    //	     ntrkV = (*recVtxs)[ind].tracksSize();
-	    //	    reco::Vertex::trackRef_iterator ittrk;
-	    //	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
-	    //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
-	  } else {
-	    double DZ = fabs(cPVz - PVz);
-	    if(DZ < cDVZmin) 
-	      {
-		cDVZmin = DZ;
-	      } 
-	  }
-	}
-    }
-
-  nvertex = nvtx;
-  DZmin = cDVZmin;
+   edm::Handle<reco::BeamSpot> beamSpot_;
+   iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
+   const reco::BeamSpot& bs = *(beamSpot_.product());
+   
+   // reco vertex part
+   int nvtx = 0;
+   unsigned ntrkV = 0;
+   double cDVZmin = 1000.;
+   for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
+     {
+       if ( !((*recVtxs)[ind].isFake()) && ((*recVtxs)[ind].ndof() > 4) )
+	 {
+	   
+	   nvtx = nvtx + 1;
+	   
+	   double cPVx  = (*recVtxs)[ind].x();
+	   double cPVy  = (*recVtxs)[ind].y();
+	   double cPVz  = (*recVtxs)[ind].z();
+	   
+	   if(nvtx == 1) {
+	     PVx  = cPVx;
+	     PVy  = cPVy;
+	     PVz  = cPVz;
+	     //      ndof(PV)>=5.0
+	     //	     ntrkV = (*recVtxs)[ind].tracksSize();
+	     //	    reco::Vertex::trackRef_iterator ittrk;
+	     //	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
+	     //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
+	   } else {
+	     double DZ = fabs(cPVz - PVz);
+	     if(DZ < cDVZmin) 
+	       {
+		 cDVZmin = DZ;
+	       } 
+	   }
+	 }
+     }
+   
+   nvertex = nvtx;
+   DZmin = cDVZmin;
 
   // access muons and jets
-  if( nvtx >= 1 ) {
+   if( nvtx >= 1 ) {
 
-    //    cout <<" nvertex = " << nvertex <<" DZmin = " << DZmin << endl;
+     //    cout <<" nvertex = " << nvertex <<" DZmin = " << DZmin << endl;
+     
+     // muons
+     RecoMuons::const_iterator imuon = reco_muons->begin(); 
+     RecoMuons::const_iterator jmuon = reco_muons->end();
+     for ( ; imuon != jmuon; ++imuon ) {
+       if ( imuon->innerTrack().isNull() ||
 
-    // muons
-    RecoMuons::const_iterator imuon = reco_muons->begin(); 
-    RecoMuons::const_iterator jmuon = reco_muons->end();
-    for ( ; imuon != jmuon; ++imuon ) {
-      if ( imuon->innerTrack().isNull() ||
-
-	   // (*imuon).charge()
-	   !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
-	   imuon->numberOfMatchedStations() <= 1 ||
-	   imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
-	   imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
-           fabs(imuon->innerTrack()->dxy(bs)) > 0.2 ) { continue; }
-
-      pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
-
-    }
+	    // (*imuon).charge()
+	    !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
+	    imuon->numberOfMatchedStations() <= 1 ||
+	    imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
+	    imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
+	    fabs(imuon->innerTrack()->dxy(bs)) > 0.2 ) { continue; }
+       
+       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
+       
+     }
     
     // fill muon variables
-    map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
-    map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
-    int imu = 0;
-    while (rmfirst != rmlast) {
+     map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
+     map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
+     int imu = 0;
+     while (rmfirst != rmlast) {
     
-      const Muon* muon = (*rmfirst).second;
+       const Muon* muon = (*rmfirst).second;
       
-      imu++;
-      math::XYZTLorentzVector muonc(muon->innerTrack()->px(),muon->innerTrack()->py(), muon->innerTrack()->pz(), muon->innerTrack()->p()); 
-      EtaMu->push_back(muon->innerTrack()->eta());
-      PhiMu->push_back(muon->innerTrack()->phi());
-      PtMu->push_back(muon->innerTrack()->pt());
-      /*
-      cout <<" muon " << imu <<" pT / eta / phi = " << muon->innerTrack()->pt() 
-	   <<" "<< muon->innerTrack()->eta() 
-	   <<" "<< muon->innerTrack()->phi()
-	   << endl;
-      */
-      double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
-      dzmuon->push_back(dzvtx);
-      // muon isolation variables
-      double muon_sumPt = muon->isolationR03().sumPt;
-      double muon_emEt  = muon->isolationR03().emEt;
-      double muon_hadEt = muon->isolationR03().hadEt;
-      double muon_isol  = (muon_sumPt + muon_emEt + muon_hadEt) / muon->innerTrack()->pt(); 
-      muisol->push_back(muon_isol);
-      if (imu == 1) muon1 = muonc; 
-      if (imu == 2) muon2 = muonc; 
-      rmfirst++;
-    }
-    
-    if(imu >= 2) {
-      math::XYZTLorentzVector twomuons = muon1 + muon2;
-      mass_mumu = twomuons.M();
-    }
-    
-    // jets
-    if(jptjetsl1l2l3->size() != 0) {
+       imu++;
+       math::XYZTLorentzVector muonc(muon->innerTrack()->px(),muon->innerTrack()->py(), muon->innerTrack()->pz(), muon->innerTrack()->p()); 
+       EtaMu->push_back(muon->innerTrack()->eta());
+       PhiMu->push_back(muon->innerTrack()->phi());
+       PtMu->push_back(muon->innerTrack()->pt());
+       /*
+	 cout <<" muon " << imu <<" pT / eta / phi = " << muon->innerTrack()->pt() 
+	 <<" "<< muon->innerTrack()->eta() 
+	 <<" "<< muon->innerTrack()->phi()
+	 << endl;
+       */
+       double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
+       dzmuon->push_back(dzvtx);
+       // muon isolation variables
+       double muon_sumPt = muon->isolationR03().sumPt;
+       double muon_emEt  = muon->isolationR03().emEt;
+       double muon_hadEt = muon->isolationR03().hadEt;
+       //       double muon_isol  = (muon_sumPt + muon_emEt + muon_hadEt) / muon->innerTrack()->pt(); 
+       muisol->push_back(muon_sumPt);
+       if (imu == 1) muon1 = muonc; 
+       if (imu == 2) muon2 = muonc; 
+       rmfirst++;
+     }
+     
+     if(imu >= 2) {
+       math::XYZTLorentzVector twomuons = muon1 + muon2;
+       mass_mumu = twomuons.M();
+     }
+     
+     // jets
+     if(jptjetsl1l2l3->size() != 0) {
 
-      double DR1 = 10.;
-      double DR2 = 10.;
+       double DR1 = 10.;
+       double DR2 = 10.;
 
-      int ic = 0;
-      for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
-	if(jptjet->pt() > 20.) {
-	  if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
-	  if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
-	  ic++;
-	  // do not count jets overlapped with muons
-	  if( (DR1 > 0.5) && (DR2 > 0.5) ) {
-	    pTjptIndex[jptjet->pt()] = &(*jptjet);
-	    /*
-	    cout <<" jet = " << ic << " pTj / etaj / phij = " << jptjet->pt() <<" " << jptjet->eta() <<" " << jptjet->phi() 
-		 <<" DR1 = " << DR1 
-		 <<" DR2 = " 
-		 << DR2 << endl;
-	    */
-	  }
-	}
-      }
-    }
-  }
+       int ic = 0;
+       for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
+	 if(jptjet->pt() > 20.) {
+	   if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
+	   if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
+	   ic++;
+	   // do not count jets overlapped with muons
+	   if( (DR1 > 0.6) && (DR2 > 0.6) ) {
+	     pTjptIndex[jptjet->pt()] = &(*jptjet);
+	     /*
+	       cout <<" jet = " << ic << " pTj / etaj / phij = " << jptjet->pt() <<" " << jptjet->eta() <<" " << jptjet->phi() 
+	       <<" DR1 = " << DR1 
+	       <<" DR2 = " 
+	       << DR2 << endl;
+	     */
+	   }
+	 }
+       }
+     }
+   }
 
-  //  cout <<" Selected jet size = " << pTjptIndex.size() << endl;
-
-  // fill jet variables
-  int jc = 0;
-  map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
-  map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
-  while (rfirst != rlast) {
-
-    const JPTJet* jptjet = (*rfirst).second;
-    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
-
-    //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-
-    double mN90Hits  = (*jetsID)[jptjetRef].n90Hits;
-    double mfHPD     = (*jetsID)[jptjetRef].fHPD;
-    double mfRBX     = (*jetsID)[jptjetRef].fRBX;
-
-    double mN90      = rawcalojet->n90();
-    double mEmf      = rawcalojet->emEnergyFraction(); 	
- 
-    jc++;
-    rfirst++;
-
-    if(mEmf  < 0.01) continue;
-    if(mfHPD > 0.98) continue;
-    if(mfRBX > 0.98) continue;
-    if(mN90  < 2) continue;
-
-    // access tracks used in JPT
-    TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
-    TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
-    int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
-    // find track with max pT and number of layers it crosses
-    double pTMax = 0.;
-    int NLayersPxl = 0;
-    int NLayersSiI = 0;
-    int NLayersSiO = 0;
-    // loop over in-vertex-in calo tracks
-    for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
-	 iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
-      const double pt  = (*iInConeVtxTrk)->pt();
-      if(pt > pTMax) {
-	pTMax = pt;
-	NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-      }
-    }
-    
-    // loop over in-vertex-out of calo tracks
-    for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
-	 iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
-      const double pt  = (*iInConeVtxTrk)->pt();
-      if(pt > pTMax) {
-	pTMax = pt;
-	NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-      }
-    }
-
-    jecUnc->setJetEta(jptjet->eta());
-    jecUnc->setJetPt (jptjet->pt() ); 
-    double unc = jecUnc->getUncertainty(true);
+   //  cout <<" Selected jet size = " << pTjptIndex.size() << endl;
    
-    //    cout <<" jet pT = " << jptjet->pt() <<" eta = " << jptjet->eta() <<" unc = " << unc << endl;
+   // fill jet variables
+   int jc = 0;
+   map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
+   map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
+   while (rfirst != rlast) {
+     
+     const JPTJet* jptjet = (*rfirst).second;
+     RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+     reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+     
+     //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+     
+     double mN90Hits  = (*jetsID)[jptjetRef].n90Hits;
+     double mfHPD     = (*jetsID)[jptjetRef].fHPD;
+     double mfRBX     = (*jetsID)[jptjetRef].fRBX;
+     
+     double mN90      = rawcalojet->n90();
+     double mEmf      = rawcalojet->emEnergyFraction(); 	
+     
+     jc++;
+     rfirst++;
+     
+     if(mEmf  < 0.01) continue;
+     if(mfHPD > 0.98) continue;
+     if(mfRBX > 0.98) continue;
+     if(mN90  < 2) continue;
+     
+     // access tracks used in JPT
+     TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
+     TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
+     int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
+     // find track with max pT and number of layers it crosses
+     double pTMax = 0.;
+     int NLayersPxl = 0;
+     int NLayersSiI = 0;
+     int NLayersSiO = 0;
+     // loop over in-vertex-in calo tracks
+     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
+	  iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
+       const double pt  = (*iInConeVtxTrk)->pt();
+       if(pt > pTMax) {
+	 pTMax = pt;
+	 NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	 NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+	 NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+       }
+     }
+    
+     // loop over in-vertex-out of calo tracks
+     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
+	  iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
+       const double pt  = (*iInConeVtxTrk)->pt();
+       if(pt > pTMax) {
+	 pTMax = pt;
+	 NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
+	 NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
+	 NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+(*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
+       }
+     }
 
-    EtaRaw->push_back(jptjetRef->eta());
-    PhiRaw->push_back(jptjetRef->phi());
-    EtRaw->push_back(jptjetRef->pt());
-    EtaJPT->push_back(jptjet->eta());
-    PhiJPT->push_back(jptjet->phi());
-    EtJPT->push_back(jptjet->pt());
-    Ntrk->push_back(npions);
-    jesunc->push_back(unc);
-    beta->push_back(jptjet->getSpecific().Zch);
+     jecUnc->setJetEta(jptjet->eta());
+     jecUnc->setJetPt (jptjet->pt() ); 
+     double unc = jecUnc->getUncertainty(true);
+   
+     //    cout <<" jet pT = " << jptjet->pt() <<" eta = " << jptjet->eta() <<" unc = " << unc << endl;
 
-    //    NPxlMaxPtTrk->push_back(NLayersPxl);
-    //    NSiIMaxPtTrk->push_back(NLayersSiI);
-    //    NSiOMaxPtTrk->push_back(NLayersSiO);
-    /*
-    cout <<" jpt jet pT = " << jptjet->pt()
-	 <<" jpt eta = " << jptjet->eta() 
-	 <<" jpt phi = " << jptjet->phi() 
-	 <<" raw pt = " << jptjetRef->pt()
-	 <<" raw eta = " << jptjetRef->eta()
-	 <<" raw phi = " << jptjetRef->phi() 
-	 <<" Ntrk1 = " << pionsInVertexInCalo.size()
-	 <<" Ntrk2 = " << pionsInVertexOutCalo.size()
-	 <<" Zch = " << jptjet->getSpecific().Zch << endl; 
-    */
-  }
+     EtaRaw->push_back(jptjetRef->eta());
+     PhiRaw->push_back(jptjetRef->phi());
+     EtRaw->push_back(jptjetRef->pt());
+     EtaJPT->push_back(jptjet->eta());
+     PhiJPT->push_back(jptjet->phi());
+     EtJPT->push_back(jptjet->pt());
+     Ntrk->push_back(npions);
+     jesunc->push_back(unc);
+     beta->push_back(jptjet->getSpecific().Zch);
 
-  //  cout <<" mass mumu = " << mass_mumu <<" jc = " <<jc << endl; 
+     //    NPxlMaxPtTrk->push_back(NLayersPxl);
+     //    NSiIMaxPtTrk->push_back(NLayersSiI);
+     //    NSiOMaxPtTrk->push_back(NLayersSiO);
+     /*
+       cout <<" jpt jet pT = " << jptjet->pt()
+       <<" jpt eta = " << jptjet->eta() 
+       <<" jpt phi = " << jptjet->phi() 
+       <<" raw pt = " << jptjetRef->pt()
+       <<" raw eta = " << jptjetRef->eta()
+       <<" raw phi = " << jptjetRef->phi() 
+       <<" Ntrk1 = " << pionsInVertexInCalo.size()
+       <<" Ntrk2 = " << pionsInVertexOutCalo.size()
+       <<" Zch = " << jptjet->getSpecific().Zch << endl; 
+     */
+   }
 
-  // fill tree
-  //  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
-  if( mass_mumu >= 40. ) t1->Fill();
+   //  cout <<" mass mumu = " << mass_mumu <<" jc = " <<jc << endl; 
+   
+   // fill tree
+   //  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
+   if( mass_mumu >= 40. ) t1->Fill();
 }
 
 //define this as a plug-in
