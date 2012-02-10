@@ -528,7 +528,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   imuon->numberOfMatchedStations() <= 1 ||
 	   imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
 	   imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
-           imuon->innerTrack()->dxy(bs) > 0.2 ) { continue; }
+           fabs(imuon->innerTrack()->dxy(bs)) > 0.2 ) { continue; }
 
       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
 
