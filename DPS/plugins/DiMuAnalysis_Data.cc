@@ -523,10 +523,11 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     for ( ; imuon != jmuon; ++imuon ) {
       if ( imuon->innerTrack().isNull() ||
 
-	   //	   !muon::isGoodMuon(*imuon,muon::TMLastStationTight) ||
 	   // (*imuon).charge()
 	   !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
-	   imuon->innerTrack()->numberOfValidHits() <= 10 ||
+	   imuon->numberOfMatchedStations() <= 1 ||
+	   imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
+	   imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
            imuon->innerTrack()->dxy(bs) > 0.2 ) { continue; }
 
       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
@@ -582,15 +583,15 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
 	  if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
 	  ic++;
-	  /*
-	  cout <<" jet = " << ic << " pTj / etaj / phij = " << jptjet->pt() <<" " << jptjet->eta() <<" " << jptjet->phi() 
-	       <<" DR1 = " << DR1 
-	       <<" DR2 = " 
-	       << DR2 << endl;
-	  */
 	  // do not count jets overlapped with muons
 	  if( (DR1 > 0.5) && (DR2 > 0.5) ) {
 	    pTjptIndex[jptjet->pt()] = &(*jptjet);
+	    /*
+	    cout <<" jet = " << ic << " pTj / etaj / phij = " << jptjet->pt() <<" " << jptjet->eta() <<" " << jptjet->phi() 
+		 <<" DR1 = " << DR1 
+		 <<" DR2 = " 
+		 << DR2 << endl;
+	    */
 	  }
 	}
       }
