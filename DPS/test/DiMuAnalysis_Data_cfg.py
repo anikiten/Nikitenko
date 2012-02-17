@@ -19,8 +19,7 @@ process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 # process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
 # process.GlobalTag.globaltag = cms.string('GR_R_44_V4::All')
 
-process.GlobalTag.globaltag = cms.string('GR_R_42_V23::All') 
-
+process.GlobalTag.globaltag = cms.string('GR_R_44_V14::All') 
 
 ####################################################################################
 #from CondCore.DBCommon.CondDBSetup_cfi import *
@@ -78,8 +77,8 @@ process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
     calojets = cms.InputTag("ak5CaloJets"),
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
-#    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
-    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),
+    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
+#    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),
     TriggerResults = cms.InputTag("TriggerResults","","HLT")	
 )
 
@@ -96,7 +95,8 @@ process.dump = cms.EDAnalyzer("EventContentAnalyzer")
  
 # process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
 
-# process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3Residual*process.myjetplustrack)
-process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
+process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3Residual*process.myjetplustrack)
+
+# process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
 
 # process.p1 = cms.Path(process.dump)
