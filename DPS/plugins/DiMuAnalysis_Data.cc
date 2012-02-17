@@ -444,6 +444,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
       //      std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
        if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
+       //       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getTrueNumInteractions();
      }
    }
 
