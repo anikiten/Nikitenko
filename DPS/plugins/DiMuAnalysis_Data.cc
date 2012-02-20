@@ -419,8 +419,10 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_Mu8")   > 0 ) {Mu17_Mu8   = triggerResults->accept(ihlt);}
      if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_TkMu8") > 0 ) {Mu17_TkMu8 = triggerResults->accept(ihlt);}
 
-     //       std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-     //		 <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+     /*
+     std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
+	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+     */
    }
 
   //  std::map<double,int> pTjptIndex;
@@ -442,9 +444,10 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      
      std::vector<PileupSummaryInfo>::const_iterator PVI;
      for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-      //      std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
-       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
-       //       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getTrueNumInteractions();
+       //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+       //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+       //       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
+       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getTrueNumInteractions();
      }
    }
 
