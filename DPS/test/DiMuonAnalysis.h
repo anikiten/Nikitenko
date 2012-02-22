@@ -21,6 +21,11 @@ public :
    Int_t           run;
    Int_t           event;
    Int_t           nvertex;
+   Int_t           nsimvertex;
+   Int_t           DoubleMu7;
+   Int_t           Mu13_Mu8;
+   Int_t           Mu17_Mu8;
+   Int_t           Mu17_TkMu8;
    Double_t        DZmin;
    Double_t        PVx;
    Double_t        PVy;
@@ -38,13 +43,18 @@ public :
    vector<double>  *PhiJPT;
    vector<double>  *EtJPT;
    vector<int>     *Ntrk;
-   vector<double>  *pTtrkMax;
+   vector<double>  *jesunc;
    vector<double>  *beta;
 
    // List of branches
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
    TBranch        *b_nvertex;   //!
+   TBranch        *b_nsimvertex;   //!
+   TBranch        *b_DoubleMu7;   //!
+   TBranch        *b_Mu13_Mu8;   //!
+   TBranch        *b_Mu17_Mu8;   //!
+   TBranch        *b_Mu17_TkMu8;   //!
    TBranch        *b_DZmin;   //!
    TBranch        *b_PVx;   //!
    TBranch        *b_PVy;   //!
@@ -62,7 +72,7 @@ public :
    TBranch        *b_PhiJPT;   //!
    TBranch        *b_EtJPT;   //!
    TBranch        *b_Ntrk;   //!
-   TBranch        *b_pTtrkMax;   //!
+   TBranch        *b_jesunc;   //!
    TBranch        *b_beta;   //!
 
    DiMuonAnalysis(TTree *tree=0);
@@ -95,8 +105,8 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
 */
   if (tree == 0) {
     TChain * chain = new TChain("t1","");
-    chain->Add("/tmp/anikiten/TEST/DiMuAnalysis_Data_*.root");
-    //    chain->Add("/tmp/anikiten/TEST/DiMuAnalysis_MC_*.root");
+    //    chain->Add("/tmp/anikiten/TEST/DiMuAnalysis_Data_*.root");
+    chain->Add("/tmp/anikiten/DiMuAnalysis_Data_*.root");
     tree = chain;
   }
    Init(tree);
@@ -152,7 +162,7 @@ void DiMuonAnalysis::Init(TTree *tree)
    PhiJPT = 0;
    EtJPT = 0;
    Ntrk = 0;
-   pTtrkMax = 0;
+   jesunc = 0;
    beta = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
@@ -163,6 +173,11 @@ void DiMuonAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("nvertex", &nvertex, &b_nvertex);
+   fChain->SetBranchAddress("nsimvertex", &nsimvertex, &b_nsimvertex);
+   fChain->SetBranchAddress("DoubleMu7", &DoubleMu7, &b_DoubleMu7);
+   fChain->SetBranchAddress("Mu13_Mu8", &Mu13_Mu8, &b_Mu13_Mu8);
+   fChain->SetBranchAddress("Mu17_Mu8", &Mu17_Mu8, &b_Mu17_Mu8);
+   fChain->SetBranchAddress("Mu17_TkMu8", &Mu17_TkMu8, &b_Mu17_TkMu8);
    fChain->SetBranchAddress("DZmin", &DZmin, &b_DZmin);
    fChain->SetBranchAddress("PVx", &PVx, &b_PVx);
    fChain->SetBranchAddress("PVy", &PVy, &b_PVy);
@@ -180,7 +195,7 @@ void DiMuonAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("PhiJPT", &PhiJPT, &b_PhiJPT);
    fChain->SetBranchAddress("EtJPT", &EtJPT, &b_EtJPT);
    fChain->SetBranchAddress("Ntrk", &Ntrk, &b_Ntrk);
-   fChain->SetBranchAddress("pTtrkMax", &pTtrkMax, &b_pTtrkMax);
+   fChain->SetBranchAddress("jesunc", &jesunc, &b_jesunc);
    fChain->SetBranchAddress("beta", &beta, &b_beta);
    Notify();
 }
