@@ -211,12 +211,15 @@ void Draw()
    hZY1J->SetMarkerSize(0.7);
    hZY1J->Draw("samePE");
 
+   cout <<" N data with >= 1 jet = " << hZY1J->Integral() << endl;
+
    hZY2J->SetLineStyle(1);
    hZY2J->SetLineWidth(3);
    hZY2J->SetMarkerStyle(25);
    hZY2J->SetMarkerSize(0.7);
    hZY2J->Draw("samePE");
 
+   cout <<" N data with >= 2 jet = " << hZY2J->Integral() << endl;
 
    TLegend *leg = new TLegend(0.3,0.75,0.7,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
@@ -242,10 +245,14 @@ void Draw()
    hZY1J->SetLineWidth(2);
    hZY1J->Draw("same");
 
+   cout <<" N MC with >= 1 jet = " << hZY1J->Integral() << endl;
+
    hZY2J->Scale(scale);
    hZY2J->SetLineStyle(1);
    hZY2J->SetLineWidth(3);
    hZY2J->Draw("same");
+
+   cout <<" N MC with >= 2 jet = " << hZY2J->Integral() << endl;
 
    c1->SaveAs("ZYDataVsMC.png");
 
@@ -263,7 +270,6 @@ void Draw()
    hPtZ->SetMarkerStyle(26);
    hPtZ->SetMarkerSize(0.7);
    hPtZ->Draw("PE");
-   Double_t Ndata = hPtZ->Integral();
 
    hPtZ1J->SetLineStyle(1);
    hPtZ1J->SetLineWidth(3);
@@ -286,11 +292,6 @@ void Draw()
    leg->Draw();
 
    TFile* file = new TFile("DiMuonMCFall11.root");
-
-   Double_t Nmc   = hPtZ->Integral();
-   Double_t scale = Ndata/Nmc;
-
-   cout <<" Ndata = " << Ndata <<" Nmc = " << Nmc <<" scale = " << scale << endl;
 
    hPtZ->Scale(scale);
    hPtZ->SetLineStyle(1);
@@ -413,7 +414,7 @@ void Draw()
    TCanvas* c6 = new TCanvas("X","Y",1);
 
    hDeta0->GetXaxis()->SetTitle("#Delta#eta_{j1j2}");
-   hDeta0->GetYaxis()->SetTitle("Nev");
+   hDeta0->GetYaxis()->SetTitle("Nev / 0.2");
 
    //   hDeta0->SetMaximum(120.);
    //   hDeta0->SetMinimum(2.0);
@@ -444,8 +445,8 @@ void Draw()
    TFile* file = new TFile("Run2011A_08Nov.root");
    TCanvas* c7 = new TCanvas("X","Y",1);
 
-   hMjjnoVBF->GetXaxis()->SetTitle("#Delta#eta_{j1j2}");
-   hMjjnoVBF->GetYaxis()->SetTitle("Nev");
+   hMjjnoVBF->GetXaxis()->SetTitle("M_{j1j2}, GeV");
+   hMjjnoVBF->GetYaxis()->SetTitle("Nev / 50 GeV");
 
    hMjjnoVBF->SetMaximum(550.);
    hMjjnoVBF->SetMinimum(0.1);
