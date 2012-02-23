@@ -253,8 +253,8 @@ void DiMuonAnalysis::Loop()
 
    TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
    TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
-   TH1F * hDeta0   = new TH1F( "hDeta0", "Deta0", 50, 0., 10.);
-   TH1F * hDeta1   = new TH1F( "hDeta1", "Deta1", 50, 0., 10.);
+   TH1F * hDeta0   = new TH1F( "hDeta0", "Deta0", 25, 0., 10.);
+   TH1F * hDeta1   = new TH1F( "hDeta1", "Deta1", 25, 0., 10.);
    TH1F * hMjj     = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
 
    //   TH1F * hPtZ1              = new TH1F( "hPtZ1", "PtZ1", 25, 0., 100.);
@@ -263,21 +263,21 @@ void DiMuonAnalysis::Loop()
    //   TH1F * hPtZ12JDetaMjj     = new TH1F( "hPtZ12JDetaMjj", "PtZ12JDetaMjj", 25, 0., 100.);
    //   TH1F * hPtZ12JDetaMjjCJV  = new TH1F( "hPtZ12JDetaMjjCJV", "PtZ12JDetaMjjCJV", 25, 0., 100.);
    
-   TH1F * hZY              = new TH1F( "hZY", "ZY", 50, -5., 5.);
+   TH1F * hZY              = new TH1F( "hZY", "ZY", 30, -3., 3.);
    TH1F * hPtZ             = new TH1F( "hPtZ", "PtZ", 28, 0., 140.);
    //
    TH1F * hPtZ1J           = new TH1F( "hPtZ1J", "PtZ1J", 28, 0., 140.);
-   TH1F * hZY1J            = new TH1F( "hZY1J", "ZY1J", 50, -5., 5.);
+   TH1F * hZY1J            = new TH1F( "hZY1J", "ZY1J", 30, -3., 3.);
    //
    TH1F * hPtZ2J           = new TH1F( "hPtZ2J", "PtZ2J", 28, 0., 140.);
-   TH1F * hZY2J            = new TH1F( "hZY2J", "ZY2J", 50, -5., 5.);
+   TH1F * hZY2J            = new TH1F( "hZY2J", "ZY2J", 30, -3., 3.);
    //
-   TH1F * hZY2JDeta        = new TH1F( "hZY2JDeta", "ZY2JDeta", 25, -5., 5.);
-   TH1F * hZY2JDetaCJV     = new TH1F( "hZY2JDetaCJV", "ZY2JDetaCJV", 25, -5., 5.);
-   TH1F * hZY2JDetaCJVMjj  = new TH1F( "hZY2JDetaCJVMjj", "ZY2JDetaCJVMjj", 25, -5., 5.);
+   TH1F * hZY2JDeta        = new TH1F( "hZY2JDeta", "ZY2JDeta", 30, -3., 3.);
+   TH1F * hZY2JDetaCJV     = new TH1F( "hZY2JDetaCJV", "ZY2JDetaCJV", 30, -3., 3.);
+   TH1F * hZY2JDetaCJVMjj  = new TH1F( "hZY2JDetaCJVMjj", "ZY2JDetaCJVMjj", 30, -3., 3.);
 
    TH1F * hPtJ      = new TH1F( "hPtJ", "PtJ", 30, 0., 150.);
-   TH1F * hEtaJ     = new TH1F( "hEtaJ", "EtaJ", 100, -5.0, 5.0);
+   TH1F * hEtaJ     = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
    TH1F * hNjets    = new TH1F( "hNjets", "Njets", 6, 0., 6.);
    TH1F * hMjjnoVBF = new TH1F( "hMjjnoVBF", "MjjnoVBF", 40, 0., 2000.);
 
