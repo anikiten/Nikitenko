@@ -189,14 +189,14 @@ void Draw()
 
    // YZ
    setTDRStyle(0,1);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c1 = new TCanvas("X","Y",1);
    //   TAxis* xaxis = hprEH11x5->GetXaxis();
 
    hZY->GetXaxis()->SetTitle("Z rapidity");
    hZY->GetYaxis()->SetTitle("Nev / 0.2");
 
-   hZY->SetMaximum(20000.);
+   hZY->SetMaximum(70000.);
    hZY->SetMinimum(0.5);
    hZY->SetLineStyle(1);
    hZY->SetLineWidth(3);
@@ -228,7 +228,7 @@ void Draw()
    leg->AddEntry(hZY2J,"Z+#geq 2jets","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    Double_t Nmc   = hZY->Integral();
    Double_t scale = Ndata/Nmc;
@@ -258,12 +258,12 @@ void Draw()
 
    // pTZ
    setTDRStyle(0,1);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c2 = new TCanvas("X","Y",1);
    hPtZ->GetXaxis()->SetTitle("p_{T} di-muon, GeV");
    hPtZ->GetYaxis()->SetTitle("Nev / 5 GeV");
 
-   hPtZ->SetMaximum(10000.);
+   hPtZ->SetMaximum(40000.);
    hPtZ->SetMinimum(0.5);
    hPtZ->SetLineStyle(1);
    hPtZ->SetLineWidth(3);
@@ -291,7 +291,7 @@ void Draw()
    leg->AddEntry(hPtZ2J,"Z+#geq 2jets","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    hPtZ->Scale(scale);
    hPtZ->SetLineStyle(1);
@@ -312,7 +312,7 @@ void Draw()
 
    // Njets
    setTDRStyle(0,1);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c3 = new TCanvas("X","Y",1);
 
    hNjets->GetXaxis()->SetTitle("jet multiplicity");
@@ -331,7 +331,7 @@ void Draw()
    leg->AddEntry(hNjets,"data","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    hNjets->Scale(scale);
    hNjets->SetLineStyle(1);
@@ -344,13 +344,13 @@ void Draw()
 
    // pT jets for Nj >= 1
    setTDRStyle(0,1);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c4 = new TCanvas("X","Y",1);
 
    hPtJ->GetXaxis()->SetTitle("p_{T} jet, GeV");
    hPtJ->GetYaxis()->SetTitle("Nev / 5 GeV");
 
-   hPtJ->SetMaximum(2000.);
+   hPtJ->SetMaximum(10000.);
    hPtJ->SetMinimum(2.0);
    hPtJ->SetLineStyle(1);
    hPtJ->SetLineWidth(3);
@@ -363,7 +363,7 @@ void Draw()
    leg->AddEntry(hPtJ,"data, #geq1jet","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    hPtJ->Scale(scale);
    hPtJ->SetLineStyle(1);
@@ -377,13 +377,13 @@ void Draw()
 
    // eta jets for Nj >= 1
    setTDRStyle(0,0);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c5 = new TCanvas("X","Y",1);
 
    hEtaJ->GetXaxis()->SetTitle("#eta jet");
    hEtaJ->GetYaxis()->SetTitle("Nev / 0.1");
 
-   hEtaJ->SetMaximum(120.);
+   hEtaJ->SetMaximum(800.);
    //   hEtaJ->SetMinimum(2.0);
    hEtaJ->SetLineStyle(1);
    hEtaJ->SetLineWidth(1);
@@ -396,7 +396,7 @@ void Draw()
    leg->AddEntry(hEtaJ,"data, #geq1jet","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    hEtaJ->Scale(scale);
    hEtaJ->SetLineStyle(1);
@@ -410,7 +410,7 @@ void Draw()
 
    // Detaj1j2 jets for Nj >= 2
    setTDRStyle(0,0);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c6 = new TCanvas("X","Y",1);
 
    hDeta0->GetXaxis()->SetTitle("#Delta#eta_{j1j2}");
@@ -429,7 +429,7 @@ void Draw()
    leg->AddEntry(hDeta0,"data, #geq2jet","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    hDeta0->Scale(scale);
    hDeta0->SetLineStyle(1);
@@ -442,13 +442,13 @@ void Draw()
 
    // Detaj1j2 jets for Nj >= 2
    setTDRStyle(0,1);
-   TFile* file = new TFile("Run2011A_08Nov.root");
+   TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c7 = new TCanvas("X","Y",1);
 
    hMjjnoVBF->GetXaxis()->SetTitle("M_{j1j2}, GeV");
    hMjjnoVBF->GetYaxis()->SetTitle("Nev / 50 GeV");
 
-   hMjjnoVBF->SetMaximum(550.);
+   hMjjnoVBF->SetMaximum(1000.);
    hMjjnoVBF->SetMinimum(0.1);
    hMjjnoVBF->SetLineStyle(1);
    hMjjnoVBF->SetLineWidth(2);
@@ -461,7 +461,7 @@ void Draw()
    leg->AddEntry(hMjjnoVBF,"data, #geq2jet","P");
    leg->Draw();
 
-   TFile* file = new TFile("DiMuonMCFall11.root");
+   TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
 
    hMjjnoVBF->Scale(scale);
    hMjjnoVBF->SetLineStyle(1);
@@ -471,7 +471,6 @@ void Draw()
    leg->Draw();
 
    c7->SaveAs("MjjnoVBF.png");
-
 
    /*
 
