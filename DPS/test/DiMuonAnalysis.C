@@ -371,7 +371,7 @@ void DiMuonAnalysis::Loop()
 
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.1) || (fabs((*EtaMu)[1]) > 2.1) ) {continue;}
       if( ((*muisol)[0]/(*PtMu)[0] > 0.1) || ((*muisol)[1]/(*PtMu)[1] > 0.1)) {continue;}
-      if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0 && Mu17_TkMu8 == 0) {continue;}
+      if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0) {continue;}
       if(nvertex > 2) {continue;}
 
       N_muons++;
