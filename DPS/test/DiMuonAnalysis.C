@@ -372,7 +372,7 @@ void DiMuonAnalysis::Loop()
 
       // pT mu > 20 GeV, |eta| < 2.1
 
-      if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.1) || (fabs((*EtaMu)[1]) > 2.1) ) {continue;}
+      if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
       if( ((*muisol)[0]/(*PtMu)[0] > 0.1) || ((*muisol)[1]/(*PtMu)[1] > 0.1)) {continue;}
       if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0) {continue;}
       //      if(nvertex > 2) {continue;}
@@ -384,7 +384,7 @@ void DiMuonAnalysis::Loop()
 
 
       // M_mumu 85-97 GeV
-      if(mass_mumu < 85. || mass_mumu > 97.) {continue;}
+      if( fabs(MZ-mass_mumu) > 15.0) {continue;}
       N_mass2mu++;
 
       Int_t smallbeta = 0;
