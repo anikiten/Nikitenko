@@ -381,27 +381,54 @@ void Draw()
    setTDRStyle(0,0);
    TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
    TCanvas* c5 = new TCanvas("X","Y",1);
+
    TH1F *hEtaJData = (TH1F*)hEtaJ->Clone();
-   //   c5->Divide(1,2);
-   //   c5->cd(1);
-   TPad *plotpad = new TPad("plotpad", "plotpad",0.,0.2,1.,1.);
-   plotpad->Draw();
-   plotpad->cd();
+   TH1F *hEtaJDiv  = (TH1F*)hEtaJ->Clone();
 
-   hEtaJData->GetXaxis()->SetTitle("#eta jet");
+   TPad *pad1 = new TPad("plotpad", "plotpad",0.,0.2,1.,1.);
+   pad1->SetPad(0, 0.2, 1.0, 1.0);
+   pad1->SetFillStyle(0);
+   pad1->SetTopMargin(0.06);
+   pad1->SetRightMargin(0.04);
+   pad1->SetLeftMargin(0.16);
+
+   TPad *pad2 = new TPad("ratiopad", "ratiopad",0.,0.,1.,1.);
+   pad2->SetPad(0.0, 0.0, 1.0, 0.2+0.12);
+   pad2->SetFillStyle(4000);
+   pad2->SetBottomMargin(0.3);
+   pad2->SetRightMargin(0.04);
+   pad2->SetLeftMargin(0.16);
+
+   pad3 = new TPad("pad3","pad3", 0.0, 0.0, 1.0, 1.0, 0, 0, 0);
+   pad3->SetPad(0.065, 0.285, 0.155, 0.33);
+
+   pad1->Draw();
+   pad1->Update();
+   pad2->Draw();
+   pad2->Update(); 
+  
+   pad3->Draw();
+   pad2->Draw();
+
+
+   pad1->cd();
+   //   hEtaJData->GetYaxis()->SetTitleFont(42);
+   //   hEtaJData->GetYaxis()->SetLabelFont(42);
+   hEtaJData->GetYaxis()->SetTitleOffset(1.5);
    hEtaJData->GetYaxis()->SetTitle("Nev / 0.1");
-
    hEtaJData->SetMaximum(1200.);
-   //   hEtaJ->SetMinimum(2.0);
    hEtaJData->SetLineStyle(1);
    hEtaJData->SetLineWidth(1);
    hEtaJData->SetMarkerStyle(24);
    hEtaJData->SetMarkerSize(0.7);
    hEtaJData->Draw("PE");
+   hEtaJData->GetXaxis()->SetTitle("");
+   hEtaJData->GetXaxis()->SetLabelSize(2.0); //??? it works
+   
 
-   TLegend *leg = new TLegend(0.5,0.8,0.9,0.95,NULL,"brNDC");
+   TLegend *leg = new TLegend(0.3,0.75,0.9,0.90,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hEtaJData,"data, #geq1jet","P");
+   leg->AddEntry(hEtaJData,"data, #geq1jet, Nvxt < 3","P");
    leg->Draw();
 
    TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
@@ -410,13 +437,36 @@ void Draw()
    hEtaJ->SetLineStyle(1);
    hEtaJ->SetLineWidth(2);
    hEtaJ->Draw("same");
-   leg->AddEntry(hEtaJ,"simulation, #geq1j","L");
+   leg->AddEntry(hEtaJ,"simulation, #geq1j, Nvtx < 3","L");
    leg->Draw();
+   //
 
-   //   TPad *ratiopad = new TPad("ratiopad", "ratiopad",0,0,1,0.3);
-   //   ratiopad->SetTopMargin(0);
-   //   ratiopad->Draw();
-   //   ratiopad->cd();
+   hEtaJData->Sumw2(); 
+//   hEtaJ->Sumw2(); 
+   hEtaJDiv->Divide(hEtaJData,hEtaJ,1.,1.,"");
+   //   ratiopad->SetTopMargin(0.);
+
+   pad2->cd();
+   hEtaJDiv->SetMarkerStyle(24);
+   hEtaJDiv->SetMarkerSize(0.7);
+   hEtaJDiv->SetMaximum(2.0);
+   hEtaJDiv->SetMinimum(0.0);
+   hEtaJDiv->Draw("PE");
+
+   //
+   titleSize = hEtaJDiv->GetXaxis()->GetTitleSize(); 
+   double labelSize = hEtaJDiv->GetXaxis()->GetLabelSize();
+   double titleOffset = hEtaJDiv->GetXaxis()->GetTitleOffset();
+   hEtaJDiv->GetXaxis()->SetTitleSize(titleSize*3.0);
+   hEtaJDiv->GetXaxis()->SetTitle("#eta jet");
+   hEtaJDiv->GetXaxis()->SetLabelSize(labelSize*2.5);
+   hEtaJDiv->GetXaxis()->SetTitleOffset(titleOffset*0.8);
+   hEtaJDiv->GetYaxis()->SetTitleSize(titleSize*3.0);
+   hEtaJDiv->GetYaxis()->SetTitle("Data/MC");
+   hEtaJDiv->GetYaxis()->SetLabelSize(labelSize*1.7);
+   hEtaJDiv->GetYaxis()->SetTitleOffset(titleOffset*0.45);  
+   line = new TLine(-5.,1.,5.,1.);
+   line->Draw("same");
 
    c5->SaveAs("EtaJ.png");
 
