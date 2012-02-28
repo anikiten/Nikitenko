@@ -249,7 +249,7 @@ void DiMuonAnalysis::Loop()
    }
 
    TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
-   TH1F * pileup   = new TH1F( "pileup", "pileup", 36, -0.5, 35.5);
+   TH1F * pileup   = new TH1F( "pileup", "pileup", 50, 0., 50.);
 
    TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
    TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
@@ -362,6 +362,9 @@ void DiMuonAnalysis::Loop()
       if(DZmin < 0.2) izmin = 1;
       // di muon mass
       Int_t nmuon = PtMu->size();
+
+      pileup->Fill(1.*nsimvertex,puweight[nsimvertex]);
+
       // Selections
 
       // 1. two muons
@@ -372,13 +375,13 @@ void DiMuonAnalysis::Loop()
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.1) || (fabs((*EtaMu)[1]) > 2.1) ) {continue;}
       if( ((*muisol)[0]/(*PtMu)[0] > 0.1) || ((*muisol)[1]/(*PtMu)[1] > 0.1)) {continue;}
       if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0) {continue;}
-      if(nvertex > 2) {continue;}
+      //      if(nvertex > 2) {continue;}
 
       N_muons++;
 
       hM2mu0->Fill(mass_mumu,puweight[nsimvertex]);
       hnvtx0->Fill(1.*nvertex,puweight[nsimvertex]);
-      pileup->Fill(1.*nsimvertex,puweight[nsimvertex]);
+
 
       // M_mumu 85-97 GeV
       if(mass_mumu < 85. || mass_mumu > 97.) {continue;}
