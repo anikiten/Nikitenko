@@ -436,16 +436,17 @@ void Draw()
    hEtaJ->Scale(scale);
    hEtaJ->SetLineStyle(1);
    hEtaJ->SetLineWidth(2);
-   hEtaJ->Draw("same");
+   hEtaJ->Draw("samehist");
    leg->AddEntry(hEtaJ,"simulation, #geq1j, Nvtx < 3","L");
    leg->Draw();
    //
 
-   hEtaJData->Sumw2(); 
-//   hEtaJ->Sumw2(); 
+   hEtaJData->Sumw2();
+   Int_t nbins = hEtaJ->GetNbinsX();
+   for (Int_t ib = 1; ib <= nbins; ib++) {
+     hEtaJ->SetBinError(ib,0.1);
+   }
    hEtaJDiv->Divide(hEtaJData,hEtaJ,1.,1.,"");
-   //   ratiopad->SetTopMargin(0.);
-
    pad2->cd();
    hEtaJDiv->SetMarkerStyle(24);
    hEtaJDiv->SetMarkerSize(0.7);
@@ -454,7 +455,7 @@ void Draw()
    hEtaJDiv->Draw("PE");
 
    //
-   titleSize = hEtaJDiv->GetXaxis()->GetTitleSize(); 
+   Double_t titleSize = hEtaJDiv->GetXaxis()->GetTitleSize(); 
    double labelSize = hEtaJDiv->GetXaxis()->GetLabelSize();
    double titleOffset = hEtaJDiv->GetXaxis()->GetTitleOffset();
    hEtaJDiv->GetXaxis()->SetTitleSize(titleSize*3.0);
