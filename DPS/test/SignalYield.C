@@ -158,37 +158,23 @@ void Draw()
    t->DrawLatex(1.5,0.70,"no SR in ECAL");
    */
 
-  // normalization
-  TFile* file = new TFile("MyDataPileupHistogramB.root");
-  Double_t Ndata = 1.* pileup->Integral();
-
-  TFile* file = new TFile("MCPileupHistogram.root");
-  Double_t Nmc   = 1.* pileup->Integral();
-
-  Double_t scale = Ndata/Nmc;
 
   // total number of processed MC events
-  Double_t NSmc  = 1500000.;
-
-  Double_t NStot = NSmc * scale;
-
+  Double_t NSmc  = 1450000.;
   // Lumi
   // stream A
   Double_t luminosityA = 2.215;
   // stream B
   Double_t luminosityB = 2.534;
-
   // cross-section in fb
   // MadGraph
   Double_t xsect = 745.0;
   // NLO VBFNLO
   // Double_t xsect = 630.0;
-    
+  TFile* file = new TFile("MCPileupHistogram.root");
+  Double_t Nmc   = 1.* pileup->Integral();
 
-  cout <<" => NPUdata = " << Ndata <<" NPUmc = " << Nmc <<" scale = " << scale << endl;
-
-  cout <<" => total number of processed MC events = " << NSmc 
-       <<" with scaling factor = " << NStot << endl;
+  cout <<" => total number of processed signal MC events = " << NSmc << endl;
 
   cout <<" ==> Run A: Signal xsect = " << xsect 
        <<" Total number of expected events at lumi A " << luminosityA 
@@ -196,90 +182,99 @@ void Draw()
   cout <<" ==> Run B: Signal xsect = " << xsect
        <<" Total number of expected events at lumi B " << luminosityB 
        <<" = " << xsect*luminosityB << endl;
-
   cout <<" " << endl;
-
-
   // Run A
-   TFile* file = new TFile("DiMuonMCFall11A_29Feb.root");
-
-   Double_t luminosity = luminosityA;
-   // Z
-   Double_t NZY            = hZY->Integral();
-   Double_t efficiency     = NZY/NStot;
-   Double_t NS             = xsect * luminosity * efficiency;
-   cout <<" Run A: expected signal at Z mass peak = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
+  cout <<" ================= run A ====================================" << endl;
+  TFile* file = new TFile("MyDataPileupHistogramA.root");
+  Double_t Ndata = 1.* pileup->Integral();
+  Double_t scale = Ndata/Nmc;
+  Double_t luminosity = luminosityA;
+  // normalization
+  Double_t NStot = NSmc * scale;
+  cout <<" => NPUdata = " << Ndata <<" NPUmc = " << Nmc <<" scale = " << scale << endl;
+  cout <<" => total number of processed MC events after scaling= " << NStot << endl;
+  TFile* file = new TFile("SignalMCFall11A_29Feb.root");
+  // Z
+  Double_t NZY            = hZY->Integral();
+  Double_t efficiency     = NZY/NStot;
+  Double_t NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal at Z mass peak = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
  
-   // +2J
-   Double_t NZY2J          = hZY2J->Integral();
-   efficiency     = NZY2J/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run A: expected signal Z + two jets = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
+  // +2J
+  Double_t NZY2J          = hZY2J->Integral();
+  efficiency     = NZY2J/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
 
-   // + Deta
-   Double_t NZY2JDeta      = hZY2JDeta->Integral();
-   efficiency     = NZY2JDeta/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run A: expected signal Z + two jets + Deta = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
+  // + Deta
+  Double_t NZY2JDeta      = hZY2JDeta->Integral();
+  efficiency     = NZY2JDeta/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets + Deta = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
+  
+  // + CJV
+  Double_t NZY2JDetaCJV   = hZY2JDetaCJV->Integral();
+  efficiency     = NZY2JDetaCJV/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets + Deta + CJV = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
+  
+  // + Mjj
+  Double_t NZY2JDetaCJVMjj =  hZY2JDetaCJVMjj->Integral();
+  efficiency     = NZY2JDetaCJVMjj/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets + Deta + CJV + Mjj = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
 
-   // + CJV
-   Double_t NZY2JDetaCJV   = hZY2JDetaCJV->Integral();
-   efficiency     = NZY2JDetaCJV/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run A: expected signal Z + two jets + Deta + CJV = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
-
-   // + Mjj
-   Double_t NZY2JDetaCJVMjj =  hZY2JDetaCJVMjj->Integral();
-   efficiency     = NZY2JDetaCJVMjj/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run A: expected signal Z + two jets + Deta + CJV + Mjj = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
 
   cout <<" " << endl;
-
-
   // Run B
-   TFile* file = new TFile("DiMuonMCFall11A_29Feb.root");
-
-   Double_t luminosity = luminosityB;
-   // Z
-   Double_t NZY            = hZY->Integral();
-   Double_t efficiency     = NZY/NStot;
-   Double_t NS             = xsect * luminosity * efficiency;
-   cout <<" Run B: expected signal at Z mass peak = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
+  cout <<" ================= run B ====================================" << endl;
+  TFile* file = new TFile("MyDataPileupHistogramB.root");
+  Ndata = 1.* pileup->Integral();
+  scale = Ndata/Nmc;
+  luminosity = luminosityB;
+  // normalization
+  Double_t NStot = NSmc * scale;
+  cout <<" => NPUdata = " << Ndata <<" NPUmc = " << Nmc <<" scale = " << scale << endl;
+  cout <<" => total number of processed MC events after scaling= " << NStot << endl;
+  TFile* file = new TFile("SignalMCFall11A_29Feb.root");
+  // Z
+  NZY            = hZY->Integral();
+  efficiency     = NZY/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal at Z mass peak = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
  
-   // +2J
-   Double_t NZY2J          = hZY2J->Integral();
-   efficiency     = NZY2J/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run B: expected signal Z + two jets = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
+  // +2J
+  NZY2J          = hZY2J->Integral();
+  efficiency     = NZY2J/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
 
-   // + Deta
-   Double_t NZY2JDeta      = hZY2JDeta->Integral();
-   efficiency     = NZY2JDeta/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run B: expected signal Z + two jets + Deta = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
-
-   // + CJV
-   Double_t NZY2JDetaCJV   = hZY2JDetaCJV->Integral();
-   efficiency     = NZY2JDetaCJV/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run B: expected signal Z + two jets + Deta + CJV = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
-
-   // + Mjj
-   Double_t NZY2JDetaCJVMjj =  hZY2JDetaCJVMjj->Integral();
-   efficiency     = NZY2JDetaCJVMjj/NStot;
-   NS             = xsect * luminosity * efficiency;
-   cout <<" Run B: expected signal Z + two jets + Deta + CJV + Mjj = " << NS 
-	<<"  (efficiency = " << efficiency <<" )" << endl;
-
+  // + Deta
+  Double_t NZY2JDeta      = hZY2JDeta->Integral();
+  efficiency     = NZY2JDeta/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets + Deta = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
+  
+  // + CJV
+  NZY2JDetaCJV   = hZY2JDetaCJV->Integral();
+  efficiency     = NZY2JDetaCJV/NStot;
+  NS             = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets + Deta + CJV = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
+  
+  // + Mjj
+  NZY2JDetaCJVMjj =  hZY2JDetaCJVMjj->Integral();
+  efficiency      = NZY2JDetaCJVMjj/NStot;
+  NS              = xsect * luminosity * efficiency;
+  cout <<" Expected signal Z + two jets + Deta + CJV + Mjj = " << NS 
+       <<"  (efficiency = " << efficiency <<" )" << endl;
 
 }
