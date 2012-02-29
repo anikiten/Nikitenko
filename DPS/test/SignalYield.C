@@ -150,15 +150,6 @@ void setTDRStyle(Int_t xlog, Int_t ylog) {
 void Draw()
 {
 
-   /*
-   TLatex *t = new TLatex();
-   t->SetTextSize(0.042);
-   t->DrawLatex(1.5,0.80,"CMSSW_1_6_12, |#eta|< 1.3");
-   t->DrawLatex(1.5,0.75,"no ZSP in HCAL");
-   t->DrawLatex(1.5,0.70,"no SR in ECAL");
-   */
-
-
   // total number of processed MC events
   Double_t NSmc  = 1450000.;
   // Lumi
@@ -207,6 +198,30 @@ void Draw()
   NS             = xsect * luminosity * efficiency;
   cout <<" Expected signal Z + two jets = " << NS 
        <<"  (efficiency = " << efficiency <<" )" << endl;
+   setTDRStyle(0,0);
+   TCanvas* c1 = new TCanvas("X","Y",1);
+   hDeta0->GetXaxis()->SetTitle("#Delta #eta _{j1j2}");
+   hDeta0->GetYaxis()->SetTitle("Nev");
+   Double_t norm = NS / hDeta0->Integral();
+   hDeta0->Scale(norm);
+   hDeta0->SetMaximum(20.);
+   hDeta0->SetLineStyle(1);
+   hDeta0->SetLineWidth(3);
+   //   hDeta1->SetMarkerStyle(24);
+   hDeta0->Draw("hist");
+   hDeta1->SetLineWidth(3);
+   hDeta1->SetLineStyle(2);
+   hDeta1->Scale(norm);
+   hDeta1->Draw("same");
+   TLegend *leg = new TLegend(0.2,0.85,0.9,0.95,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hDeta0,"two jets","L");
+   leg->AddEntry(hDeta1,"two jets, #eta_{j1}#times#eta_{j2}<0","L");
+   leg->Draw();
+   TLatex *t = new TLatex();
+   t->SetTextSize(0.042);
+   t->DrawLatex(4.,14.,"EWK Z+2jets, stream A");
+   c1->SaveAs("detaj1j2A_signal.png");
 
   // + Deta
   Double_t NZY2JDeta      = hZY2JDeta->Integral();
@@ -221,7 +236,26 @@ void Draw()
   NS             = xsect * luminosity * efficiency;
   cout <<" Expected signal Z + two jets + Deta + CJV = " << NS 
        <<"  (efficiency = " << efficiency <<" )" << endl;
-  
+  setTDRStyle(0,1);
+  TCanvas* c2 = new TCanvas("X","Y",1);
+  hMjj->GetXaxis()->SetTitle("M_{j1j2}, GeV");
+  hMjj->GetYaxis()->SetTitle("Nev");
+  norm = NS / hMjj->Integral();
+  hMjj->Scale(norm);
+  hMjj->SetMaximum(10.);
+  hMjj->SetMinimum(0.1);
+  hMjj->SetLineStyle(1);
+  hMjj->SetLineWidth(3);
+  hMjj->Draw("hist");
+  TLegend *leg = new TLegend(0.15,0.8,0.9,0.9,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hMjj,"two jets, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5, CJV ","L");
+  leg->Draw();
+  TLatex *t = new TLatex();
+  t->SetTextSize(0.042);
+  t->DrawLatex(800.,3.,"EWK Z+2jets, stream A");
+  c2->SaveAs("mass_jjA_signal.png");
+
   // + Mjj
   Double_t NZY2JDetaCJVMjj =  hZY2JDetaCJVMjj->Integral();
   efficiency     = NZY2JDetaCJVMjj/NStot;
@@ -241,7 +275,7 @@ void Draw()
   Double_t NStot = NSmc * scale;
   cout <<" => NPUdata = " << Ndata <<" NPUmc = " << Nmc <<" scale = " << scale << endl;
   cout <<" => total number of processed MC events after scaling= " << NStot << endl;
-  TFile* file = new TFile("SignalMCFall11A_29Feb.root");
+  TFile* file = new TFile("SignalMCFall11B_29Feb.root");
   // Z
   NZY            = hZY->Integral();
   efficiency     = NZY/NStot;
