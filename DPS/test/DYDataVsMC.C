@@ -330,6 +330,12 @@ void Draw()
    TLegend *leg = new TLegend(0.15,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
    leg->AddEntry(hMjj,"Stream A, two jets p_{T}>25 GeV, |#eta|<4.7, #eta _{j1}#eta _{j2}<0, #Delta#eta>3.5, CJV ","P");
+   cout <<" " << endl;
+   cout <<"  ->data Z peak = " << hZY->Integral() << endl; 
+   cout <<"  ->data two jet selection = " << hZY2J->Integral() << endl; 
+   cout <<"  ->data two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5 = " << hZY2JDeta->Integral() << endl; 
+   cout <<"  ->data two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, CJV = " << hZY2JDetaCJV->Integral() << endl; 
+   cout <<"  ->data two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, CJV, Mjj > 700, CJV = " << hZY2JDetaCJVMjj->Integral() << endl; 
 
    // MC
    TFile* file = new TFile("DYMuonMCFall11A_29Feb.root");
@@ -344,6 +350,8 @@ void Draw()
    hZY2JDeta->Scale(scale);   
    hZY2JDetaCJV->Scale(scale);   
    hZY2JDetaCJVMjj->Scale(scale);   
+   cout <<" " << endl;
+   cout <<"  ->N MC predicted at Z peak = " << hZY->Integral() << endl; 
    cout <<"  ->N MC predicted after two jet selection = " << hZY2J->Integral() << endl; 
    cout <<"  ->N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5 = " << hZY2JDeta->Integral() << endl; 
    cout <<"  ->N MC predicted after two jet selection, eta1 x eta2<0, Detaj1j2 > 3.5, CJV = " << hZY2JDetaCJV->Integral() << endl; 
