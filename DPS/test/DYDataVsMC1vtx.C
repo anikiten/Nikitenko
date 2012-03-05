@@ -383,6 +383,7 @@ void Draw()
 
    TH1F *hEtaJData = (TH1F*)hEtaJ->Clone();
    TH1F *hEtaJDiv  = (TH1F*)hEtaJ->Clone();
+   TH1F *hEtaJDivmjes  = (TH1F*)hEtaJ->Clone();
 
    TPad *pad1 = new TPad("plotpad", "plotpad",0.,0.2,1.,1.);
    pad1->SetPad(0, 0.2, 1.0, 1.0);
@@ -417,7 +418,7 @@ void Draw()
    hEtaJData->GetYaxis()->SetTitle("Nev / 0.1");
    hEtaJData->SetMaximum(1200.);
    hEtaJData->SetLineStyle(1);
-   hEtaJData->SetLineWidth(1);
+   hEtaJData->SetLineWidth(2);
    hEtaJData->SetMarkerStyle(24);
    hEtaJData->SetMarkerSize(0.7);
    hEtaJData->Draw("PE");
@@ -434,19 +435,19 @@ void Draw()
    TH1F *hEtaJMC = (TH1F*)hEtaJ->Clone();
    hEtaJMC->Scale(scale);
    hEtaJMC->SetLineStyle(1);
-   hEtaJMC->SetLineWidth(2);
+   hEtaJMC->SetLineWidth(3);
    hEtaJMC->Draw("samehist");
-   leg->AddEntry(hEtaJMC,"simulation, #geq1j, Nvtx < 3","L");
+   leg->AddEntry(hEtaJMC,"simulation","L");
 
    TFile* file = new TFile("DYhistosMCA1vtx-jes.root");
    Nmc   = hZY->Integral();
    Double_t scalemjes = Ndata/Nmc;
    TH1F *hEtaJMCmjes = (TH1F*)hEtaJ->Clone();
-   hEtaJMCmjes->Scale(scalemjes);
-   hEtaJMCmjes->SetLineStyle(2);
+   hEtaJMCmjes->Scale(scalemjes); 
+   hEtaJMCmjes->SetLineStyle(3);
    hEtaJMCmjes->SetLineWidth(2);
    hEtaJMCmjes->Draw("samehist");
-   leg->AddEntry(hEtaJMCmjes,"sim., -#sigma JES","L");
+   leg->AddEntry(hEtaJMCmjes,"simulation, #pm 1 #sigma JES","L");
 
 
    leg->Draw();
@@ -456,13 +457,25 @@ void Draw()
    for (Int_t ib = 1; ib <= nbins; ib++) {
      hEtaJMC->SetBinError(ib,0.1);
    }
+
+   Int_t nbins = hEtaJMCmjes->GetNbinsX();
+   for (Int_t ib = 1; ib <= nbins; ib++) {
+     hEtaJMCmjes->SetBinError(ib,0.1);
+   }
+
+
    hEtaJDiv->Divide(hEtaJData,hEtaJMC,1.,1.,"");
+   hEtaJDivmjes->Divide(hEtaJData,hEtaJMCmjes,1.,1.,"");
    pad2->cd();
    hEtaJDiv->SetMarkerStyle(24);
    hEtaJDiv->SetMarkerSize(0.7);
    hEtaJDiv->SetMaximum(2.0);
    hEtaJDiv->SetMinimum(0.0);
    hEtaJDiv->Draw("PE");
+
+   hEtaJDivmjes->SetLineStyle(3);
+   hEtaJDivmjes->SetLineWidth(2);
+   hEtaJDivmjes->Draw("samehist");
 
    //
    Double_t titleSize = hEtaJDiv->GetXaxis()->GetTitleSize(); 
