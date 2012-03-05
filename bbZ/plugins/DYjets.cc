@@ -267,7 +267,7 @@ DYjets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	*/
       Double_t DR1 = deltaR(muon1.Eta(), muon1.Phi(), partonjet->eta(), partonjet->phi());
       Double_t DR2 = deltaR(muon2.Eta(), muon2.Phi(), partonjet->eta(), partonjet->phi());
-      if( DR1 > 0.5 && DR2 > 0.5 ) {
+      if( DR1 > 0.6 && DR2 > 0.6 ) {
 	EtaJ->push_back(partonjet->eta());
 	PhiJ->push_back(partonjet->phi());
 	pTJ->push_back(partonjet->pt());
