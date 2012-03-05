@@ -256,6 +256,7 @@ void Draw()
 
    c1->SaveAs("zy1vxtA.png");
 
+   /*
    // pTZ
    setTDRStyle(0,1);
    TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
@@ -373,6 +374,7 @@ void Draw()
    leg->Draw();
 
    c4->SaveAs("ptj1vtxA.png");
+   */
 
    // eta jets for Nj >= 1
    setTDRStyle(0,0);
@@ -429,21 +431,32 @@ void Draw()
    leg->Draw();
 
    TFile* file = new TFile("DiMuonMCFall11_23Feb.root");
+   TH1F *hEtaJMC = (TH1F*)hEtaJ->Clone();
+   hEtaJMC->Scale(scale);
+   hEtaJMC->SetLineStyle(1);
+   hEtaJMC->SetLineWidth(2);
+   hEtaJMC->Draw("samehist");
+   leg->AddEntry(hEtaJMC,"simulation, #geq1j, Nvtx < 3","L");
 
-   hEtaJ->Scale(scale);
-   hEtaJ->SetLineStyle(1);
-   hEtaJ->SetLineWidth(2);
-   hEtaJ->Draw("samehist");
-   leg->AddEntry(hEtaJ,"simulation, #geq1j, Nvtx < 3","L");
+   TFile* file = new TFile("DYhistosMCA1vtx-jes.root");
+   Nmc   = hZY->Integral();
+   Double_t scalemjes = Ndata/Nmc;
+   TH1F *hEtaJMCmjes = (TH1F*)hEtaJ->Clone();
+   hEtaJMCmjes->Scale(scalemjes);
+   hEtaJMCmjes->SetLineStyle(2);
+   hEtaJMCmjes->SetLineWidth(2);
+   hEtaJMCmjes->Draw("samehist");
+   leg->AddEntry(hEtaJMCmjes,"sim., -#sigma JES","L");
+
+
    leg->Draw();
    //
-
    hEtaJData->Sumw2();
-   Int_t nbins = hEtaJ->GetNbinsX();
+   Int_t nbins = hEtaJMC->GetNbinsX();
    for (Int_t ib = 1; ib <= nbins; ib++) {
-     hEtaJ->SetBinError(ib,0.1);
+     hEtaJMC->SetBinError(ib,0.1);
    }
-   hEtaJDiv->Divide(hEtaJData,hEtaJ,1.,1.,"");
+   hEtaJDiv->Divide(hEtaJData,hEtaJMC,1.,1.,"");
    pad2->cd();
    hEtaJDiv->SetMarkerStyle(24);
    hEtaJDiv->SetMarkerSize(0.7);
@@ -468,6 +481,7 @@ void Draw()
 
    c5->SaveAs("etaj1vtxA.png");
 
+   /*
    // Detaj1j2 jets for Nj >= 2
    setTDRStyle(0,0);
    TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
@@ -531,5 +545,6 @@ void Draw()
    leg->Draw();
 
    c7->SaveAs("mjjnovbf1vtxA.png");
+   */
 
 }
