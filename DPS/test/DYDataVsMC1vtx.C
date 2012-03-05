@@ -254,9 +254,8 @@ void Draw()
 
    cout <<" N MC with >= 2 jet = " << hZY2J->Integral() << endl;
 
-   c1->SaveAs("ZYDataVsMC.png");
+   c1->SaveAs("zy1vxtA.png");
 
-   /*
    // pTZ
    setTDRStyle(0,1);
    TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
@@ -309,7 +308,7 @@ void Draw()
    hPtZ2J->SetLineWidth(3);
    hPtZ2J->Draw("same");
 
-   c2->SaveAs("PtZDataVsMC.png");
+   c2->SaveAs("ptz1vtxA.png");
 
    // Njets
    setTDRStyle(0,1);
@@ -341,7 +340,7 @@ void Draw()
    leg->AddEntry(hNjets,"simulation","L");
    leg->Draw();
 
-   c3->SaveAs("Njets.png");
+   c3->SaveAs("njets1vtxA.png");
 
    // pT jets for Nj >= 1
    setTDRStyle(0,1);
@@ -373,9 +372,7 @@ void Draw()
    leg->AddEntry(hPtJ,"simulation, #geq1j","L");
    leg->Draw();
 
-   c4->SaveAs("PtJ.png");
-
-   */
+   c4->SaveAs("ptj1vtxA.png");
 
    // eta jets for Nj >= 1
    setTDRStyle(0,0);
@@ -469,9 +466,8 @@ void Draw()
    line = new TLine(-5.,1.,5.,1.);
    line->Draw("same");
 
-   c5->SaveAs("EtaJ.png");
+   c5->SaveAs("etaj1vtxA.png");
 
-   /*
    // Detaj1j2 jets for Nj >= 2
    setTDRStyle(0,0);
    TFile* file = new TFile("Run2011A_08Nov_23Feb.root");
@@ -502,7 +498,7 @@ void Draw()
    leg->AddEntry(hDeta0,"simulation, #geq2j","L");
    leg->Draw();
 
-   c6->SaveAs("Deta0.png");
+   c6->SaveAs("deta01vtxA.png");
 
    // Detaj1j2 jets for Nj >= 2
    setTDRStyle(0,1);
@@ -534,7 +530,6 @@ void Draw()
    leg->AddEntry(hMjjnoVBF,"simulation, #geq2j","L");
    leg->Draw();
 
-   c7->SaveAs("MjjnoVBF.png");
-   */
+   c7->SaveAs("mjjnovbf1vtxA.png");
 
 }
