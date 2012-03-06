@@ -384,6 +384,7 @@ void Draw()
    TH1F *hEtaJData = (TH1F*)hEtaJ->Clone();
    TH1F *hEtaJDiv  = (TH1F*)hEtaJ->Clone();
    TH1F *hEtaJDivmjes  = (TH1F*)hEtaJ->Clone();
+   TH1F *hEtaJDivpjes  = (TH1F*)hEtaJ->Clone();
 
    TPad *pad1 = new TPad("plotpad", "plotpad",0.,0.2,1.,1.);
    pad1->SetPad(0, 0.2, 1.0, 1.0);
@@ -426,7 +427,7 @@ void Draw()
    hEtaJData->GetXaxis()->SetLabelSize(2.0); //??? it works
    
 
-   TLegend *leg = new TLegend(0.3,0.75,0.9,0.90,NULL,"brNDC");
+   TLegend *leg = new TLegend(0.3,0.70,0.9,0.90,NULL,"brNDC");
    leg->SetFillColor(10);
    leg->AddEntry(hEtaJData,"data, #geq1jet, Nvxt < 3","P");
    leg->Draw();
@@ -439,16 +440,35 @@ void Draw()
    hEtaJMC->Draw("samehist");
    leg->AddEntry(hEtaJMC,"simulation","L");
 
+   TFile* file = new TFile("DYhistosMCA1vtx+jes.root");
+   Nmc   = hZY->Integral();
+   Double_t scalepjes = Ndata/Nmc;
+   TH1F *hEtaJMCpjes = (TH1F*)hEtaJ->Clone();
+   hZY1J->Scale(scalepjes);
+   hZY2J->Scale(scalepjes);
+   hEtaJMCpjes->Scale(scalepjes); 
+   hEtaJMCpjes->SetLineStyle(2);
+   hEtaJMCpjes->SetLineWidth(2);
+   hEtaJMCpjes->Draw("samehist");
+   leg->AddEntry(hEtaJMCpjes,"simulation, +1 #sigma JES","L");
+   cout <<" " << endl;
+   cout <<" MC with >= 1 jets + 1sigma JES = " << hZY1J->Integral() << endl;
+   cout <<" MC with >= 2 jets + 1sigma JES = " << hZY2J->Integral() << endl;
+
    TFile* file = new TFile("DYhistosMCA1vtx-jes.root");
    Nmc   = hZY->Integral();
    Double_t scalemjes = Ndata/Nmc;
    TH1F *hEtaJMCmjes = (TH1F*)hEtaJ->Clone();
+   hZY1J->Scale(scalemjes);
+   hZY2J->Scale(scalemjes);
    hEtaJMCmjes->Scale(scalemjes); 
    hEtaJMCmjes->SetLineStyle(3);
    hEtaJMCmjes->SetLineWidth(2);
    hEtaJMCmjes->Draw("samehist");
-   leg->AddEntry(hEtaJMCmjes,"simulation, #pm 1 #sigma JES","L");
-
+   leg->AddEntry(hEtaJMCmjes,"simulation, -1 #sigma JES","L");
+   cout <<" " << endl;
+   cout <<" MC with >= 1 jets - 1sigma JES = " << hZY1J->Integral() << endl;
+   cout <<" MC with >= 2 jets - 1sigma JES = " << hZY2J->Integral() << endl;
 
    leg->Draw();
    //
@@ -461,21 +481,28 @@ void Draw()
    Int_t nbins = hEtaJMCmjes->GetNbinsX();
    for (Int_t ib = 1; ib <= nbins; ib++) {
      hEtaJMCmjes->SetBinError(ib,0.1);
+     hEtaJMCpjes->SetBinError(ib,0.1);
    }
-
 
    hEtaJDiv->Divide(hEtaJData,hEtaJMC,1.,1.,"");
    hEtaJDivmjes->Divide(hEtaJData,hEtaJMCmjes,1.,1.,"");
+   hEtaJDivpjes->Divide(hEtaJData,hEtaJMCpjes,1.,1.,"");
    pad2->cd();
    hEtaJDiv->SetMarkerStyle(24);
    hEtaJDiv->SetMarkerSize(0.7);
    hEtaJDiv->SetMaximum(2.0);
    hEtaJDiv->SetMinimum(0.0);
+   hEtaJDiv->SetLineStyle(1);
+   hEtaJDiv->SetLineWidth(2);
    hEtaJDiv->Draw("PE");
 
    hEtaJDivmjes->SetLineStyle(3);
    hEtaJDivmjes->SetLineWidth(2);
    hEtaJDivmjes->Draw("samehist");
+
+   hEtaJDivpjes->SetLineStyle(2);
+   hEtaJDivpjes->SetLineWidth(2);
+   hEtaJDivpjes->Draw("samehist");
 
    //
    Double_t titleSize = hEtaJDiv->GetXaxis()->GetTitleSize(); 
