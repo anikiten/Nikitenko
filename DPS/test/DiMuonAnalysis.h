@@ -11,11 +11,16 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <iostream>
 
 class DiMuonAnalysis {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
+
+   Double_t deltaPhi(Double_t phi1, Double_t phi2);
+   Double_t deltaEta(Double_t eta1, Double_t eta2);
+   Double_t deltaR(Double_t eta1, Double_t phi1, Double_t eta2, Double_t phi2);
 
    // Declaration of leaf types
    Int_t           run;
@@ -105,9 +110,10 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
 */
   if (tree == 0) {
     TChain * chain = new TChain("t1","");
-    chain->Add("/tmp/anikiten/SignalMCFall11/DiMuAnalysis_MC_*.root");
-    //    chain->Add("/tmp/anikiten/DiMuonMCFall11/DiMuAnalysis_MC_*.root");
-    //    chain->Add("/tmp/anikiten/Run2011A-08Nov2011/DiMuAnalysis_Data_*.root");
+    //    chain->Add("/tmp/anikiten/SignalMCFall11/DiMuAnalysis_MC_*.root");
+    //    chain->Add("/vols/cms02/anikiten/DiMuonMCFall11/DiMuAnalysis_MC_*.root");
+    chain->Add("/vols/cms02/anikiten/Run2011A-08Nov2011/DiMuAnalysis_Data_*.root");
+    //    chain->Add("/tmp/anikiten/Run2011A-19Nov2011/DiMuAnalysis_Data_*.root");
     tree = chain;
   }
    Init(tree);

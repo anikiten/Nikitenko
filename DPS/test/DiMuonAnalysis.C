@@ -4,155 +4,6 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void DiMuonAnalysis::setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
-
-  TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
-
-// For the canvas:
-  tdrStyle->SetCanvasBorderMode(0);
-  tdrStyle->SetCanvasColor(kWhite);
-  tdrStyle->SetCanvasDefH(600); //Height of canvas
-  tdrStyle->SetCanvasDefW(600); //Width of canvas
-  tdrStyle->SetCanvasDefX(0);   //POsition on screen
-  tdrStyle->SetCanvasDefY(0);
-
-// For the Pad:
-  tdrStyle->SetPadBorderMode(0);
-  // tdrStyle->SetPadBorderSize(Width_t size = 1);
-  tdrStyle->SetPadColor(kWhite);
-  tdrStyle->SetPadGridX(false);
-  tdrStyle->SetPadGridY(false);
-  tdrStyle->SetGridColor(0);
-  tdrStyle->SetGridStyle(3);
-  tdrStyle->SetGridWidth(1);
-
-// For the frame:
-  tdrStyle->SetFrameBorderMode(0);
-  tdrStyle->SetFrameBorderSize(1);
-  tdrStyle->SetFrameFillColor(0);
-  tdrStyle->SetFrameFillStyle(0);
-  tdrStyle->SetFrameLineColor(1);
-  tdrStyle->SetFrameLineStyle(1);
-  tdrStyle->SetFrameLineWidth(1);
-
-// For the histo:
-  // tdrStyle->SetHistFillColor(1);
-  // tdrStyle->SetHistFillStyle(0);
-  tdrStyle->SetHistLineColor(1);
-  tdrStyle->SetHistLineStyle(0);
-  tdrStyle->SetHistLineWidth(2);
-  // tdrStyle->SetLegoInnerR(Float_t rad = 0.5);
-  // tdrStyle->SetNumberContours(Int_t number = 20);
-
-  tdrStyle->SetEndErrorSize(4);
-  //  tdrStyle->SetErrorMarker(20);
-  //  tdrStyle->SetErrorX(0.);
-  
-  tdrStyle->SetMarkerStyle(20);
-
-//For the fit/function:
-  tdrStyle->SetOptFit(1);
-  tdrStyle->SetFitFormat("5.4g");
-  tdrStyle->SetFuncColor(1);
-  tdrStyle->SetFuncStyle(1);
-  tdrStyle->SetFuncWidth(1);
-
-//For the date:
-  tdrStyle->SetOptDate(0);
-  // tdrStyle->SetDateX(Float_t x = 0.01);
-  // tdrStyle->SetDateY(Float_t y = 0.01);
-
-// For the statistics box:
-  tdrStyle->SetOptFile(0);
-  tdrStyle->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
-  tdrStyle->SetStatColor(kWhite);
-  tdrStyle->SetStatFont(42);
-  tdrStyle->SetStatFontSize(0.025);
-  tdrStyle->SetStatTextColor(1);
-  tdrStyle->SetStatFormat("6.4g");
-  tdrStyle->SetStatBorderSize(1);
-  tdrStyle->SetStatH(0.1);
-  tdrStyle->SetStatW(0.15);
-  // tdrStyle->SetStatStyle(Style_t style = 1001);
-  // tdrStyle->SetStatX(Float_t x = 0);
-  // tdrStyle->SetStatY(Float_t y = 0);
-
-// Margins:
-  tdrStyle->SetPadTopMargin(0.05);
-  tdrStyle->SetPadBottomMargin(0.13);
-  tdrStyle->SetPadLeftMargin(0.13);
-  tdrStyle->SetPadRightMargin(0.05);
-
-// For the Global title:
-
-  tdrStyle->SetOptTitle(0);
-  tdrStyle->SetTitleFont(42);
-  tdrStyle->SetTitleColor(1);
-  tdrStyle->SetTitleTextColor(1);
-  tdrStyle->SetTitleFillColor(10);
-  tdrStyle->SetTitleFontSize(0.05);
-  // tdrStyle->SetTitleH(0); // Set the height of the title box
-  // tdrStyle->SetTitleW(0); // Set the width of the title box
-  // tdrStyle->SetTitleX(0); // Set the position of the title box
-  // tdrStyle->SetTitleY(0.985); // Set the position of the title box
-  // tdrStyle->SetTitleStyle(Style_t style = 1001);
-  // tdrStyle->SetTitleBorderSize(2);
-
-// For the axis titles:
-
-  tdrStyle->SetTitleColor(1, "XYZ");
-  tdrStyle->SetTitleFont(42, "XYZ");
-  tdrStyle->SetTitleSize(0.06, "XYZ");
-  // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
-  // tdrStyle->SetTitleYSize(Float_t size = 0.02);
-  tdrStyle->SetTitleXOffset(0.9);
-  tdrStyle->SetTitleYOffset(1.05);
-  // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
-
-// For the axis labels:
-
-  tdrStyle->SetLabelColor(1, "XYZ");
-  tdrStyle->SetLabelFont(42, "XYZ");
-  tdrStyle->SetLabelOffset(0.007, "XYZ");
-  tdrStyle->SetLabelSize(0.05, "XYZ");
-
-// For the axis:
-
-  tdrStyle->SetAxisColor(1, "XYZ");
-  tdrStyle->SetStripDecimals(kTRUE);
-  tdrStyle->SetTickLength(0.03, "XYZ");
-  tdrStyle->SetNdivisions(510, "XYZ");
-  tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
-  tdrStyle->SetPadTickY(1);
-
-// Change for log plots:
-  tdrStyle->SetOptLogx(xlog);
-  tdrStyle->SetOptLogy(ylog);
-  tdrStyle->SetOptLogz(zlog);
-
-// Postscript options:
-
-//  tdrStyle->SetPaperSize(7.5,7.5);
-
-  tdrStyle->SetPaperSize(15.,15.);
-
-//  tdrStyle->SetPaperSize(20.,20.);
-
-  // tdrStyle->SetLineScalePS(Float_t scale = 3);
-  // tdrStyle->SetLineStyleString(Int_t i, const char* text);
-  // tdrStyle->SetHeaderPS(const char* header);
-  // tdrStyle->SetTitlePS(const char* pstitle);
-
-  // tdrStyle->SetBarOffset(Float_t baroff = 0.5);
-  // tdrStyle->SetBarWidth(Float_t barwidth = 0.5);
-  // tdrStyle->SetPaintTextFormat(const char* format = "g");
-  // tdrStyle->SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
-  // tdrStyle->SetTimeOffset(Double_t toffset);
-  // tdrStyle->SetHistMinimumZero(kTRUE);
-
-  tdrStyle->cd();
-}
-
 Double_t DiMuonAnalysis::deltaPhi(Double_t phi1, Double_t phi2)
 {
   Double_t pi = 3.1415927;
@@ -204,29 +55,32 @@ void DiMuonAnalysis::Loop()
 
    // vertex reweighting
 
-   TFile* file = new TFile("DataAObservedPU.root");
+   TFile fd("MyDataPileupHistogramA.root");
+   //   TFile fd("MyDataPileupHistogramB.root");
+   TH1D *pileup = (TH1D*)fd.Get("pileup");
    pileup->Draw();
    Double_t nvtx_data[100];
    Double_t nvtx_mc[100];
    Double_t puweight[100];
    for (Int_t id = 0; id < 100; id++) {
-     if(id < 36) {
+     if(id < 50) {
        nvtx_data[id] = pileup->GetBinContent(id+1);
      } else {
        nvtx_data[id] = 0.;
      }
-     cout <<" data bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
+     std::cout <<" data bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
    }
 
-   TFile* file = new TFile("MCSummer11ObservedPU.root");
+   TFile fm("MCPileupHistogram.root");
+   pileup = (TH1D*)fm.Get("pileup");
    pileup->Draw();
    for (Int_t im = 0; im < 100; im++) {
-     if(im < 36) {
+     if(im < 50) {
        nvtx_mc[im] = pileup->GetBinContent(im+1);
      } else {
        nvtx_mc[im] = 0.;
      }
-     cout <<" MC bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
+     std::cout <<" MC bin im = " << im <<"  bin content = " << nvtx_mc[im] << endl; 
    }
 
    // for MC
@@ -237,19 +91,18 @@ void DiMuonAnalysis::Loop()
      } else {
        puweight[idm] = 0.;
      }
-     cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
+     std::cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
    */
 
    // for data
-
-   for (Int_t idm = 0; idm < 36; idm++) {
+   for (Int_t idm = 0; idm < 100; idm++) {
      puweight[idm] = 1.0;
-     cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
+     std::cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
 
    TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
-   TH1F * pileup   = new TH1F( "pileup", "pileup", 50, 0., 50.);
+   TH1F * pileupMC   = new TH1F( "pileupMC", "pileupMC", 50, 0., 50.);
 
    TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
    TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
@@ -280,6 +133,18 @@ void DiMuonAnalysis::Loop()
    TH1F * hEtaJ     = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
    TH1F * hNjets    = new TH1F( "hNjets", "Njets", 6, 0., 6.);
    TH1F * hMjjnoVBF = new TH1F( "hMjjnoVBF", "MjjnoVBF", 40, 0., 2000.);
+
+   TH1F * hPtJ3tag25      = new TH1F( "hPtJ3tag25", "PtJ3tag25", 20, 0., 100.);
+   TH1F * hEtaJ3tag25     = new TH1F( "hEtaJ3tag25", "EtaJ3tag25", 25, -5.0, 5.0);
+
+   TH1F * hZY2JDeta35      = new TH1F( "hZY2JDeta35", "ZY2JDeta35", 30, -3., 3.);
+   TH1F * hPtJ3tag35      = new TH1F( "hPtJ3tag35", "PtJ3tag35", 20, 0., 100.);
+   TH1F * hEtaJ3tag35     = new TH1F( "hEtaJ3tag35", "EtaJ3tag35", 25, -5.0, 5.0);
+
+   TH1F * hZY2JDeta45      = new TH1F( "hZY2JDeta45", "ZY2JDeta45", 30, -3., 3.);
+   TH1F * hPtJ3tag45      = new TH1F( "hPtJ3tag45", "PtJ3tag45", 20, 0., 100.);
+   TH1F * hEtaJ3tag45     = new TH1F( "hEtaJ3tag45", "EtaJ3tag45", 25, -5.0, 5.0);
+
 
    /*
    TH1F * hbeta1  = new TH1F( "hbeta1", "beta1", 25, 0., 1.0);
@@ -341,7 +206,7 @@ void DiMuonAnalysis::Loop()
    // 6. CJV
    Double_t N_cjv = 0;
    // scale
-   Double_t jescale = 0.;
+   Double_t jescale = 1.;
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
@@ -363,7 +228,7 @@ void DiMuonAnalysis::Loop()
       // di muon mass
       Int_t nmuon = PtMu->size();
 
-      pileup->Fill(1.*nsimvertex,puweight[nsimvertex]);
+      pileupMC->Fill(1.*nsimvertex,puweight[nsimvertex]);
 
       // Selections
 
@@ -375,7 +240,7 @@ void DiMuonAnalysis::Loop()
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
       if( ((*muisol)[0]/(*PtMu)[0] > 0.1) || ((*muisol)[1]/(*PtMu)[1] > 0.1)) {continue;}
       if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0) {continue;}
-      //      if(nvertex > 2) {continue;}
+      if(nvertex > 2) {continue;}
 
       N_muons++;
 
@@ -418,9 +283,11 @@ void DiMuonAnalysis::Loop()
       // jet
       for (unsigned int i = 0; i < njets; i++) {
 
-	if( (*EtJPT)[i] >= 25. && fabs((*EtaJPT)[i]) < 4.7 ) {
+	Double_t pTj = (*EtJPT)[i] + jescale*(*jesunc)[i]*(*EtJPT)[i];
+
+	if( pTj >= 25. && fabs((*EtaJPT)[i]) < 4.7 ) {
 	  nalljets = nalljets + 1;
-	  hPtJ->Fill((*EtJPT)[i],puweight[nsimvertex]);
+	  hPtJ->Fill(pTj,puweight[nsimvertex]);
 	  hEtaJ->Fill((*EtaJPT)[i],puweight[nsimvertex]);
 	}
       }
@@ -497,9 +364,52 @@ void DiMuonAnalysis::Loop()
 	if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
 	  if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
 	    ncj++;
+	    if(ncj == 1) {
+	      hPtJ3tag25->Fill((*EtJPT)[i],puweight[nsimvertex]);
+	      hEtaJ3tag25->Fill((*EtaJPT)[i],puweight[nsimvertex]);
+	    }
 	  }
 	}
       }
+
+      // check with cut on tagging jets 35, 45 GeV
+      if( ( pTj1 > 35.0 ) &&  ( pTj2 > 35.0 ) ) {
+	hZY2JDeta35->Fill(ZY,puweight[nsimvertex]);
+	// CJV part
+	Int_t ncj35 = 0;
+	for (unsigned int i = 0; i < njets; i++) {
+	  if(i < 2 ) {continue;}
+	  if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
+	    if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
+	      ncj35++;
+	      if(ncj35 == 1) {
+		hPtJ3tag35->Fill((*EtJPT)[i],puweight[nsimvertex]);
+		hEtaJ3tag35->Fill((*EtaJPT)[i],puweight[nsimvertex]);
+	      }
+	    }
+	  }
+	}
+      }
+
+      if( ( pTj1 > 45.0 ) &&  ( pTj2 > 45.0 ) ) {
+	hZY2JDeta45->Fill(ZY,puweight[nsimvertex]);
+	// CJV part
+	Int_t ncj45 = 0;
+	for (unsigned int i = 0; i < njets; i++) {
+	  if(i < 2 ) {continue;}
+	  if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
+	    if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
+	      ncj45++;
+	      if(ncj45 == 1) {
+		hPtJ3tag45->Fill((*EtJPT)[i],puweight[nsimvertex]);
+		hEtaJ3tag45->Fill((*EtaJPT)[i],puweight[nsimvertex]);
+	      }
+	    }
+	  }
+	}
+      }
+
+
       if(ncj != 0) {continue;}
       N_cjv++;
       hZY2JDetaCJV->Fill(ZY,puweight[nsimvertex]);
@@ -555,18 +465,18 @@ void DiMuonAnalysis::Loop()
       */
    }
    // selections summary
-   cout <<"===> Total number of events analysed - " << N_total << endl;
-   cout <<"===--> passed muon pT/eta selections - " << N_muons << endl;
-   cout <<"===--> passed di-muon mass window    - " << N_mass2mu << endl;
-   cout <<"===--> passed two jet selections     - " << N_jets << endl;
-   cout <<"===--> passed Detaj1j2 cut           - " << N_deta << endl;
-   cout <<"===--> passed CVJ                    - " << N_cjv << endl;
-   cout <<"===--> passed Mj1j2 cut              - " << N_massjj << endl;
+   std::cout <<"===> Total number of events analysed - " << N_total << endl;
+   std::cout <<"===--> passed muon pT/eta selections - " << N_muons << endl;
+   std::cout <<"===--> passed di-muon mass window    - " << N_mass2mu << endl;
+   std::cout <<"===--> passed two jet selections     - " << N_jets << endl;
+   std::cout <<"===--> passed Detaj1j2 cut           - " << N_deta << endl;
+   std::cout <<"===--> passed CVJ                    - " << N_cjv << endl;
+   std::cout <<"===--> passed Mj1j2 cut              - " << N_massjj << endl;
 
-   TFile efile("DYhistos.root","recreate");
+   TFile efile("DYhistosMCA1vtx+jes.root","recreate");
 
    hnvtx0->Write();   
-   pileup->Write();   
+   pileupMC->Write();   
    hM2mu0->Write();
    hM2mu1->Write();
    hDeta0->Write();
@@ -588,9 +498,21 @@ void DiMuonAnalysis::Loop()
    hZY2JDetaCJV->Write();
    hZY2JDetaCJVMjj->Write();
 
+
+   hPtJ3tag25->Write();
+   hEtaJ3tag25->Write();
+
+   hZY2JDeta35->Write();
+   hPtJ3tag35->Write(); 
+   hEtaJ3tag35->Write();
+
+   hZY2JDeta45->Write();
+   hPtJ3tag45->Write(); 
+   hEtaJ3tag45->Write();
+
    efile.Close();
 
-   setTDRStyle(0,1,0);
+   //   setTDRStyle(0,1,0);
    TCanvas* c1 = new TCanvas("X","Y",1);
    hPtZ->Draw();
    hPtZ1J->Draw("same");
