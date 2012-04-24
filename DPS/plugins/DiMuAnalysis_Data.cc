@@ -179,6 +179,9 @@ private:
   std::vector<double> *jesunc;
   // beta
   std::vector<double> *beta;
+  // tracks counting
+  int n_trk1GeV, n_trk2GeV, n_trk3GeV;
+
   // number of Pxl and silicon inner and outer layers used for trk. measurement
   //  std::vector<int>    *NPxlMaxPtTrk;  
   //  std::vector<int>    *NSiIMaxPtTrk;  
@@ -258,6 +261,11 @@ DiMuAnalysis_Data::beginJob()
   t1->Branch("Ntrk","vector<int>",&Ntrk);
   t1->Branch("jesunc" ,"vector<double>",&jesunc);
   t1->Branch("beta" ,"vector<double>",&beta);
+
+  t1->Branch("n_trk1GeV",&n_trk1GeV,"n_trk1GeV/I");
+  t1->Branch("n_trk2GeV",&n_trk2GeV,"n_trk2GeV/I");
+  t1->Branch("n_trk3GeV",&n_trk3GeV,"n_trk3GeV/I");
+
   //  t1->Branch("NPxlMaxPtTrk","vector<int>",&NPxlMaxPtTrk);
   //  t1->Branch("NSiIMaxPtTrk","vector<int>",&NSiIMaxPtTrk);
   //  t1->Branch("NSiOMaxPtTrk","vector<int>",&NSiOMaxPtTrk);
@@ -358,6 +366,10 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   Ntrk->clear();
   jesunc->clear(); 
   beta->clear(); 
+
+  n_trk1GeV = 0.;
+  n_trk2GeV = 0.;
+  n_trk3GeV = 0.;
 
   //  NPxlMaxPtTrk->clear();
   //  NSiIMaxPtTrk->clear();
@@ -511,9 +523,10 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	     PVz  = cPVz;
 	     //      ndof(PV)>=5.0
 	     //	     ntrkV = (*recVtxs)[ind].tracksSize();
-	     //	    reco::Vertex::trackRef_iterator ittrk;
+	     //	    reco::Vertex::trackRef_iterator ittk;
 	     //	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
 	     //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
+	     // access tracks from PV
 	   } else {
 	     double DZ = fabs(cPVz - PVz);
 	     if(DZ < cDVZmin) 
@@ -537,7 +550,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      RecoMuons::const_iterator jmuon = reco_muons->end();
      for ( ; imuon != jmuon; ++imuon ) {
        if ( imuon->innerTrack().isNull() ||
-
+	    
 	    // (*imuon).charge()
 	    !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
 	    imuon->numberOfMatchedStations() <= 1 ||
@@ -707,7 +720,46 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      */
    }
 
-   //  cout <<" mass mumu = " << mass_mumu <<" jc = " <<jc << endl; 
+   if( (EtJPT->size() >= 2) && ( (*EtaJPT)[0] * (*EtaJPT)[1] < 0.0) ) {
+
+     const std::string trkqualiti = "highPurity";
+
+     RecoMuons::const_iterator imuon = reco_muons->begin(); 
+     RecoMuons::const_iterator jmuon = reco_muons->end();
+
+     double eta_jmin = (*EtaJPT)[0]; 
+     double eta_jmax = (*EtaJPT)[1]; 
+     if( (*EtaJPT)[0] > (*EtaJPT)[1] ) {
+       eta_jmin = (*EtaJPT)[1]; 
+       eta_jmax = (*EtaJPT)[0]; 
+     }
+     // loop over tracks in vertex
+     reco::Vertex::trackRef_iterator ittrk;
+     for(ittrk =(*recVtxs)[0].tracks_begin(); ittrk != (*recVtxs)[0].tracks_end(); ++ittrk) {
+       //       cout <<" track weight = " << (*recVtxs)[0].trackWeight(*ittrk) << endl;
+       if( (*recVtxs)[0].trackWeight(*ittrk) > 0.5 && (*ittrk)->quality(reco::TrackBase::qualityByName(trkqualiti)) )  {
+	 int muontrack = 0;
+	 for ( ; imuon != jmuon; ++imuon ) {
+	   if ( imuon->innerTrack().isNull() ) {continue;}
+	   const reco::TrackBaseRef ttr1(imuon->innerTrack());
+	   if ( *ittrk == ttr1 ) {
+	     muontrack = 1; 
+	   }
+	 }
+	 if(muontrack == 0) {
+	   if( (*ittrk)->eta() > eta_jmin + 0.5 && (*ittrk)->eta() < eta_jmax - 0.5) {
+	     //	     cout << eta_jmin + 0.5 << " < track eta = " << (*ittrk)->eta() <<" < " << eta_jmax - 0.5 << endl;
+	     if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
+	     if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
+	     if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
+	   }
+	 }
+       }
+     }
+     //     cout <<" n_trk1GeV, n_trk2GeV, n_trk3GeV = " << n_trk1GeV <<" "<< n_trk2GeV <<" " << n_trk3GeV << endl;    
+     // loop over muons
+   }
+     //  cout <<" mass mumu = " << mass_mumu <<" jc = " <<jc << endl; 
    
    // fill tree
    //  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
