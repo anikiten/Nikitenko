@@ -74,8 +74,8 @@ dymadgraph::dymadgraph(TTree *tree)
 
   if (tree == 0) {
     TChain * chain = new TChain("t1","");
-    //    chain->Add("/tmp/anikiten/TEST/dysherpa_*.root");
     chain->Add("/tmp/anikiten/TEST/dymadgraph_*.root");
+    //    chain->Add("dymadgraph.root");
     tree = chain;
   }
    Init(tree);
