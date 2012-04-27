@@ -720,6 +720,8 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      */
    }
 
+   // code to calculate variables for track counting veto: n_trk1GeV, n_trk3GeV, n_trk1GeV
+   // 
    if( (EtJPT->size() >= 2) && ( (*EtaJPT)[0] * (*EtaJPT)[1] < 0.0) ) {
 
      const std::string trkqualiti = "highPurity";
