@@ -150,242 +150,48 @@ void setTDRStyle(Int_t xlog, Int_t ylog) {
 void Draw()
 {
 
+   setTDRStyle(0,0);
+   TFile* file = new TFile("DataA+B_1stMay.root");
+   TCanvas* c1 = new TCanvas("X","Y",1);
+   
+   TH1F *hcjveff = (TH1F*)hNvtxAcjv->Clone();
+   hcjveff->GetYaxis()->SetTitle("CJV efficiency");
+   hcjveff->GetXaxis()->SetTitle("Nvtx");
 
-  // stream A+B
-
-  cout <<" ========================== A+B ============================" << endl;
-
-  // CJV 25 GeV 
-  // pT
-  setTDRStyle(0,0);
-  // data
-  cout <<" =============== CJV with pT tag jets > 25 GeV =================== " << endl;
-  TFile* file = new TFile("DYhistosA+B.root");
-  TCanvas* c1 = new TCanvas("X","Y",1);
-  hPtJ3tag25->GetXaxis()->SetTitle("p_{T} central jet, GeV");
-  hPtJ3tag25->GetYaxis()->SetTitle("Nev / 5 GeV");
-  hPtJ3tag25->SetMaximum(1000.);
-  hPtJ3tag25->SetMinimum(0.);
-  hPtJ3tag25->SetLineStyle(1);
-  hPtJ3tag25->SetLineWidth(3);
-  hPtJ3tag25->SetMarkerStyle(24);
-  hPtJ3tag25->SetMarkerSize(1.2);
-  hPtJ3tag25->Draw("PE");
-  Double_t N0data = hZY2JDeta->Integral();
-  Double_t NSdata = hEtaJ3tag25->Integral();
-  Double_t effdata = (N0data-NSdata)/N0data;
-  Double_t err = sqrt(effdata*(1-effdata)/(N0data-NSdata));
-  cout <<" => data: Nev before CJV = " << N0data 
-       <<" Nev after CVJ = " << N0data-NSdata
-       <<" efficiency = " << effdata <<" +/- " << err << endl;
-  TLegend *leg = new TLegend(0.35,0.7,0.95,0.85,NULL,"brNDC");
-  leg->SetFillColor(10);
-  leg->AddEntry(hPtJ3tag25,"data, p_{T}^{j1,j2}>25 GeV, #Delta#eta_{j1j2}>3.5","P");
-  // MC
-  TFile* file = new TFile("DYhistosMCA+B.root");
-  Double_t N0mc = hZY2JDeta->Integral();
-  Double_t NSmc = hEtaJ3tag25->Integral();
-  Double_t effmc = (N0mc-NSmc)/N0mc;
-  cout <<" => mc  : Nev before CJV = " << N0mc 
-       <<" Nev after CVJ = " << N0mc-NSmc
-       <<" efficiency = " << effmc << endl;
-  Double_t scale = NSdata/hEtaJ3tag25->Integral();
-  hPtJ3tag25->Scale(scale);
-  hPtJ3tag25->SetLineStyle(1);
-  hPtJ3tag25->SetLineWidth(3);
-  hPtJ3tag25->Draw("same");
-  leg->AddEntry(hPtJ3tag25,"simulation","L");
-  leg->Draw();
-  c1->SaveAs("cjv25pt.png");
+   hNvtxAcjv->Sumw2();
 
 
-  // eta
-  setTDRStyle(0,0);
-  // data
-  TFile* file = new TFile("DYhistosA+B.root");
-  TCanvas* c2 = new TCanvas("X","Y",1);
-  hEtaJ3tag25->GetXaxis()->SetTitle("#eta");
-  hEtaJ3tag25->GetYaxis()->SetTitle("Nev / 0.4");
-  hEtaJ3tag25->SetMaximum(400.);
-  hEtaJ3tag25->SetMinimum(0.);
-  hEtaJ3tag25->SetLineStyle(1);
-  hEtaJ3tag25->SetLineWidth(3);
-  hEtaJ3tag25->SetMarkerStyle(24);
-  hEtaJ3tag25->SetMarkerSize(1.2);
-  hEtaJ3tag25->Draw("PE");
-  TLegend *leg = new TLegend(0.25,0.75,0.85,0.90,NULL,"brNDC");
-  leg->SetFillColor(10);
-  leg->AddEntry(hEtaJ3tag25,"data, p_{T}^{j1,j2}>25 GeV, #Delta#eta_{j1j2}>3.5","P");
-  // MC
-  TFile* file = new TFile("DYhistosMCA+B.root");
-  Double_t scale = NSdata/hEtaJ3tag25->Integral();
-  hEtaJ3tag25->Scale(scale);
-  hEtaJ3tag25->SetLineStyle(1);
-  hEtaJ3tag25->SetLineWidth(3);
-  hEtaJ3tag25->Draw("same");
-  leg->AddEntry(hEtaJ3tag25,"simulation","L");
-  leg->Draw();
-  /*
-    TLatex *t = new TLatex();
-    t->SetTextSize(0.042);
-    t->DrawLatex(50,600,"p_{T}^{tag jets}>25 GeV");
-    t->DrawLatex(50,600,"p_{T}^{tag jets}>25 GeV");
-  */
-  c2->SaveAs("cjv25eta.png");
+   Int_t nbins = hNvtxBcjv->GetNbinsX();
+   for (Int_t ib = 1; ib <= nbins; ib++) {
+     hNvtxBcjv->SetBinError(ib,0.1);
+   }
+  
+   hcjveff->Divide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
+   //   hcjveff->TGraphAsymmErrors::BayesDivide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
 
-  // CJV 35 GeV 
-  // pT
-  setTDRStyle(0,0);
-  // data
-  cout <<" =============== CJV with pT tag jets > 35 GeV =================== " << endl;
-  TFile* file = new TFile("DYhistosA+B.root");
-  TCanvas* c3 = new TCanvas("X","Y",1);
-  hPtJ3tag35->GetXaxis()->SetTitle("p_{T} central jet, GeV");
-  hPtJ3tag35->GetYaxis()->SetTitle("Nev / 5 GeV");
-  hPtJ3tag35->SetMaximum(350.);
-  hPtJ3tag35->SetMinimum(0.);
-  hPtJ3tag35->SetLineStyle(1);
-  hPtJ3tag35->SetLineWidth(3);
-  hPtJ3tag35->SetMarkerStyle(24);
-  hPtJ3tag35->SetMarkerSize(1.2);
-  hPtJ3tag35->Draw("PE");
-  Double_t N0data = hZY2JDeta35->Integral();
-  Double_t NSdata = hEtaJ3tag35->Integral();
-  Double_t effdata = (N0data-NSdata)/N0data;
-  Double_t err = sqrt(effdata*(1-effdata)/(N0data-NSdata));
-  cout <<" => data: Nev before CJV = " << N0data 
-       <<" Nev after CVJ = " << N0data-NSdata
-       <<" efficiency = " << effdata <<" +/- " << err << endl;
-  TLegend *leg = new TLegend(0.35,0.7,0.95,0.85,NULL,"brNDC");
-  leg->SetFillColor(10);
-  leg->AddEntry(hPtJ3tag35,"data, p_{T}^{j1,j2}>35 GeV, #Delta#eta_{j1j2}>3.5","P");
-  // MC
-  TFile* file = new TFile("DYhistosMCA+B.root");
-  Double_t N0mc = hZY2JDeta35->Integral();
-  Double_t NSmc = hEtaJ3tag35->Integral();
-  Double_t effmc = (N0mc-NSmc)/N0mc;
-  cout <<" => mc  : Nev before CJV = " << N0mc 
-       <<" Nev after CVJ = " << N0mc-NSmc
-       <<" efficiency = " << effmc << endl;
-  Double_t scale = NSdata/hEtaJ3tag35->Integral();
-  hPtJ3tag35->Scale(scale);
-  hPtJ3tag35->SetLineStyle(1);
-  hPtJ3tag35->SetLineWidth(3);
-  hPtJ3tag35->Draw("same");
-  leg->AddEntry(hPtJ3tag35,"simulation","L");
-  leg->Draw();
-  c3->SaveAs("cjv35pt.png");
+   hcjveff->SetMaximum(1.0);
+   hcjveff->SetMinimum(0.);
+   hcjveff->SetLineStyle(1);
+   hcjveff->SetLineWidth(3);
+   hcjveff->SetMarkerStyle(24);
+   hcjveff->SetMarkerSize(1.2);
+   hcjveff->Draw("PE");
 
-  // eta
-  setTDRStyle(0,0);
-  // data
-  TFile* file = new TFile("DYhistosA+B.root");
-  TCanvas* c4 = new TCanvas("X","Y",1);
-  hEtaJ3tag35->GetXaxis()->SetTitle("#eta");
-  hEtaJ3tag35->GetYaxis()->SetTitle("Nev / 0.4");
-  hEtaJ3tag35->SetMaximum(220.);
-  hEtaJ3tag35->SetMinimum(0.);
-  hEtaJ3tag35->SetLineStyle(1);
-  hEtaJ3tag35->SetLineWidth(3);
-  hEtaJ3tag35->SetMarkerStyle(24);
-  hEtaJ3tag35->SetMarkerSize(1.2);
-  hEtaJ3tag35->Draw("PE");
-  TLegend *leg = new TLegend(0.25,0.75,0.85,0.90,NULL,"brNDC");
-  leg->SetFillColor(10);
-  leg->AddEntry(hEtaJ3tag35,"data, p_{T}^{j1,j2}>35 GeV, #Delta#eta_{j1j2}>3.5","P");
-  // MC
-  TFile* file = new TFile("DYhistosMCA+B.root");
-  Double_t scale = NSdata/hEtaJ3tag35->Integral();
-  hEtaJ3tag35->Scale(scale);
-  hEtaJ3tag35->SetLineStyle(1);
-  hEtaJ3tag35->SetLineWidth(3);
-  hEtaJ3tag35->Draw("same");
-  leg->AddEntry(hEtaJ3tag35,"simulation","L");
-  leg->Draw();
-  /*
-    TLatex *t = new TLatex();
-    t->SetTextSize(0.042);
-    t->DrawLatex(50,600,"p_{T}^{tag jets}>35 GeV");
-    t->DrawLatex(50,600,"p_{T}^{tag jets}>35 GeV");
-  */
-  c4->SaveAs("cjv35eta.png");
+   TLegend *leg = new TLegend(0.6,0.8,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hcjveff,"no #beta cut","P");
+   leg->AddEntry(hcjveff,"#beta_{j3} > 0.2","P");
+   leg->Draw();
 
+   TLatex *t = new TLatex();
 
-  // CJV 45 GeV 
-  // pT
-  setTDRStyle(0,0);
-  // data
-  cout <<" =============== CJV with pT tag jets > 45 GeV =================== " << endl;
-  TFile* file = new TFile("DYhistosA+B.root");
-  TCanvas* c5 = new TCanvas("X","Y",1);
-  hPtJ3tag45->GetXaxis()->SetTitle("p_{T} central jet, GeV");
-  hPtJ3tag45->GetYaxis()->SetTitle("Nev / 5 GeV");
-  hPtJ3tag45->SetMaximum(160.);
-  hPtJ3tag45->SetMinimum(0.);
-  hPtJ3tag45->SetLineStyle(1);
-  hPtJ3tag45->SetLineWidth(3);
-  hPtJ3tag45->SetMarkerStyle(24);
-  hPtJ3tag45->SetMarkerSize(1.2);
-  hPtJ3tag45->Draw("PE");
-  Double_t N0data = hZY2JDeta45->Integral();
-  Double_t NSdata = hEtaJ3tag45->Integral();
-  Double_t effdata = (N0data-NSdata)/N0data;
-  Double_t err = sqrt(effdata*(1-effdata)/(N0data-NSdata));
-  cout <<" => data: Nev before CJV = " << N0data 
-       <<" Nev after CVJ = " << N0data-NSdata
-       <<" efficiency = " << effdata <<" +/- " << err << endl;
-  TLegend *leg = new TLegend(0.35,0.7,0.95,0.85,NULL,"brNDC");
-  leg->SetFillColor(10);
-  leg->AddEntry(hPtJ3tag45,"data, p_{T}^{j1,j2}>45 GeV, #Delta#eta_{j1j2}>3.5","P");
-  // MC
-  TFile* file = new TFile("DYhistosMCA+B.root");
-  Double_t N0mc = hZY2JDeta45->Integral();
-  Double_t NSmc = hEtaJ3tag45->Integral();
-  Double_t effmc = (N0mc-NSmc)/N0mc;
-  cout <<" => mc  : Nev before CJV = " << N0mc 
-       <<" Nev after CVJ = " << N0mc-NSmc
-       <<" efficiency = " << effmc << endl;
-  Double_t scale = NSdata/hEtaJ3tag45->Integral();
-  hPtJ3tag45->Scale(scale);
-  hPtJ3tag45->SetLineStyle(1);
-  hPtJ3tag45->SetLineWidth(3);
-  hPtJ3tag45->Draw("same");
-  leg->AddEntry(hPtJ3tag45,"simulation","L");
-  leg->Draw();
-  c5->SaveAs("cjv45pt.png");
+   t->DrawLatex(1.0,0.85,"Z+jets, data 2011");
 
-  // eta
-  setTDRStyle(0,0);
-  // data
-  TFile* file = new TFile("DYhistosA+B.root");
-  TCanvas* c6 = new TCanvas("X","Y",1);
-  hEtaJ3tag45->GetXaxis()->SetTitle("#eta");
-  hEtaJ3tag45->GetYaxis()->SetTitle("Nev / 0.4");
-  hEtaJ3tag45->SetMaximum(120.);
-  hEtaJ3tag45->SetMinimum(0.);
-  hEtaJ3tag45->SetLineStyle(1);
-  hEtaJ3tag45->SetLineWidth(3);
-  hEtaJ3tag45->SetMarkerStyle(24);
-  hEtaJ3tag45->SetMarkerSize(1.2);
-  hEtaJ3tag45->Draw("PE");
-  TLegend *leg = new TLegend(0.25,0.75,0.85,0.90,NULL,"brNDC");
-  leg->SetFillColor(10);
-  leg->AddEntry(hEtaJ3tag45,"data, p_{T}^{j1,j2}>45 GeV, #Delta#eta_{j1j2}>3.5","P");
-  // MC
-  TFile* file = new TFile("DYhistosMCA+B.root");
-  Double_t scale = NSdata/hEtaJ3tag45->Integral();
-  hEtaJ3tag45->Scale(scale);
-  hEtaJ3tag45->SetLineStyle(1);
-  hEtaJ3tag45->SetLineWidth(3);
-  hEtaJ3tag45->Draw("same");
-  leg->AddEntry(hEtaJ3tag45,"simulation","L");
-  leg->Draw();
-  /*
-    TLatex *t = new TLatex();
-    t->SetTextSize(0.042);
-    t->DrawLatex(50,600,"p_{T}^{tag jets}>45 GeV");
-    t->DrawLatex(50,600,"p_{T}^{tag jets}>45 GeV");
-  */
-  c6->SaveAs("cjv45eta.png");
+   t->SetTextSize(0.042);
+   t->DrawLatex(0.5,0.30,"VBF selections:");
+   t->DrawLatex(1.0,0.22,"p_{T}^{j1,j2} > 30 GeV, #Delta#eta_{j1,j2} > 3.5, M_{j1j2} > 700 GeV");
+   t->DrawLatex(0.5,0.14,"Central jet veto:");
+   t->DrawLatex(1.0,0.06,"no jets p_{T}^{j3} > 20 GeV, #eta_{min}<#eta_{j3}<#eta_{max}, |#eta_{j3}| < 2.0");
 
+   c1->SaveAs("cjv.png");
 }
