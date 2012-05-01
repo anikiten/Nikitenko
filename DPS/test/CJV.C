@@ -179,7 +179,7 @@ void Draw()
 
    TLegend *leg = new TLegend(0.6,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hcjveff,"no #beta cut","P");
+   leg->AddEntry(hcjveff,"no #beta_{j3} cut","P");
    leg->AddEntry(hcjveff,"#beta_{j3} > 0.2","P");
    leg->Draw();
 
