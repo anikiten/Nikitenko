@@ -151,24 +151,19 @@ void Draw()
 {
 
    setTDRStyle(0,0);
-   TFile* file = new TFile("DataA+B_1stMay.root");
+   TFile* file = new TFile("DataA+B_betaCJV_1stMay.root");
    TCanvas* c1 = new TCanvas("X","Y",1);
    
    TH1F *hcjveff = (TH1F*)hNvtxAcjv->Clone();
    hcjveff->GetYaxis()->SetTitle("CJV efficiency");
    hcjveff->GetXaxis()->SetTitle("Nvtx");
-
    hNvtxAcjv->Sumw2();
-
-
    Int_t nbins = hNvtxBcjv->GetNbinsX();
    for (Int_t ib = 1; ib <= nbins; ib++) {
      hNvtxBcjv->SetBinError(ib,0.1);
    }
-  
    hcjveff->Divide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
    //   hcjveff->TGraphAsymmErrors::BayesDivide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
-
    hcjveff->SetMaximum(1.0);
    hcjveff->SetMinimum(0.);
    hcjveff->SetLineStyle(1);
@@ -176,11 +171,27 @@ void Draw()
    hcjveff->SetMarkerStyle(24);
    hcjveff->SetMarkerSize(1.2);
    hcjveff->Draw("PE");
-
    TLegend *leg = new TLegend(0.6,0.8,0.9,0.9,NULL,"brNDC");
    leg->SetFillColor(10);
-   leg->AddEntry(hcjveff,"no #beta_{j3} cut","P");
-   leg->AddEntry(hcjveff,"#beta_{j3} > 0.2","P");
+   leg->AddEntry(hcjveff,"#beta > 0.2","P");
+
+   TFile* file = new TFile("DataA+B_nobetaCJV_1stMay.root");
+   TH1F *hcjveff1 = (TH1F*)hNvtxAcjv->Clone();
+   hcjveff1->GetYaxis()->SetTitle("CJV efficiency");
+   hcjveff1->GetXaxis()->SetTitle("Nvtx");
+   hNvtxAcjv->Sumw2();
+   Int_t nbins = hNvtxBcjv->GetNbinsX();
+   for (Int_t ib = 1; ib <= nbins; ib++) {
+     hNvtxBcjv->SetBinError(ib,0.1);
+   }
+   hcjveff1->Divide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
+   hcjveff1->SetMarkerStyle(20);
+   hcjveff1->SetMarkerSize(1.2);
+   hcjveff1->SetLineStyle(2);
+   hcjveff1->SetLineWidth(3);
+   hcjveff1->Draw("samePE");
+
+   leg->AddEntry(hcjveff1,"no beta cut","P");
    leg->Draw();
 
    TLatex *t = new TLatex();
