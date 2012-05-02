@@ -211,7 +211,7 @@ void Draw()
 
    setTDRStyle(0,0);
    TFile* file = new TFile("Signal_betaCJV.root");
-   TCanvas* c1 = new TCanvas("X","Y",1);
+   TCanvas* c2 = new TCanvas("X","Y",1);
    
    TH1F *hcjveff = (TH1F*)hNvtxAcjv->Clone();
    hcjveff->GetYaxis()->SetTitle("CJV efficiency");
@@ -263,5 +263,66 @@ void Draw()
    t->DrawLatex(0.5,0.14,"Central jet veto:");
    t->DrawLatex(1.0,0.06,"no jets p_{T}^{j3} > 20 GeV, #eta_{min}<#eta_{j3}<#eta_{max}, |#eta_{j3}| < 2.0");
 
-   c1->SaveAs("cjvSignal.png");
+   c2->SaveAs("cjvSignal.png");
+
+  setTDRStyle(0,0);
+  TFile* file = new TFile("DataB.root");
+  TCanvas* c3 = new TCanvas("X","Y",1);
+  Double_t scale = 1.0/hNTrk2GeV->Integral();
+  cout <<" Integral data = " << hNTrk2GeV->Integral() << endl;
+  for (Int_t im = 1; im <= 30; im++) {
+    Double_t eff = hNTrk2GeV->GetBinContent(im);
+    cout <<"   Nev in bin = " << im <<" " << eff << endl;
+  }
+
+  Double_t eff = 0.;
+  Double_t bkgeff[30], sigeff[30];
+  Double_t bkgeffCJV[1], sigeffCJV[1];
+  bkgeffCJV[0] = 0.58;
+  sigeffCJV[0] = 0.76;
+
+  hNTrk2GeV->Scale(scale);
+  for (Int_t im = 1; im <= 30; im++) {
+    eff += hNTrk2GeV->GetBinContent(im);
+    bkgeff[im-1] = eff;
+    cout <<"   data eff in bin = " << im <<" " << eff << endl;
+  }
+
+
+  TFile* file = new TFile("SignalB.root");
+  TCanvas* c3 = new TCanvas("X","Y",1);
+  Double_t scale = 1.0/hNTrk2GeV->Integral();
+  cout <<" Integral MC = " << hNTrk2GeV->Integral() << endl;
+  for (Int_t im = 1; im <= 30; im++) {
+    Double_t eff = hNTrk2GeV->GetBinContent(im);
+    cout <<"   Nev in bin = " << im <<" " << eff << endl;
+  }
+  eff = 0.;
+  hNTrk2GeV->Scale(scale);
+  for (Int_t im = 1; im <= 30; im++) {
+    eff += hNTrk2GeV->GetBinContent(im);
+    sigeff[im-1] = eff;
+    cout <<"   Signal eff in bin = " << im <<" " << eff << endl;
+  }
+
+  TGraph *grTrk2 = new TGraph(30,bkgeff,sigeff);
+  TGraph *grCJV  = new TGraph(1,bkgeffCJV,sigeffCJV);
+
+  grTrk2->SetMarkerStyle(20);
+  grTrk2->SetMarkerSize(1.2);
+  grTrk2->GetXaxis()->SetTitle("TCV eff. on DY 2011 B data");
+  grTrk2->GetYaxis()->SetTitle("TCV eff. on EWK Z+2jets");
+  grTrk2->Draw("AP");
+
+  grCJV->SetMarkerStyle(28);
+  grCJV->SetMarkerSize(2.0);
+  grCJV->SetLineWidth(3);
+  grCJV->Draw("sameP");
+  TLegend *leg = new TLegend(0.4,0.20,0.9,0.35,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(grTrk2,"TCV with tracks p_{T} > 2 GeV","P");
+  leg->AddEntry(grCJV,"CJV","P");
+  leg->Draw();
+
+  c2->SaveAs("Trk2GeV.png");
 }
