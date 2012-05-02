@@ -55,8 +55,8 @@ void DiMuonAnalysis::Loop()
 
    // vertex reweighting
 
-   TFile fd("MyDataPileupHistogramA.root");
-   //   TFile fd("MyDataPileupHistogramB.root");
+   //   TFile fd("MyDataPileupHistogramA.root");
+   TFile fd("MyDataPileupHistogramB.root");
    TH1D *pileup = (TH1D*)fd.Get("pileup");
    pileup->Draw();
    Double_t nvtx_data[100];
@@ -96,55 +96,52 @@ void DiMuonAnalysis::Loop()
    */
 
    // for data
+
    for (Int_t idm = 0; idm < 100; idm++) {
      puweight[idm] = 1.0;
      std::cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
 
+   // selections
+   TH1F * hZY              = new TH1F( "hZY", "ZY", 30, -3., 3.);
+   TH1F * hZY2J            = new TH1F( "hZY2J", "ZY2J", 30, -3., 3.);
+   TH1F * hZY2JDeta0       = new TH1F( "hZY2JDeta0", "ZY2JDeta0", 30, -3., 3.);
+   TH1F * hZY2JDeta1       = new TH1F( "hZY2JDeta1", "ZY2JDeta1", 30, -3., 3.);
+   TH1F * hZY2JDetaMjj     = new TH1F( "hZY2JDetaMjj", "ZY2JDetaMjj", 30, -3., 3.);
+   TH1F * hZY2JDetaMjjCJV  = new TH1F( "hZY2JDetaMjjCJV", "ZY2JDetaMjjCJV", 30, -3., 3.);
+   //
+
    TH1F * hnvtx0   = new TH1F( "hnvtx0", "nvtx0", 40, 0., 40.);
    TH1F * pileupMC   = new TH1F( "pileupMC", "pileupMC", 50, 0., 50.);
 
+   // two tight muons, no Z mass window
    TH1F * hM2mu0   = new TH1F( "hM2mu0", "M2mu0", 60, 20., 140.);
+   // two tight muons, inside Z mass window
    TH1F * hM2mu1   = new TH1F( "hM2mu1", "M2mu1", 60, 20., 140.);
    TH1F * hDeta0   = new TH1F( "hDeta0", "Deta0", 25, 0., 10.);
    TH1F * hDeta1   = new TH1F( "hDeta1", "Deta1", 25, 0., 10.);
    TH1F * hMjj     = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
 
-   //   TH1F * hPtZ1              = new TH1F( "hPtZ1", "PtZ1", 25, 0., 100.);
-   //   TH1F * hPtZ12J            = new TH1F( "hPtZ12J", "PtZ12J", 25, 0., 100.);
-   //   TH1F * hPtZ12JDeta        = new TH1F( "hPtZ12JDeta", "PtZ12JDeta", 25, 0., 100.);
-   //   TH1F * hPtZ12JDetaMjj     = new TH1F( "hPtZ12JDetaMjj", "PtZ12JDetaMjj", 25, 0., 100.);
-   //   TH1F * hPtZ12JDetaMjjCJV  = new TH1F( "hPtZ12JDetaMjjCJV", "PtZ12JDetaMjjCJV", 25, 0., 100.);
-   
-   TH1F * hZY              = new TH1F( "hZY", "ZY", 30, -3., 3.);
+   // CJV analysis
+   TH1F * hNvtxBcjv     = new TH1F( "hNvtxBcjv", "hNvtxBcjv", 5, 0., 15.);
+   TH1F * hNvtxAcjv     = new TH1F( "hNvtxAcjv", "hNvtxAcjv", 5, 0., 15.);
+   TH1F * hPtTagJ_25      = new TH1F( "hPtTagJ_25", "PtTagJ_25", 60, 0., 300.);
+   TH1F * hPtTagJ_45      = new TH1F( "hPtTagJ_45", "PtTagJ_45", 60, 0., 300.);
+   TH1F * hEtaJmin      = new TH1F( "hEtaJmin", "EtaJmin", 25, -5.0, 5.0);
+   TH1F * hEtaJmax      = new TH1F( "hEtaJmax", "EtaJmax", 25, -5.0, 5.0);
+
+   // general stuff
    TH1F * hPtZ             = new TH1F( "hPtZ", "PtZ", 28, 0., 140.);
-   //
    TH1F * hPtZ1J           = new TH1F( "hPtZ1J", "PtZ1J", 28, 0., 140.);
+   TH1F * hPtZ2J           = new TH1F( "hPtZ2J", "PtZ2J", 28, 0., 140.);
    TH1F * hZY1J            = new TH1F( "hZY1J", "ZY1J", 30, -3., 3.);
    //
-   TH1F * hPtZ2J           = new TH1F( "hPtZ2J", "PtZ2J", 28, 0., 140.);
-   TH1F * hZY2J            = new TH1F( "hZY2J", "ZY2J", 30, -3., 3.);
-   //
-   TH1F * hZY2JDeta        = new TH1F( "hZY2JDeta", "ZY2JDeta", 30, -3., 3.);
-   TH1F * hZY2JDetaCJV     = new TH1F( "hZY2JDetaCJV", "ZY2JDetaCJV", 30, -3., 3.);
-   TH1F * hZY2JDetaCJVMjj  = new TH1F( "hZY2JDetaCJVMjj", "ZY2JDetaCJVMjj", 30, -3., 3.);
-
    TH1F * hPtJ      = new TH1F( "hPtJ", "PtJ", 30, 0., 150.);
    TH1F * hEtaJ     = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
    TH1F * hNjets    = new TH1F( "hNjets", "Njets", 6, 0., 6.);
-   TH1F * hMjjnoVBF = new TH1F( "hMjjnoVBF", "MjjnoVBF", 40, 0., 2000.);
 
-   TH1F * hPtJ3tag25      = new TH1F( "hPtJ3tag25", "PtJ3tag25", 20, 0., 100.);
-   TH1F * hEtaJ3tag25     = new TH1F( "hEtaJ3tag25", "EtaJ3tag25", 25, -5.0, 5.0);
-
-   TH1F * hZY2JDeta35      = new TH1F( "hZY2JDeta35", "ZY2JDeta35", 30, -3., 3.);
-   TH1F * hPtJ3tag35      = new TH1F( "hPtJ3tag35", "PtJ3tag35", 20, 0., 100.);
-   TH1F * hEtaJ3tag35     = new TH1F( "hEtaJ3tag35", "EtaJ3tag35", 25, -5.0, 5.0);
-
-   TH1F * hZY2JDeta45      = new TH1F( "hZY2JDeta45", "ZY2JDeta45", 30, -3., 3.);
-   TH1F * hPtJ3tag45      = new TH1F( "hPtJ3tag45", "PtJ3tag45", 20, 0., 100.);
-   TH1F * hEtaJ3tag45     = new TH1F( "hEtaJ3tag45", "EtaJ3tag45", 25, -5.0, 5.0);
-
+   TH1F * hPtJ3     = new TH1F( "hPtJ3", "PtJ3", 20, 0., 100.);
+   TH1F * hEtaJ3    = new TH1F( "hEtaJ3", "EtaJ3", 25, -5.0, 5.0);
 
    /*
    TH1F * hbeta1  = new TH1F( "hbeta1", "beta1", 25, 0., 1.0);
@@ -184,10 +181,20 @@ void DiMuonAnalysis::Loop()
 
    Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nbytes = 0, nb = 0;
-
-   Int_t nev = 0;
-
+   // MZ
    Double_t MZ = 91.2;
+   // cuts
+   Double_t pTj1cut = 30.0;
+   Double_t pTj2cut = 30.0;
+   Double_t Detaj1j2cut_1 = 2.5;
+   Double_t Detaj1j2cut_2 = 3.5;
+   Double_t Detaj1j2cut_3 = 4.5;
+   Double_t Mjjcut = 700.;
+   //   Double_t Mjjcut = 0.0;
+   Double_t eta3_cut = 2.0;
+   //   Double_t beta_cut = 0.2;
+   //   Double_t eta3_cut = 10.0;
+   Double_t beta_cut = -10.0;
 
    // even selection counters
    //
@@ -195,18 +202,26 @@ void DiMuonAnalysis::Loop()
    Double_t N_total = 0;
    // 1. pT mu > 20 GeV, eta < 2.4
    Double_t N_muons = 0;
-   // 2. mumu mass window 85-97
+   // 2. mumu mass window +/- 15 GeV
    Double_t N_mass2mu = 0;
-   // 3. two jets pT > 25 GeV, eta < 4.7
+   // 3. two jets pT > 30 GeV, eta < 4.7
    Double_t N_jets = 0;
-   // 4. Deta j1j2 > 3.5
-   Double_t N_deta = 0;
-   // 5. Mj1j2 > 700 GeV
-   Double_t N_massjj = 0;
-   // 6. CJV
-   Double_t N_cjv = 0;
-   // scale
-   Double_t jescale = 1.;
+   // 4. eta_j1 x eta_j2 < 0
+   Double_t N_deta0 = 0;
+   // 5. Deta j1j2 > 2.5, 3.5, 4.5
+   Double_t N_deta1_1 = 0;
+   Double_t N_deta1_2 = 0;
+   Double_t N_deta1_3 = 0;
+   // 6. Mj1j2 > 700 GeV
+   Double_t N_massjj_1 = 0;
+   Double_t N_massjj_2 = 0;
+   Double_t N_massjj_3 = 0;
+   // 7. CJV
+   Double_t N_cjv_1 = 0;
+   Double_t N_cjv_2 = 0;
+   Double_t N_cjv_3 = 0;
+   // scale 0 - no error, 1 or -1 : +1/-1 sigma error
+   Double_t jescale = 0.;
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
@@ -217,9 +232,7 @@ void DiMuonAnalysis::Loop()
 
       //      cout <<" run number = " << run << endl;
 
-      nev++;
-
-      N_total++;
+      N_total += puweight[nsimvertex];
 
       Int_t ngoodjets = 0;
       Int_t nalljets = 0;
@@ -235,22 +248,22 @@ void DiMuonAnalysis::Loop()
       // 1. two muons
       if(nmuon < 2) {continue;}
 
-      // pT mu > 20 GeV, |eta| < 2.1
+      // pT mu > 20 GeV, |eta| < 2.4
 
       if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
       if( ((*muisol)[0]/(*PtMu)[0] > 0.1) || ((*muisol)[1]/(*PtMu)[1] > 0.1)) {continue;}
       if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0) {continue;}
-      if(nvertex > 2) {continue;}
+      //      if(nvertex > 2) {continue;}
 
-      N_muons++;
+      N_muons += puweight[nsimvertex];
 
       hM2mu0->Fill(mass_mumu,puweight[nsimvertex]);
       hnvtx0->Fill(1.*nvertex,puweight[nsimvertex]);
 
 
-      // M_mumu 85-97 GeV
+      // M_mumu MZ +- 15 GeV
       if( fabs(MZ-mass_mumu) > 15.0) {continue;}
-      N_mass2mu++;
+      N_mass2mu += puweight[nsimvertex];
 
       Int_t smallbeta = 0;
       Int_t jet25 = 0;
@@ -285,7 +298,7 @@ void DiMuonAnalysis::Loop()
 
 	Double_t pTj = (*EtJPT)[i] + jescale*(*jesunc)[i]*(*EtJPT)[i];
 
-	if( pTj >= 25. && fabs((*EtaJPT)[i]) < 4.7 ) {
+	if( pTj >= pTj2cut && fabs((*EtaJPT)[i]) < 4.7 ) {
 	  nalljets = nalljets + 1;
 	  hPtJ->Fill(pTj,puweight[nsimvertex]);
 	  hEtaJ->Fill((*EtaJPT)[i],puweight[nsimvertex]);
@@ -313,16 +326,16 @@ void DiMuonAnalysis::Loop()
       //      cout <<"  Etj1 = " << (*EtJPT)[0] <<" jesunc1 = " << (*jesunc)[0] <<" pTj1 = " << pTj1 << endl;
       //      cout <<"  Etj2 = " << (*EtJPT)[1] <<" jesunc2 = " << (*jesunc)[1] <<" pTj2 = " << pTj2 << endl;
 
-      if( ( pTj1 < 25.0 ) || 
-          ( pTj2 < 25.0 ) || 
-	  ( fabs((*EtaJPT)[0]) > 4.7) || 
-	  ( fabs((*EtaJPT)[1]) > 4.7) ) {continue;}
+      if( ( pTj1 < pTj1cut ) || 
+          ( pTj2 < pTj2cut ) || 
+	  ( fabs((*EtaJPT)[0]) > 4.7 ) || 
+	  ( fabs((*EtaJPT)[1]) > 4.7 ) ) {continue;}
 
-      N_jets++;
+      N_jets += puweight[nsimvertex];
       hPtZ2J->Fill(PtZ,puweight[nsimvertex]);
       hZY2J->Fill(ZY,puweight[nsimvertex]);
 
-      // Mj1j2 caclulations
+      // Mj1j2 calculations
       Double_t PJ1x = pTj1 * cos((*PhiJPT)[0]); 
       Double_t PJ1y = pTj1 * sin((*PhiJPT)[0]);
       Double_t Eta = (*EtaJPT)[0];
@@ -338,17 +351,6 @@ void DiMuonAnalysis::Loop()
       Double_t EJ2  = pTj2 / sin(theta);
       Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
 
-      hMjjnoVBF->Fill(Mj1j2,puweight[nsimvertex]); 
-      //
-      Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
-      hDeta0->Fill(DetaJJ,puweight[nsimvertex]);
-      if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
-      hDeta1->Fill(DetaJJ,puweight[nsimvertex]);
-
-      if( DetaJJ < 3.5 ) {continue;}
-      N_deta++;
-      hZY2JDeta->Fill(ZY,puweight[nsimvertex]);
-
       // VBF jets with max and min rapidity
       Double_t eta_jmin = (*EtaJPT)[0]; 
       Double_t eta_jmax = (*EtaJPT)[1]; 
@@ -356,68 +358,109 @@ void DiMuonAnalysis::Loop()
 	eta_jmin = (*EtaJPT)[1]; 
 	eta_jmax = (*EtaJPT)[0]; 
       }
+      //
+      Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
+      hDeta0->Fill(DetaJJ,puweight[nsimvertex]);
+      if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
+      N_deta0 += puweight[nsimvertex];
+      hDeta1->Fill(DetaJJ,puweight[nsimvertex]);
+      hZY2JDeta0->Fill(ZY,puweight[nsimvertex]);
 
-      // CJV part
-      Int_t ncj = 0;
-      for (unsigned int i = 0; i < njets; i++) {
-	if(i < 2 ) {continue;}
-	if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
-	  if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
-	    ncj++;
-	    if(ncj == 1) {
-	      hPtJ3tag25->Fill((*EtJPT)[i],puweight[nsimvertex]);
-	      hEtaJ3tag25->Fill((*EtaJPT)[i],puweight[nsimvertex]);
-	    }
-	  }
-	}
-      }
-
-      // check with cut on tagging jets 35, 45 GeV
-      if( ( pTj1 > 35.0 ) &&  ( pTj2 > 35.0 ) ) {
-	hZY2JDeta35->Fill(ZY,puweight[nsimvertex]);
-	// CJV part
-	Int_t ncj35 = 0;
-	for (unsigned int i = 0; i < njets; i++) {
-	  if(i < 2 ) {continue;}
-	  if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
-	    if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
-	      ncj35++;
-	      if(ncj35 == 1) {
-		hPtJ3tag35->Fill((*EtJPT)[i],puweight[nsimvertex]);
-		hEtaJ3tag35->Fill((*EtaJPT)[i],puweight[nsimvertex]);
-	      }
-	    }
-	  }
-	}
-      }
-
-      if( ( pTj1 > 45.0 ) &&  ( pTj2 > 45.0 ) ) {
-	hZY2JDeta45->Fill(ZY,puweight[nsimvertex]);
-	// CJV part
-	Int_t ncj45 = 0;
-	for (unsigned int i = 0; i < njets; i++) {
-	  if(i < 2 ) {continue;}
-	  if( (fabs((*EtaJPT)[i]) < 2.0) && ((*beta)[i] > 0.2) ) {
-	    if( ((eta_jmin+0.5) < (*EtaJPT)[i]) && ( (*EtaJPT)[i]) < (eta_jmax-0.5) ) {
-	      ncj45++;
-	      if(ncj45 == 1) {
-		hPtJ3tag45->Fill((*EtJPT)[i],puweight[nsimvertex]);
-		hEtaJ3tag45->Fill((*EtaJPT)[i],puweight[nsimvertex]);
-	      }
-	    }
-	  }
-	}
-      }
-
-
-      if(ncj != 0) {continue;}
-      N_cjv++;
-      hZY2JDetaCJV->Fill(ZY,puweight[nsimvertex]);
+      if( DetaJJ < Detaj1j2cut_1 ) {continue;}
+      N_deta1_1 += puweight[nsimvertex];
+      hZY2JDeta1->Fill(ZY,puweight[nsimvertex]);
       hMjj->Fill(Mj1j2,puweight[nsimvertex]);
 
-      if(Mj1j2 < 700.) {continue;}
-      N_massjj++;
-      hZY2JDetaCJVMjj->Fill(ZY,puweight[nsimvertex]);
+      if(Mj1j2 > Mjjcut) {
+
+	if(DetaJJ < Detaj1j2cut_3) {
+	  hPtTagJ_25->Fill(pTj1,puweight[nsimvertex]);
+	  hPtTagJ_25->Fill(pTj2,puweight[nsimvertex]);
+	}
+
+	N_massjj_1 += puweight[nsimvertex];
+	hZY2JDetaMjj->Fill(ZY,puweight[nsimvertex]);
+	
+	// CJV part
+	Int_t ncj = 0;
+	for (unsigned int i = 0; i < njets; i++) {
+	  if(i < 2 ) {continue;}
+	  if( (fabs((*EtaJPT)[i]) < eta3_cut) && ((*beta)[i] > beta_cut) ) {
+	    if( eta_jmin < (*EtaJPT)[i]  && (*EtaJPT)[i] < eta_jmax ) {
+	      ncj++;
+	      if(ncj == 1) {
+	      }
+	    }
+	  }
+	}
+	
+	if(ncj == 0) {
+	  N_cjv_1 += puweight[nsimvertex];
+	  hZY2JDetaMjjCJV->Fill(ZY,puweight[nsimvertex]);
+	}
+      }
+
+      // Deta > 3.5
+      if( DetaJJ < Detaj1j2cut_2 ) {continue;}
+      N_deta1_2 += puweight[nsimvertex];
+
+      if(Mj1j2 > Mjjcut) {
+	hNvtxBcjv->Fill(1.*nvertex,puweight[nsimvertex]);
+	N_massjj_2 += puweight[nsimvertex];
+	
+	// CJV part
+	Int_t ncj = 0;
+	for (unsigned int i = 0; i < njets; i++) {
+	  if(i < 2 ) {continue;}
+	  if( (fabs((*EtaJPT)[i]) < eta3_cut) && ((*beta)[i] > beta_cut) ) {
+	    if( eta_jmin < (*EtaJPT)[i]  && (*EtaJPT)[i] < eta_jmax ) {
+	      ncj++;
+	      if(ncj == 1) {
+	      }
+	    }
+	  }
+	}
+
+	if(ncj == 0) {
+	  hNvtxAcjv->Fill(1.*nvertex,puweight[nsimvertex]);
+	  N_cjv_2 += puweight[nsimvertex];
+	}
+      }
+
+      // Deta > 4.5 
+      if( DetaJJ < Detaj1j2cut_3 ) {continue;}
+
+      N_deta1_3 += puweight[nsimvertex];
+
+      if(Mj1j2 > Mjjcut) {
+
+	hPtTagJ_45->Fill(pTj1,puweight[nsimvertex]);
+	hPtTagJ_45->Fill(pTj2,puweight[nsimvertex]);
+
+	N_massjj_3 += puweight[nsimvertex];
+
+	// CJV part
+	Int_t ncj = 0;
+	for (unsigned int i = 0; i < njets; i++) {
+	  if(i < 2 ) {continue;}
+	  if( (fabs((*EtaJPT)[i]) < eta3_cut) && ((*beta)[i] > beta_cut) ) {
+	    if( eta_jmin < (*EtaJPT)[i]  && (*EtaJPT)[i] < eta_jmax ) {
+	      ncj++;
+	      if(ncj == 1) {
+		hPtJ3->Fill((*EtJPT)[i],puweight[nsimvertex]);
+		hEtaJ3->Fill((*EtaJPT)[i],puweight[nsimvertex]);
+		hEtaJmin->Fill(eta_jmin,puweight[nsimvertex]);
+		hEtaJmax->Fill(eta_jmax,puweight[nsimvertex]);
+
+	      }
+	    }
+	  }
+	}
+	
+	if(ncj == 0) {
+	  N_cjv_3 += puweight[nsimvertex];
+	}
+      }
 
       /*
       // 
@@ -468,12 +511,27 @@ void DiMuonAnalysis::Loop()
    std::cout <<"===> Total number of events analysed - " << N_total << endl;
    std::cout <<"===--> passed muon pT/eta selections - " << N_muons << endl;
    std::cout <<"===--> passed di-muon mass window    - " << N_mass2mu << endl;
-   std::cout <<"===--> passed two jet selections     - " << N_jets << endl;
-   std::cout <<"===--> passed Detaj1j2 cut           - " << N_deta << endl;
-   std::cout <<"===--> passed CVJ                    - " << N_cjv << endl;
-   std::cout <<"===--> passed Mj1j2 cut              - " << N_massjj << endl;
+   std::cout <<"===--> passed two jet selections     - " << N_jets << endl;  
+   std::cout <<"===--> passed eta_j1 x eta_j2 cut    - " << N_deta0 << endl;
+   std::cout <<"===--> passed Detaj1j2 cut           - " << N_deta1_1 <<" "<< N_deta1_2 <<" "<< N_deta1_3 << endl;
+   std::cout <<"===--> passed Mj1j2 cut              - " << N_massjj_1 <<" "<< N_massjj_2 <<" "<< N_massjj_3 << endl;
+   std::cout <<"===--> passed CVJ                    - " << N_cjv_1 <<" "<< N_cjv_2 <<" "<< N_cjv_3 << endl;
 
-   TFile efile("DYhistosMCA1vtx+jes.root","recreate");
+   std::cout <<"----------------------------------" << endl;
+   std::cout <<" efficiency of CJV " << endl;
+   std::cout <<" Deta > " << Detaj1j2cut_1 <<" CJV eff = " << N_cjv_1/N_massjj_1 << endl;
+   std::cout <<" Deta > " << Detaj1j2cut_2 <<" CJV eff = " << N_cjv_2/N_massjj_2 << endl;
+   std::cout <<" Deta > " << Detaj1j2cut_3 <<" CJV eff = " << N_cjv_3/N_massjj_3 << endl;
+
+   std::cout <<"----------------------------------" << endl;
+   std::cout <<" cuts used: " << endl;
+   std::cout <<" pTj1cut, pTj2cut  > " << pTj1cut <<"  " << pTj2cut << endl;
+   std::cout <<" Detaj1j2cut_1, Detaj1j2cut_2, Detaj1j2cut_3  > " 
+	     << Detaj1j2cut_1 <<"  " << Detaj1j2cut_2 <<" " << Detaj1j2cut_3 << endl;
+   std::cout <<" Mjjcut > " << Mjjcut << endl;
+   std::cout <<" eta3 < " << eta3_cut <<" beta > " << beta_cut << endl;
+  
+   TFile efile("DYhistosDataA.root","recreate");
 
    hnvtx0->Write();   
    pileupMC->Write();   
@@ -490,25 +548,23 @@ void DiMuonAnalysis::Loop()
    hNjets->Write();
    hPtJ->Write();
    hEtaJ->Write();
-   hMjjnoVBF->Write();
-
+   // event selections
    hZY->Write();
    hZY2J->Write();
-   hZY2JDeta->Write();
-   hZY2JDetaCJV->Write();
-   hZY2JDetaCJVMjj->Write();
+   hZY2JDeta0->Write();
+   hZY2JDeta1->Write();
+   hZY2JDetaMjj->Write();
+   hZY2JDetaMjjCJV->Write();
 
-
-   hPtJ3tag25->Write();
-   hEtaJ3tag25->Write();
-
-   hZY2JDeta35->Write();
-   hPtJ3tag35->Write(); 
-   hEtaJ3tag35->Write();
-
-   hZY2JDeta45->Write();
-   hPtJ3tag45->Write(); 
-   hEtaJ3tag45->Write();
+   // CJV
+   hEtaJmin->Write();
+   hEtaJmax->Write();
+   hPtJ3->Write();
+   hEtaJ3->Write();
+   hNvtxAcjv->Write();
+   hNvtxBcjv->Write();
+   hPtTagJ_25->Write();
+   hPtTagJ_45->Write();
 
    efile.Close();
 
@@ -520,7 +576,6 @@ void DiMuonAnalysis::Loop()
    hNjets->Draw("");
    hPtJ->Draw("");
    hEtaJ->Draw("");
-   hMjjnoVBF->Draw("");
    hDeta0->Draw("");
    hDeta1->Draw("");
 }
