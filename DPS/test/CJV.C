@@ -150,6 +150,7 @@ void setTDRStyle(Int_t xlog, Int_t ylog) {
 void Draw()
 {
 
+  // Data
    setTDRStyle(0,0);
    TFile* file = new TFile("DataA+B_betaCJV_1stMay.root");
    TCanvas* c1 = new TCanvas("X","Y",1);
@@ -204,5 +205,63 @@ void Draw()
    t->DrawLatex(0.5,0.14,"Central jet veto:");
    t->DrawLatex(1.0,0.06,"no jets p_{T}^{j3} > 20 GeV, #eta_{min}<#eta_{j3}<#eta_{max}, |#eta_{j3}| < 2.0");
 
-   c1->SaveAs("cjv.png");
+   c1->SaveAs("cjvData.png");
+
+   //  Signal MC
+
+   setTDRStyle(0,0);
+   TFile* file = new TFile("Signal_betaCJV.root");
+   TCanvas* c1 = new TCanvas("X","Y",1);
+   
+   TH1F *hcjveff = (TH1F*)hNvtxAcjv->Clone();
+   hcjveff->GetYaxis()->SetTitle("CJV efficiency");
+   hcjveff->GetXaxis()->SetTitle("Nvtx");
+   hNvtxAcjv->Sumw2();
+   Int_t nbins = hNvtxBcjv->GetNbinsX();
+   for (Int_t ib = 1; ib <= nbins; ib++) {
+     hNvtxBcjv->SetBinError(ib,0.1);
+   }
+   hcjveff->Divide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
+   //   hcjveff->TGraphAsymmErrors::BayesDivide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
+   hcjveff->SetMaximum(1.0);
+   hcjveff->SetMinimum(0.);
+   hcjveff->SetLineStyle(1);
+   hcjveff->SetLineWidth(3);
+   hcjveff->SetMarkerStyle(24);
+   hcjveff->SetMarkerSize(1.2);
+   hcjveff->Draw("PE");
+   TLegend *leg = new TLegend(0.6,0.8,0.9,0.9,NULL,"brNDC");
+   leg->SetFillColor(10);
+   leg->AddEntry(hcjveff,"#beta > 0.2","P");
+
+   TFile* file = new TFile("Signal_nobetaCJV.root");
+   TH1F *hcjveff1 = (TH1F*)hNvtxAcjv->Clone();
+   hcjveff1->GetYaxis()->SetTitle("CJV efficiency");
+   hcjveff1->GetXaxis()->SetTitle("Nvtx");
+   hNvtxAcjv->Sumw2();
+   Int_t nbins = hNvtxBcjv->GetNbinsX();
+   for (Int_t ib = 1; ib <= nbins; ib++) {
+     hNvtxBcjv->SetBinError(ib,0.1);
+   }
+   hcjveff1->Divide(hNvtxAcjv,hNvtxBcjv,1.,1.,"");
+   hcjveff1->SetMarkerStyle(20);
+   hcjveff1->SetMarkerSize(1.2);
+   hcjveff1->SetLineStyle(2);
+   hcjveff1->SetLineWidth(3);
+   hcjveff1->Draw("samePE");
+
+   leg->AddEntry(hcjveff1,"no beta cut","P");
+   leg->Draw();
+
+   TLatex *t = new TLatex();
+
+   t->DrawLatex(1.0,0.85,"EWK Z+jj");
+
+   t->SetTextSize(0.042);
+   t->DrawLatex(0.5,0.30,"VBF selections:");
+   t->DrawLatex(1.0,0.22,"p_{T}^{j1,j2} > 30 GeV, #Delta#eta_{j1,j2} > 3.5, M_{j1j2} > 700 GeV");
+   t->DrawLatex(0.5,0.14,"Central jet veto:");
+   t->DrawLatex(1.0,0.06,"no jets p_{T}^{j3} > 20 GeV, #eta_{min}<#eta_{j3}<#eta_{max}, |#eta_{j3}| < 2.0");
+
+   c1->SaveAs("cjvSignal.png");
 }
