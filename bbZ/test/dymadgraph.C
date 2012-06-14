@@ -224,7 +224,7 @@ void dymadgraph::Loop()
       hyZ->Fill(fabs(yZ),event_w);
 
       if(njets < 2 ) {continue;}
-      if( (*pTJ)[0] < 30. || (*pTJ)[1] < 30.0 ) {continue;}
+      if( (*pTJ)[0] < 40. || (*pTJ)[1] < 40.0 ) {continue;}
       n2j = n2j + event_w;
 
       hpTZ2J->Fill(pTZ,event_w);
@@ -248,11 +248,13 @@ void dymadgraph::Loop()
       Double_t EJ2  = (*pTJ)[1] / sin(theta);
       Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) - (PJ1x+PJ2x)*(PJ1x+PJ2x) - (PJ1y+PJ2y)*(PJ1y+PJ2y) - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
 
+      hMjj->Fill(Mj1j2,event_w);
+
       if( ( (*EtaJ)[0] * (*EtaJ)[1] > 0.0 ) ) {continue;} 
-      if(DetaJJ < 2.5) {continue;}
+      if(DetaJJ < 3.5) {continue;}
       n2jDeta = n2jDeta + event_w;
 
-      if(Mj1j2 < 700.) {continue;}
+      if(Mj1j2 < 0.0) {continue;}
       n2jDetaMjj = n2jDetaMjj + event_w;
 
      // VBF jets with max and min rapidity
@@ -268,7 +270,7 @@ void dymadgraph::Loop()
       for (unsigned int i = 0; i < njets; i++) {
 	if(i < 2 ) {continue;}
 	if( ((eta_jmin+0.0) < (*EtaJ)[i]) && ( (*EtaJ)[i]) < (eta_jmax-0.0) ) {
-	  if( fabs((*EtaJ)[i]) < 2.0) {
+	  if( fabs((*EtaJ)[i]) < 10.0) {
 	    ncj++;
 	  }
 	}
@@ -283,7 +285,6 @@ void dymadgraph::Loop()
 
       hpTZ2JDeta->Fill(pTZ,event_w);
       hyZ2JDeta->Fill(fabs(yZ),event_w);
-      hMjj->Fill(Mj1j2,event_w);
    }
 
    // selections summary
@@ -294,7 +295,6 @@ void dymadgraph::Loop()
    cout <<"===--> passed Mj1j2 cut              - " << n2jDetaMjj <<" xsect = " << xsect*(n2jDetaMjj/ntot) <<" eff = " << n2jDetaMjj/n2jDeta << endl;
    cout <<"===--> passed CVJ                    - " << n2jDetaMjjCJV <<" xsect = " << xsect*(n2jDetaMjjCJV/ntot) <<" eff = " << n2jDetaMjjCJV/n2jDetaMjj << endl;
 
-   /*
    TFile efile("DYsherpa_histos.root","recreate");
    //   TFile efile("DYmadgraph_histos.root","recreate");
 
@@ -311,7 +311,6 @@ void dymadgraph::Loop()
    hMjj->Write();      
 
    efile.Close();
-   */
 
    /*
  
