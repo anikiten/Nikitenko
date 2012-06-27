@@ -19,8 +19,7 @@ process.ak5PartonJets  =  process.ak5GenJets.clone()
 process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 
 
-# process.GlobalTag.globaltag = cms.string('START44_V9B::All')
-process.GlobalTag.globaltag = cms.string('START42_V14B::All')
+process.GlobalTag.globaltag = cms.string('START44_V9B::All')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
