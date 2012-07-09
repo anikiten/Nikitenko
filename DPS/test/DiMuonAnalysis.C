@@ -55,13 +55,14 @@ void DiMuonAnalysis::Loop()
 
    // vertex reweighting
 
+   Double_t puweight[100];
+
    //   TFile fd("MyDataPileupHistogramA.root");
    TFile fd("MyDataPileupHistogramB.root");
    TH1D *pileup = (TH1D*)fd.Get("pileup");
    pileup->Draw();
    Double_t nvtx_data[100];
    Double_t nvtx_mc[100];
-   Double_t puweight[100];
    for (Int_t id = 0; id < 100; id++) {
      if(id < 50) {
        nvtx_data[id] = pileup->GetBinContent(id+1);
@@ -71,7 +72,8 @@ void DiMuonAnalysis::Loop()
      std::cout <<" data bin id = " << id <<"  bin content = " << nvtx_data[id] << endl; 
    }
 
-   TFile fm("MCPileupHistogram.root");
+   //   TFile fm("MCPileupHistogram.root");
+   TFile fm("MCSignalPileuHistogram.root");
    pileup = (TH1D*)fm.Get("pileup");
    pileup->Draw();
    for (Int_t im = 0; im < 100; im++) {
@@ -84,7 +86,6 @@ void DiMuonAnalysis::Loop()
    }
 
    // for MC
-   /*
    for (Int_t idm = 0; idm < 100; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
@@ -93,14 +94,14 @@ void DiMuonAnalysis::Loop()
      }
      std::cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
-   */
 
+   /*
    // for data
-
    for (Int_t idm = 0; idm < 100; idm++) {
      puweight[idm] = 1.0;
      std::cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
+   */
 
    // selections
    TH1F * hZY              = new TH1F( "hZY", "ZY", 30, -3., 3.);
@@ -121,14 +122,29 @@ void DiMuonAnalysis::Loop()
    TH1F * hDeta0   = new TH1F( "hDeta0", "Deta0", 25, 0., 10.);
    TH1F * hDeta1   = new TH1F( "hDeta1", "Deta1", 25, 0., 10.);
    TH1F * hMjj     = new TH1F( "hMjj", "Mjj", 40, 0., 2000.);
+   TH1F * hMjj4    = new TH1F( "hMjj4", "Mjj4", 40, 0., 2000.);
+
+   TH2F * hMjjDeta     = new TH2F( "hMjjDeta", "MjjDeta", 40, 0., 2000., 25, 0., 10.);
+   TH1F * hDetaMjj300500     = new TH1F( "hDetaMjj300500", "DetaMjj300500", 25, 0., 10.);
+   TH1F * hDetaMjj500800     = new TH1F( "hDetaMjj500800", "DetaMjj500800", 25, 0., 10.);
+   TH1F * hDetaMjjGT800       = new TH1F( "hDetaMjjGT800", "DetaMjjGT800", 25, 0., 10.);
+
+   TH2F * hMjjEta1Eta2 = new TH2F( "hMjjEta1Eta2", "MjjEta1Eta2", 40, 0., 2000., 4, -2., 2.);
 
    // CJV analysis
-   TH1F * hNvtxBcjv     = new TH1F( "hNvtxBcjv", "hNvtxBcjv", 5, 0., 15.);
-   TH1F * hNvtxAcjv     = new TH1F( "hNvtxAcjv", "hNvtxAcjv", 5, 0., 15.);
-   TH1F * hPtTagJ_25      = new TH1F( "hPtTagJ_25", "PtTagJ_25", 60, 0., 300.);
-   TH1F * hPtTagJ_45      = new TH1F( "hPtTagJ_45", "PtTagJ_45", 60, 0., 300.);
+   TH1F * hNvtxBcjv     = new TH1F( "hNvtxBcjv", "hNvtxBcjv", 10, 0., 30.);
+   TH1F * hNvtxAcjv     = new TH1F( "hNvtxAcjv", "hNvtxAcjv", 10, 0., 30.);
+   TH1F * hPtTagJ_25    = new TH1F( "hPtTagJ_25", "PtTagJ_25", 60, 0., 300.);
+   TH1F * hPtTagJ_25_45 = new TH1F( "hPtTagJ_25_45", "PtTagJ_25_45", 60, 0., 300.);
+   TH1F * hPtTagJ_45    = new TH1F( "hPtTagJ_45", "PtTagJ_45", 60, 0., 300.);
    TH1F * hEtaJmin      = new TH1F( "hEtaJmin", "EtaJmin", 25, -5.0, 5.0);
    TH1F * hEtaJmax      = new TH1F( "hEtaJmax", "EtaJmax", 25, -5.0, 5.0);
+   TH1F * hPtJ3         = new TH1F( "hPtJ3", "PtJ3", 20, 0., 100.);
+   TH1F * hEtaJ3        = new TH1F( "hEtaJ3", "EtaJ3", 25, -5.0, 5.0);
+   TH1F * hNTrk1GeV     = new TH1F( "hNTrk1GeV", "NTrk1GeV", 30, 0.0, 30.0);
+   TH1F * hNTrk2GeV     = new TH1F( "hNTrk2GeV", "NTrk2GeV", 30, 0.0, 30.0);
+   TH1F * hNTrk3GeV     = new TH1F( "hNTrk3GeV", "NTrk3GeV", 30, 0.0, 30.0);
+
 
    // general stuff
    TH1F * hPtZ             = new TH1F( "hPtZ", "PtZ", 28, 0., 140.);
@@ -139,9 +155,6 @@ void DiMuonAnalysis::Loop()
    TH1F * hPtJ      = new TH1F( "hPtJ", "PtJ", 30, 0., 150.);
    TH1F * hEtaJ     = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
    TH1F * hNjets    = new TH1F( "hNjets", "Njets", 6, 0., 6.);
-
-   TH1F * hPtJ3     = new TH1F( "hPtJ3", "PtJ3", 20, 0., 100.);
-   TH1F * hEtaJ3    = new TH1F( "hEtaJ3", "EtaJ3", 25, -5.0, 5.0);
 
    /*
    TH1F * hbeta1  = new TH1F( "hbeta1", "beta1", 25, 0., 1.0);
@@ -188,14 +201,17 @@ void DiMuonAnalysis::Loop()
    Double_t pTj2cut = 30.0;
    Double_t Detaj1j2cut_1 = 2.5;
    Double_t Detaj1j2cut_2 = 3.5;
-   Double_t Detaj1j2cut_3 = 4.5;
-   Double_t Mjjcut = 700.;
+   Double_t Detaj1j2cut_3 = 4.0;
+   Double_t Mjjcut = 600.;
    //   Double_t Mjjcut = 0.0;
    Double_t eta3_cut = 2.0;
-   //   Double_t beta_cut = 0.2;
+   Double_t beta_cut = 0.2;
    //   Double_t eta3_cut = 10.0;
-   Double_t beta_cut = -10.0;
+   //   Double_t beta_cut = -10.0;
 
+   // muon data / mc correction factors
+   // Double_t x_eta_mu[16] = {-2.4, -2.1, -1.6, -1.2, -0.9, -0.6, -0.3, -0.2, 0.2, 0.3, 0.6, 0.9, 1.2, 1.6, 2.1, 2.4};
+   // Double_t corr_mu[15] = {0.977607, 0.961587, 0.964097, 0.980235, 0.997457, 1., 0.978457, 0.995915,  0.98683, 1.001, 0.99583, 0.992862, 0.97847, 0.980215, 0.987352}; 
    // even selection counters
    //
    //  total number of events processed
@@ -359,8 +375,18 @@ void DiMuonAnalysis::Loop()
 	eta_jmax = (*EtaJPT)[0]; 
       }
       //
+      Double_t signEta1Eta2 = -1.;
+      if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {signEta1Eta2 = 1.;} 
       Double_t DetaJJ = fabs((*EtaJPT)[0]-(*EtaJPT)[1]);
       hDeta0->Fill(DetaJJ,puweight[nsimvertex]);
+      hMjjDeta->Fill(Mj1j2,DetaJJ,puweight[nsimvertex]);
+
+      if(Mj1j2 > 300. && Mj1j2 <= 500.) {hDetaMjj300500->Fill(DetaJJ,puweight[nsimvertex]);}
+      if(Mj1j2 > 500. && Mj1j2 <= 800.) {hDetaMjj500800->Fill(DetaJJ,puweight[nsimvertex]);}
+      if(Mj1j2 > 800.)                  {hDetaMjjGT800->Fill(DetaJJ,puweight[nsimvertex]);}
+
+      hMjjEta1Eta2->Fill(Mj1j2,signEta1Eta2,puweight[nsimvertex]);
+
       if( ( (*EtaJPT)[0] * (*EtaJPT)[1] > 0.0 ) ) {continue;} 
       N_deta0 += puweight[nsimvertex];
       hDeta1->Fill(DetaJJ,puweight[nsimvertex]);
@@ -373,9 +399,12 @@ void DiMuonAnalysis::Loop()
 
       if(Mj1j2 > Mjjcut) {
 
+	hPtTagJ_25->Fill(pTj1,puweight[nsimvertex]);
+	hPtTagJ_25->Fill(pTj2,puweight[nsimvertex]);
+
 	if(DetaJJ < Detaj1j2cut_3) {
-	  hPtTagJ_25->Fill(pTj1,puweight[nsimvertex]);
-	  hPtTagJ_25->Fill(pTj2,puweight[nsimvertex]);
+	  hPtTagJ_25_45->Fill(pTj1,puweight[nsimvertex]);
+	  hPtTagJ_25_45->Fill(pTj2,puweight[nsimvertex]);
 	}
 
 	N_massjj_1 += puweight[nsimvertex];
@@ -403,10 +432,13 @@ void DiMuonAnalysis::Loop()
       // Deta > 3.5
       if( DetaJJ < Detaj1j2cut_2 ) {continue;}
       N_deta1_2 += puweight[nsimvertex];
-
+     
       if(Mj1j2 > Mjjcut) {
-	hNvtxBcjv->Fill(1.*nvertex,puweight[nsimvertex]);
 	N_massjj_2 += puweight[nsimvertex];
+	hNvtxBcjv->Fill(1.*nvertex,puweight[nsimvertex]);
+	hNTrk1GeV->Fill(n_trk1GeV, puweight[nsimvertex]);
+	hNTrk2GeV->Fill(n_trk2GeV, puweight[nsimvertex]);
+	hNTrk3GeV->Fill(n_trk3GeV, puweight[nsimvertex]);
 	
 	// CJV part
 	Int_t ncj = 0;
@@ -430,6 +462,8 @@ void DiMuonAnalysis::Loop()
       // Deta > 4.5 
       if( DetaJJ < Detaj1j2cut_3 ) {continue;}
 
+      hMjj4->Fill(Mj1j2,puweight[nsimvertex]);
+
       N_deta1_3 += puweight[nsimvertex];
 
       if(Mj1j2 > Mjjcut) {
@@ -440,6 +474,8 @@ void DiMuonAnalysis::Loop()
 	N_massjj_3 += puweight[nsimvertex];
 
 	// CJV part
+	hEtaJmin->Fill(eta_jmin,puweight[nsimvertex]);
+	hEtaJmax->Fill(eta_jmax,puweight[nsimvertex]);
 	Int_t ncj = 0;
 	for (unsigned int i = 0; i < njets; i++) {
 	  if(i < 2 ) {continue;}
@@ -449,9 +485,6 @@ void DiMuonAnalysis::Loop()
 	      if(ncj == 1) {
 		hPtJ3->Fill((*EtJPT)[i],puweight[nsimvertex]);
 		hEtaJ3->Fill((*EtaJPT)[i],puweight[nsimvertex]);
-		hEtaJmin->Fill(eta_jmin,puweight[nsimvertex]);
-		hEtaJmax->Fill(eta_jmax,puweight[nsimvertex]);
-
 	      }
 	    }
 	  }
@@ -531,7 +564,7 @@ void DiMuonAnalysis::Loop()
    std::cout <<" Mjjcut > " << Mjjcut << endl;
    std::cout <<" eta3 < " << eta3_cut <<" beta > " << beta_cut << endl;
   
-   TFile efile("DYhistosDataA.root","recreate");
+   TFile efile("DYhistos.root","recreate");
 
    hnvtx0->Write();   
    pileupMC->Write();   
@@ -540,6 +573,14 @@ void DiMuonAnalysis::Loop()
    hDeta0->Write();
    hDeta1->Write();
    hMjj->Write();
+   hMjj4->Write();
+
+   hMjjDeta->Write();
+   hDetaMjj300500->Write();
+   hDetaMjj500800->Write();
+   hDetaMjjGT800->Write();
+
+   hMjjEta1Eta2->Write();
 
    hPtZ->Write();
    hPtZ1J->Write();
@@ -564,11 +605,16 @@ void DiMuonAnalysis::Loop()
    hNvtxAcjv->Write();
    hNvtxBcjv->Write();
    hPtTagJ_25->Write();
+   hPtTagJ_25_45->Write();
    hPtTagJ_45->Write();
+   hNTrk1GeV->Write();
+   hNTrk2GeV->Write();
+   hNTrk3GeV->Write();
 
    efile.Close();
 
    //   setTDRStyle(0,1,0);
+   /*
    TCanvas* c1 = new TCanvas("X","Y",1);
    hPtZ->Draw();
    hPtZ1J->Draw("same");
@@ -578,4 +624,5 @@ void DiMuonAnalysis::Loop()
    hEtaJ->Draw("");
    hDeta0->Draw("");
    hDeta1->Draw("");
+   */
 }
