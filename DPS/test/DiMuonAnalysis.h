@@ -50,6 +50,9 @@ public :
    vector<int>     *Ntrk;
    vector<double>  *jesunc;
    vector<double>  *beta;
+   Int_t           n_trk1GeV;
+   Int_t           n_trk2GeV;
+   Int_t           n_trk3GeV;
 
    // List of branches
    TBranch        *b_run;   //!
@@ -79,6 +82,9 @@ public :
    TBranch        *b_Ntrk;   //!
    TBranch        *b_jesunc;   //!
    TBranch        *b_beta;   //!
+   TBranch        *b_n_trk1GeV;   //!
+   TBranch        *b_n_trk2GeV;   //!
+   TBranch        *b_n_trk3GeV;   //!
 
    DiMuonAnalysis(TTree *tree=0);
    virtual ~DiMuonAnalysis();
@@ -204,6 +210,9 @@ void DiMuonAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("Ntrk", &Ntrk, &b_Ntrk);
    fChain->SetBranchAddress("jesunc", &jesunc, &b_jesunc);
    fChain->SetBranchAddress("beta", &beta, &b_beta);
+   fChain->SetBranchAddress("n_trk1GeV", &n_trk1GeV, &b_n_trk1GeV);
+   fChain->SetBranchAddress("n_trk2GeV", &n_trk2GeV, &b_n_trk2GeV);
+   fChain->SetBranchAddress("n_trk3GeV", &n_trk3GeV, &b_n_trk3GeV);
    Notify();
 }
 
