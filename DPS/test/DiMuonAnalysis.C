@@ -64,9 +64,12 @@ void DiMuonAnalysis::Loop()
    pileup->Draw();
    Double_t nvtx_data[100];
    Double_t nvtx_mc[100];
+   cout <<" Integral of Data PU histo = " << pileup->Integral() << endl;
+   Double_t sumdata = 0.;
    for (Int_t id = 0; id < 100; id++) {
      if(id < 50) {
        nvtx_data[id] = pileup->GetBinContent(id+1);
+       sumdata = sumdata + nvtx_data[id];
      } else {
        nvtx_data[id] = 0.;
      }
@@ -76,10 +79,13 @@ void DiMuonAnalysis::Loop()
    TFile fm("MCPileupHistogram.root");
    //   TFile fm("MCSignalPileuHistogram.root");
    pileup = (TH1D*)fm.Get("pileup");
+   cout <<" Integral of MC PU histo = " << pileup->Integral() << endl;
    pileup->Draw();
+   Double_t summc = 0.;
    for (Int_t im = 0; im < 100; im++) {
      if(im < 50) {
        nvtx_mc[im] = pileup->GetBinContent(im+1);
+       summc = summc + nvtx_mc[im];
      } else {
        nvtx_mc[im] = 0.;
      }
@@ -87,7 +93,6 @@ void DiMuonAnalysis::Loop()
    }
 
    // for MC
-   /*
    for (Int_t idm = 0; idm < 100; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
@@ -96,13 +101,27 @@ void DiMuonAnalysis::Loop()
      }
      std::cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
-   */
 
+   /*
    // for data
    for (Int_t idm = 0; idm < 100; idm++) {
      puweight[idm] = 1.0;
      std::cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
+   */
+   cout <<" Sum Data PU histo = " << sumdata <<" Sum MC PU Histo = " << summc << endl;
+   Double_t ratioPU = sumdata/summc;
+   cout <<"        ===> ratio PU data / PU MC histos = " << ratioPU << endl; 
+
+   // muon data / mc correction factors
+   Double_t x_eta_mu[16] = {-2.4, -2.1, -1.6, -1.2, -0.9, -0.6, -0.3, -0.2,
+                             0.2,  0.3,  0.6,  0.9,  1.2,  1.6,  2.1,  2.4};
+   // MC
+   Double_t corr_mu[15] = {0.977607, 0.961587, 0.964097, 0.980235, 0.997457, 1., 0.978457, 
+                           0.995915, 0.98683, 1.001, 0.99583, 0.992862, 0.97847, 0.980215,
+                           0.987352};
+   // data
+   //   Double_t corr_mu[15] = {1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.};
 
    // selections
    TH1F * hZY          = new TH1F( "hZY", "ZY", 30, -3., 3.);
@@ -139,9 +158,6 @@ void DiMuonAnalysis::Loop()
    Double_t YZ_cut   = 1.2;
    Double_t Mjjcut  = 600.;
 
-   // muon data / mc correction factors
-   // Double_t x_eta_mu[16] = {-2.4, -2.1, -1.6, -1.2, -0.9, -0.6, -0.3, -0.2, 0.2, 0.3, 0.6, 0.9, 1.2, 1.6, 2.1, 2.4};
-   // Double_t corr_mu[15] = {0.977607, 0.961587, 0.964097, 0.980235, 0.997457, 1., 0.978457, 0.995915,  0.98683, 1.001, 0.99583, 0.992862, 0.97847, 0.980215, 0.987352}; 
    // even selection counters
    //
    //  total number of events processed
@@ -184,22 +200,36 @@ void DiMuonAnalysis::Loop()
       // 1. two muons
       if(nmuon < 2) {continue;}
 
-      // pT mu > 20 GeV, |eta| < 2.4
-
-      if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
+      // muon pT/eta
+      if( ((*PtMu)[0] < 20.) || ((*PtMu)[1] < 20.) || 
+          (fabs((*EtaMu)[0]) > 2.4) || (fabs((*EtaMu)[1]) > 2.4) ) {continue;}
+      // muon isolation
       if( ((*muisol)[0]/(*PtMu)[0] > 0.1) || ((*muisol)[1]/(*PtMu)[1] > 0.1)) {continue;}
+      // muon trigger
       if( DoubleMu7 == 0 && Mu13_Mu8 == 0 && Mu17_Mu8 == 0) {continue;}
-      //      if(nvertex > 2) {continue;}
 
-      N_muons += puweight[nsimvertex];
+      Double_t mu_data_mc_scaling = 1.;
+      Double_t mu1_data_mc_scaling = 1.;
+      Double_t mu2_data_mc_scaling = 1.;
+      for (unsigned int i = 0; i < 15; i++) {
+	if( (*EtaMu)[0] >= x_eta_mu[i] && 
+            (*EtaMu)[0] <  x_eta_mu[i+1] ) {mu1_data_mc_scaling = corr_mu[i];}
+	if( (*EtaMu)[1] >= x_eta_mu[i] && 
+            (*EtaMu)[1] <  x_eta_mu[i+1] ) {mu2_data_mc_scaling = corr_mu[i];}
+      }
+      mu_data_mc_scaling = mu1_data_mc_scaling*mu2_data_mc_scaling;
 
-      hM2mu0->Fill(mass_mumu,puweight[nsimvertex]);
-      hnvtx0->Fill(1.*nvertex,puweight[nsimvertex]);
+      Double_t event_weight = puweight[nsimvertex] * mu_data_mc_scaling; 
+	  
+      N_muons += event_weight;
+
+      hM2mu0->Fill(mass_mumu,event_weight);
+      hnvtx0->Fill(1.*nvertex,event_weight);
 
 
       // M_mumu MZ +- 15 GeV
       if( fabs(MZ-mass_mumu) > 15.0) {continue;}
-      N_mass2mu += puweight[nsimvertex];
+      N_mass2mu += event_weight;
 
       Int_t njets = EtJPT->size();
       // muons
@@ -221,9 +251,9 @@ void DiMuonAnalysis::Loop()
       Double_t EZ = sqrt(MZ*MZ + PtZ*PtZ + PZz*PZz);
       Double_t ZY   = 0.5 * log( (EZ+PZz) / (EZ-PZz));
 
-      hM2mu1->Fill(mass_mumu,puweight[nsimvertex]);
-      hZY->Fill(ZY,puweight[nsimvertex]);
-      hPtZ->Fill(PtZ,puweight[nsimvertex]); 
+      hM2mu1->Fill(mass_mumu,event_weight);
+      hZY->Fill(ZY,event_weight);
+      hPtZ->Fill(PtZ,event_weight); 
 
       // jet
       for (unsigned int i = 0; i < njets; i++) {
@@ -232,17 +262,17 @@ void DiMuonAnalysis::Loop()
 
 	if( pTj >= 50. && fabs((*EtaJPT)[i]) < 2.5 ) {
 	  nalljets = nalljets + 1;
-	  hPtJ->Fill(pTj,puweight[nsimvertex]);
-	  hEtaJ->Fill((*EtaJPT)[i],puweight[nsimvertex]);
+	  hPtJ->Fill(pTj,event_weight);
+	  hEtaJ->Fill((*EtaJPT)[i],event_weight);
 	}
       }
       
-      hNjets->Fill(1.*nalljets,puweight[nsimvertex]);
+      hNjets->Fill(1.*nalljets,event_weight);
 
       if(nalljets >= 1) {
 	
-	hPtZ1J->Fill(PtZ,puweight[nsimvertex]);
-	hZY1J->Fill(ZY,puweight[nsimvertex]);
+	hPtZ1J->Fill(PtZ,event_weight);
+	hZY1J->Fill(ZY,event_weight);
 
       }
 
@@ -260,9 +290,9 @@ void DiMuonAnalysis::Loop()
 	  ( fabs((*EtaJPT)[0]) > 3.6 ) || 
 	  ( fabs((*EtaJPT)[1]) > 3.6 ) ) {continue;}
 
-      N_jets += puweight[nsimvertex];
-      hPtZ2J->Fill(PtZ,puweight[nsimvertex]);
-      hZY2J->Fill(ZY,puweight[nsimvertex]);
+      N_jets += event_weight;
+      hPtZ2J->Fill(PtZ,event_weight);
+      hZY2J->Fill(ZY,event_weight);
 
       // Mj1j2 calculations
       Double_t PJ1x = pTj1 * cos((*PhiJPT)[0]); 
@@ -287,18 +317,21 @@ void DiMuonAnalysis::Loop()
 
       if(YZstar > YZ_cut) {continue;}
 
-      N_Y += puweight[nsimvertex];
+      N_Y += event_weight;
 
-      hZY2JY->Fill(ZY,puweight[nsimvertex]);
-      hMjj->Fill(Mj1j2,puweight[nsimvertex]);
+      hZY2JY->Fill(ZY,event_weight);
+      hMjj->Fill(Mj1j2,event_weight);
       
       if(Mj1j2 < Mjjcut) {continue;}
            
-	N_massjj += puweight[nsimvertex];
-	hZY2JYMjj->Fill(ZY,puweight[nsimvertex]);
+	N_massjj += event_weight;
+	hZY2JYMjj->Fill(ZY,event_weight);
 
    }
    // selections summary
+
+   std::cout <<"===> ratio PU data/MC histo = " << ratioPU << endl;
+
    std::cout <<"===> Total number of events analysed - " << N_total << endl;
    std::cout <<"===--> passed muon pT/eta selections - " << N_muons << endl;
    std::cout <<"===--> passed di-muon mass window    - " << N_mass2mu << endl;
