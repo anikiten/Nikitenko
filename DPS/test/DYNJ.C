@@ -196,11 +196,27 @@ void Draw()
   setTDRStyle(0,1);
   // data
   TFile* file = new TFile("DataAB.root");
+  cout <<" ============= Data =============================" << endl;
+  cout <<" ===> Zmumu = " << hZY->Integral() << endl;
+  cout <<" ===> 2jets = " << hZY2J->Integral() << endl;
+  cout <<" ===> y*    = " << hZY2JY->Integral() << endl;
+  cout <<" ===> Mjj   = " << hZY2JYMjj->Integral() << endl;
   TCanvas* c1 = new TCanvas("X","Y",1);
   TH1F *hNjetsData = (TH1F*)hNjets->Clone();
+  // MC events
   TFile* file = new TFile("DYMCAB.root");
+  cout <<" ============= MC =============================" << endl;
+  cout <<" ===> Zmumu = " << hZY->Integral()*normalization << endl;
+  cout <<" ===> 2jets = " << hZY2J->Integral()*normalization << endl;
+  cout <<" ===> y*    = " << hZY2JY->Integral()*normalization << endl;
+  cout <<" ===> Mjj   = " << hZY2JYMjj->Integral()*normalization << endl;
   TH1F *hNjetsMC = (TH1F*)hNjets->Clone();
   TH1F *hNjetsRatio = (TH1F*)hNjets->Clone();
+  TH1F *hNjetsRatio_JESUP = (TH1F*)hNjets->Clone();
+  //
+  // MC events JESUP
+  TFile* file = new TFile("DYMCAB_JESUP.root");
+  TH1F *hNjetsMC_JESUP = (TH1F*)hNjets->Clone();
   //
   hNjetsData->GetXaxis()->SetTitle("N jets");
   hNjetsData->GetYaxis()->SetTitle("N events");
@@ -210,15 +226,12 @@ void Draw()
   hNjetsData->SetLineWidth(2);
   hNjetsData->SetMarkerStyle(24);
   hNjetsData->SetMarkerSize(0.7);
-  //  hNjetsData->SetAxisRange(0,4,"X");
   hNjetsData->Draw("PE");
-  Double_t mcevents= hNjetsMC->Integral();
-  Double_t dataevents=hNjetsData->Integral();
-  Double_t expected=mcevents*normalization;
-  cout <<" mcevents = " << mcevents << endl;
-  cout <<" dataevents = " << dataevents << endl;
-  cout <<" expected = " << expected << endl;
+  //  Double_t mcevents= hNjetsMC->Integral();
+  //  Double_t dataevents=hNjetsData->Integral();
+  //  Double_t expected=mcevents*normalization;
   hNjetsMC->Scale(normalization);
+  hNjetsMC_JESUP->Scale(normalization);
   hNjetsMC->SetLineStyle(1);
   hNjetsMC->SetLineWidth(2);
   hNjetsMC->Draw("same");
@@ -232,7 +245,7 @@ void Draw()
   TLatex *t = new TLatex();
   t->SetTextSize(0.042);
   t->DrawLatex(3.0,200000,"Z#rightarrow#mu#mu + jets");
-  t->DrawLatex(3.0,80000,"p_{T}^{j}>30 GeV, |#eta|<2.5");
+  t->DrawLatex(3.0,80000,"p_{T}^{j}>50 GeV, |#eta|<2.5");
   c1->SaveAs("dy_njets.png");
 
   setTDRStyle(0,0);
@@ -246,12 +259,28 @@ void Draw()
   hNjetsRatio->Divide(hNjetsData,hNjetsMC,1.,1.,"");
   hNjetsRatio->GetXaxis()->SetTitle("N jets");
   hNjetsRatio->GetYaxis()->SetTitle("Data / MC");
-  hNjetsRatio->SetMaximum(1.5);
-  hNjetsRatio->SetMinimum(0.5);
+  hNjetsRatio->SetMaximum(1.3);
+  hNjetsRatio->SetMinimum(0.7);
   hNjetsRatio->SetLineStyle(1.);
   hNjetsRatio->SetLineWidth(2);
   hNjetsRatio->SetMarkerStyle(24);
   hNjetsRatio->SetMarkerSize(1.0);
+  hNjetsRatio->SetAxisRange(0,3,"X");
   hNjetsRatio->Draw("PE");
-  c2->SaveAs("dy_ratio_njets.png");
+  hNjetsRatio_JESUP->Divide(hNjetsMC_JESUP,hNjetsMC,1.,1.,"");
+  hNjetsRatio_JESUP->SetLineStyle(2);
+  hNjetsRatio_JESUP->SetLineWidth(2);
+  hNjetsRatio_JESUP->Draw("histsame");
+  TLatex *t = new TLatex();
+  t->SetTextSize(0.042);
+  t->DrawLatex(1.0,1.20,"Z#rightarrow#mu#mu + jets");
+  t->DrawLatex(1.0,1.14,"p_{T}^{j}>50 GeV, |#eta|<2.5");
+
+  TLegend *leg = new TLegend(0.2,0.2,0.6,0.3,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hNjetsRatio,"Data 2011, L=5.06 fb^{-1} ","P");
+  leg->AddEntry(hNjetsRatio_JESUP,"Z+jets MC, JES +1#sigma","L");
+  leg->Draw();
+
+  c2->SaveAs("dy_ratio_njets_jes.png");
 }
