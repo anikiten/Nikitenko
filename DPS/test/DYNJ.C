@@ -213,10 +213,14 @@ void Draw()
   TH1F *hNjetsMC = (TH1F*)hNjets->Clone();
   TH1F *hNjetsRatio = (TH1F*)hNjets->Clone();
   TH1F *hNjetsRatio_JESUP = (TH1F*)hNjets->Clone();
+  TH1F *hNjetsRatio_JESDN = (TH1F*)hNjets->Clone();
   //
   // MC events JESUP
   TFile* file = new TFile("DYMCAB_JESUP.root");
   TH1F *hNjetsMC_JESUP = (TH1F*)hNjets->Clone();
+  // MC events JESDN
+  TFile* file = new TFile("DYMCAB_JESDN.root");
+  TH1F *hNjetsMC_JESDN = (TH1F*)hNjets->Clone();
   //
   hNjetsData->GetXaxis()->SetTitle("N jets");
   hNjetsData->GetYaxis()->SetTitle("N events");
@@ -232,6 +236,7 @@ void Draw()
   //  Double_t expected=mcevents*normalization;
   hNjetsMC->Scale(normalization);
   hNjetsMC_JESUP->Scale(normalization);
+  hNjetsMC_JESDN->Scale(normalization);
   hNjetsMC->SetLineStyle(1);
   hNjetsMC->SetLineWidth(2);
   hNjetsMC->Draw("same");
@@ -271,15 +276,20 @@ void Draw()
   hNjetsRatio_JESUP->SetLineStyle(2);
   hNjetsRatio_JESUP->SetLineWidth(2);
   hNjetsRatio_JESUP->Draw("histsame");
+  hNjetsRatio_JESDN->Divide(hNjetsMC_JESDN,hNjetsMC,1.,1.,"");
+  hNjetsRatio_JESDN->SetLineStyle(3);
+  hNjetsRatio_JESDN->SetLineWidth(2);
+  hNjetsRatio_JESDN->Draw("histsame");
   TLatex *t = new TLatex();
   t->SetTextSize(0.042);
   t->DrawLatex(1.0,1.20,"Z#rightarrow#mu#mu + jets");
   t->DrawLatex(1.0,1.14,"p_{T}^{j}>50 GeV, |#eta|<2.5");
 
-  TLegend *leg = new TLegend(0.2,0.2,0.6,0.3,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.2,0.2,0.6,0.35,NULL,"brNDC");
   leg->SetFillColor(10);
   leg->AddEntry(hNjetsRatio,"Data 2011, L=5.06 fb^{-1} ","P");
   leg->AddEntry(hNjetsRatio_JESUP,"Z+jets MC, JES +1#sigma","L");
+  leg->AddEntry(hNjetsRatio_JESDN,"Z+jets MC, JES -1#sigma","L");
   leg->Draw();
 
   c2->SaveAs("dy_ratio_njets_jes.png");
