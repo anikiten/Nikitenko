@@ -37,7 +37,6 @@ void DiMuonAnalysis::Loop()
 //      Root > t.Loop();       // Loop on all entries
 //
 
-//     This is the loop skeleton where:
 //    jentry is the global entry number in the chain
 //    ientry is the entry number in the current Tree
 //  Note that the argument to GetEntry must be:
@@ -93,6 +92,7 @@ void DiMuonAnalysis::Loop()
    }
 
    // for MC
+   /*
    for (Int_t idm = 0; idm < 100; idm++) {
      if(nvtx_mc[idm] != 0) {
        puweight[idm] =  nvtx_data[idm] /  nvtx_mc[idm]; 
@@ -101,14 +101,14 @@ void DiMuonAnalysis::Loop()
      }
      std::cout <<" bin idm = " << idm <<"  data = " << nvtx_data[idm] <<" mc = " << nvtx_mc[idm] <<" ratio = " << puweight[idm] << endl; 
    }
+   */
 
-   /*
    // for data
    for (Int_t idm = 0; idm < 100; idm++) {
      puweight[idm] = 1.0;
      std::cout <<" Weights for data analysis (1)" << puweight[idm] << endl; 
    }
-   */
+
    cout <<" Sum Data PU histo = " << sumdata <<" Sum MC PU Histo = " << summc << endl;
    Double_t ratioPU = sumdata/summc;
    cout <<"        ===> ratio PU data / PU MC histos = " << ratioPU << endl; 
@@ -117,12 +117,18 @@ void DiMuonAnalysis::Loop()
    Double_t x_eta_mu[16] = {-2.4, -2.1, -1.6, -1.2, -0.9, -0.6, -0.3, -0.2,
                              0.2,  0.3,  0.6,  0.9,  1.2,  1.6,  2.1,  2.4};
    // MC
+   /*
    Double_t corr_mu[15] = {0.977607, 0.961587, 0.964097, 0.980235, 0.997457, 1., 0.978457, 
-                           0.995915, 0.98683, 1.001, 0.99583, 0.992862, 0.97847, 0.980215,
-                           0.987352};
+			   0.995915, 0.98683, 1.001, 0.99583, 0.992862, 0.97847, 0.980215,
+			   0.987352};
+   */
    // data
-   //   Double_t corr_mu[15] = {1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.};
+   Double_t corr_mu[15] = {1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.};
 
+   for (Int_t idm = 0; idm < 15; idm++) {
+     corr_mu[idm] = 1.0;
+     std::cout <<" data/MC corr for muons " << corr_mu[idm] << endl; 
+   }
    // selections
    TH1F * hZY          = new TH1F( "hZY", "ZY", 30, -3., 3.);
    TH1F * hZY2J        = new TH1F( "hZY2J", "ZY2J", 30, -3., 3.);
@@ -147,6 +153,12 @@ void DiMuonAnalysis::Loop()
    TH1F * hPtJ      = new TH1F( "hPtJ", "PtJ", 30, 0., 150.);
    TH1F * hEtaJ     = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
    TH1F * hNjets    = new TH1F( "hNjets", "Njets", 6, 0., 6.);
+
+   TH1F * hEtaJ1noMjj      = new TH1F( "hEtaJ1noMjj", "EtaJ1noMjj", 50, -5.0, 5.0);
+   TH1F * hEtaJ2noMjj      = new TH1F( "hEtaJ2noMjj", "EtaJ2noMjj", 50, -5.0, 5.0);
+   TH1F * hEtaJ1withMjj    = new TH1F( "hEtaJ1withMjj", "EtaJ1withMjj", 50, -5.0, 5.0);
+   TH1F * hEtaJ2withMjj    = new TH1F( "hEtaJ2withMjj", "EtaJ2withMjj", 50, -5.0, 5.0);
+
 
    Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nbytes = 0, nb = 0;
@@ -175,6 +187,8 @@ void DiMuonAnalysis::Loop()
 
    // scale 0 - no error, 1 or -1 : +1/-1 sigma error
    Double_t jescale = 0.;
+
+   FILE *Out1 = fopen("events.txt", "w+");
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
@@ -289,10 +303,12 @@ void DiMuonAnalysis::Loop()
           ( pTj2 < pTj2cut ) || 
 	  ( fabs((*EtaJPT)[0]) > 3.6 ) || 
 	  ( fabs((*EtaJPT)[1]) > 3.6 ) ) {continue;}
-
       N_jets += event_weight;
       hPtZ2J->Fill(PtZ,event_weight);
       hZY2J->Fill(ZY,event_weight);
+
+      hEtaJ1noMjj->Fill((*EtaJPT)[0],event_weight); 
+      hEtaJ2noMjj->Fill((*EtaJPT)[1],event_weight); 
 
       // Mj1j2 calculations
       Double_t PJ1x = pTj1 * cos((*PhiJPT)[0]); 
@@ -311,7 +327,7 @@ void DiMuonAnalysis::Loop()
       Double_t Mj1j2 = sqrt( (EJ1+EJ2)*(EJ1+EJ2) 
                            - (PJ1x+PJ2x)*(PJ1x+PJ2x) 
                            - (PJ1y+PJ2y)*(PJ1y+PJ2y) 
-                           - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
+			   - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
 
       Double_t YZstar = fabs(ZY-0.5*((*EtaJPT)[0]+(*EtaJPT)[1]));
 
@@ -323,11 +339,25 @@ void DiMuonAnalysis::Loop()
       hMjj->Fill(Mj1j2,event_weight);
       
       if(Mj1j2 < Mjjcut) {continue;}
-           
-	N_massjj += event_weight;
-	hZY2JYMjj->Fill(ZY,event_weight);
+      
+      N_massjj += event_weight;
+      hZY2JYMjj->Fill(ZY,event_weight);
 
+      hEtaJ1withMjj->Fill((*EtaJPT)[0],event_weight); 
+      hEtaJ2withMjj->Fill((*EtaJPT)[1],event_weight); 
+
+      /*
+      if( (run == 165567 && event == 163945449) || 
+	  (run == 165617 && event == 65856566) ) {
+	cout <<" run, event, pTj1, pTj2, Mj1j2 " << 
+	  run <<" "<< event <<" "<< pTj1 <<" " << pTj2 <<" " << Mj1j2 << endl;
+	fprintf(Out1,"%d %d %.1f %.1f %.1f\n",run, event, pTj1, pTj2, Mj1j2);
+      }
+      */
    }
+
+   fclose(Out1);
+
    // selections summary
 
    std::cout <<"===> ratio PU data/MC histo = " << ratioPU << endl;
@@ -366,6 +396,11 @@ void DiMuonAnalysis::Loop()
    hNjets->Write();
    hPtJ->Write();
    hEtaJ->Write();
+
+   hEtaJ1noMjj->Write();
+   hEtaJ2noMjj->Write();      
+   hEtaJ1withMjj->Write();    
+   hEtaJ2withMjj->Write();    
 
    // event selections
 

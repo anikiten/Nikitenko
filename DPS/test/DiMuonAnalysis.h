@@ -117,9 +117,8 @@ DiMuonAnalysis::DiMuonAnalysis(TTree *tree)
   if (tree == 0) {
     TChain * chain = new TChain("t1","");
     //    chain->Add("/vols/cms02/anikiten/SignalMCFall11/DiMuAnalysis_MC_*.root");
-    chain->Add("/vols/cms02/anikiten/DiMuonMCFall11/DiMuAnalysis_MC_*.root");
-    //    chain->Add("/vols/cms02/anikiten/Run2011A-08Nov2011/DiMuAnalysis_Data_*.root");
-    //    chain->Add("/vols/cms02/anikiten/Run2011B-19Nov2011/DiMuAnalysis_Data_*.root");
+    chain->Add("/vols/cms02/anikiten/Run2011A-08Nov2011/DiMuAnalysis_Data_*.root");
+    chain->Add("/vols/cms02/anikiten/Run2011B-19Nov2011/DiMuAnalysis_Data_*.root");
     tree = chain;
   }
    Init(tree);
