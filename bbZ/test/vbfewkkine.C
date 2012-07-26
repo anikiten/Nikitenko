@@ -180,7 +180,7 @@ void Draw()
   hMjjEWKZ->Scale(scale);
   scale = 1./ hMjjVBFH->Integral();
   hMjjVBFH->Scale(scale);
-  hMjjQCDZ->GetYaxis()->SetTitle("dp/dM_{j1j2}");
+  //  hMjjQCDZ->GetYaxis()->SetTitle("dp/dM_{j1j2}");
   hMjjQCDZ->GetXaxis()->SetTitle("M_{j1j2}, GeV");
   hMjjQCDZ->SetMaximum(1.0);
   hMjjQCDZ->SetMinimum(0.0001);
@@ -194,16 +194,28 @@ void Draw()
   hMjjVBFH->SetLineWidth(2);
   hMjjVBFH->Draw("same");
 
-  TLegend *leg = new TLegend(0.6,0.7,0.9,0.9,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
   leg->AddEntry(hMjjQCDZ,"QCD Z+2jets","L");
   leg->AddEntry(hMjjEWKZ,"EWK Z+2jets","L");
-  leg->AddEntry(hMjjVBFH,"VBF H","L");
+  leg->AddEntry(hMjjVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 7 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
   //  TLatex *t = new TLatex();
   //  t->SetTextSize(0.040);
   //  t->DrawLatex(600.0,3000.0,"Z+2jets, Z#rightarrow l^{+}l^{-} MadGraph");
-  c1->SaveAs("mjj.gif");
+  c1->SaveAs("mjj.eps");
 
   // DetaJJ
   setTDRStyle(0,0,0);
@@ -214,7 +226,7 @@ void Draw()
   hDetaJJEWKZ->Scale(scale);
   scale = 1./ hDetaJJVBFH->Integral();
   hDetaJJVBFH->Scale(scale);
-  hDetaJJQCDZ->GetYaxis()->SetTitle("dp/#Delta#eta_{j1j2}");
+  //  hDetaJJQCDZ->GetYaxis()->SetTitle("dp/#Delta#eta_{j1j2}");
   hDetaJJQCDZ->GetXaxis()->SetTitle("#Delta#eta_{j1j2}");
   hDetaJJQCDZ->SetMaximum(0.2);
   hDetaJJQCDZ->SetLineStyle(1);
@@ -227,13 +239,25 @@ void Draw()
   hDetaJJVBFH->SetLineWidth(2);
   hDetaJJVBFH->Draw("same");
 
-  TLegend *leg = new TLegend(0.6,0.7,0.9,0.9,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
   leg->AddEntry(hDetaJJQCDZ,"QCD Z+2jets","L");
   leg->AddEntry(hDetaJJEWKZ,"EWK Z+2jets","L");
-  leg->AddEntry(hDetaJJVBFH,"VBF H","L");
+  leg->AddEntry(hDetaJJVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
-  c2->SaveAs("detajj.gif");
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 7 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  c2->SaveAs("detajj.eps");
 
   // Eta J1, j2
   setTDRStyle(0,0,0);
@@ -244,7 +268,7 @@ void Draw()
   hEtaJmaxEWKZ->Scale(scale);
   scale = 1./ hEtaJmaxVBFH->Integral();
   hEtaJmaxVBFH->Scale(scale);
-  hEtaJmaxQCDZ->GetYaxis()->SetTitle("dp/#eta_{j} max");
+  //  hEtaJmaxQCDZ->GetYaxis()->SetTitle("dp/#eta_{j} max");
   hEtaJmaxQCDZ->GetXaxis()->SetTitle("#eta_{j} max");
   hEtaJmaxQCDZ->SetMaximum(0.15);
   hEtaJmaxQCDZ->SetLineStyle(1);
@@ -257,13 +281,25 @@ void Draw()
   hEtaJmaxVBFH->SetLineWidth(2);
   hEtaJmaxVBFH->Draw("same");
 
-  TLegend *leg = new TLegend(0.2,0.7,0.5,0.9,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.15,0.75,0.55,0.95,NULL,"brNDC");
   leg->SetFillColor(10);
   leg->AddEntry(hEtaJmaxQCDZ,"QCD Z+2jets","L");
   leg->AddEntry(hEtaJmaxEWKZ,"EWK Z+2jets","L");
-  leg->AddEntry(hEtaJmaxVBFH,"VBF H","L");
+  leg->AddEntry(hEtaJmaxVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
-  c3->SaveAs("etaj.gif");
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 7 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  c3->SaveAs("etaj.eps");
 
   // pT jet
   setTDRStyle(0,0,0);
@@ -274,8 +310,8 @@ void Draw()
   hPtTagJEWKZ->Scale(scale);
   scale = 1./ hPtTagJVBFH->Integral();
   hPtTagJVBFH->Scale(scale);
-  hPtTagJQCDZ->GetYaxis()->SetTitle("dp/p_{T,j}");
-  hPtTagJQCDZ->GetXaxis()->SetTitle("p_{T,j}");
+  //  hPtTagJQCDZ->GetYaxis()->SetTitle("dp/p_{T,j}");
+  hPtTagJQCDZ->GetXaxis()->SetTitle("p_{T,j}, GeV");
   //  hPtTagJQCDZ->SetMaximum(0.15);
   hPtTagJQCDZ->SetLineStyle(1);
   hPtTagJQCDZ->SetLineWidth(2);
@@ -287,13 +323,24 @@ void Draw()
   hPtTagJVBFH->SetLineWidth(2);
   hPtTagJVBFH->Draw("same");
 
-  TLegend *leg = new TLegend(0.6,0.7,0.9,0.9,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
   leg->AddEntry(hPtTagJQCDZ,"QCD Z+2jets","L");
   leg->AddEntry(hPtTagJEWKZ,"EWK Z+2jets","L");
-  leg->AddEntry(hPtTagJVBFH,"VBF H","L");
+  leg->AddEntry(hPtTagJVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
-  c4->SaveAs("ptj.gif");
-
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 7 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  c4->SaveAs("ptj.eps");
 }
 
