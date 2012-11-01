@@ -12,51 +12,32 @@ process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 
-# process.GlobalTag.globaltag = cms.string('START311_V2::All')
-# process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
-# process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
-
-# process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
-# process.GlobalTag.globaltag = cms.string('GR_R_44_V4::All')
-
 process.GlobalTag.globaltag = cms.string('GR_R_44_V14::All') 
 
-####################################################################################
-#from CondCore.DBCommon.CondDBSetup_cfi import *
-#process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-#                           connect =
-#cms.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
-#                   toGet =  cms.VPSet(
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5Calo"),
-#                                label=cms.untracked.string("AK5Calo")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PF"),
-#                                label=cms.untracked.string("AK5PF")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PFchs"),
-#                                label=cms.untracked.string("AK5PFchs")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5JPT"),
-#                                label=cms.untracked.string("AK5JPT")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V3_KT4Calo"),
-#                                label=cms.untracked.string("KT4Calo")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V3_AK7Calo"),
-#                                label=cms.untracked.string("AK7Calo")),
-#                       )
-#
-#                   )
-#process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
-#process.ak5JPTL1Offset.algorithm = 'AK5JPT'
-########################################################################################
+from CondCore.DBCommon.CondDBSetup_cfi import *
+process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
+                                connect =
+cms.string("sqlite:src/CondFormats/JetMETObjects/data/Fall11.db"),
+                                toGet =  cms.VPSet(
+                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                tag =
+cms.string("JetCorrectorParametersCollection_Fall11_AK5Calo"),
+                                label=cms.untracked.string("AK5Calo")),
+                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                tag =
+cms.string("JetCorrectorParametersCollection_Fall11_AK5PF"),
+                                label=cms.untracked.string("AK5PF")),
+                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                tag =
+cms.string("JetCorrectorParametersCollection_Fall11_AK5JPT"),
+                                label=cms.untracked.string("AK5JPT"))
+                       )
+                   )
+process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
+
+process.ak5JPTL1Offset.algorithm = 'AK5JPT'
+process.ak5JetTracksAssociatorAtVertex.useAssigned = cms.bool(True)
+process.ak5JetTracksAssociatorAtVertex.pvSrc = cms.InputTag("offlinePrimaryVertices")
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
@@ -89,14 +70,7 @@ process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
-# process.p1 = cms.Path(process.dump)
+process.p1 = cms.Path(process.ak5JTA*process.recoJPTJets*process.ak5JPTJetsL1L2L3Residual*process.myjetplustrack)
 
-# process.p1 = cms.Path(process.recoJPTJets*process.myjetplustrack)
- 
-# process.p1 = cms.Path(process.ak5JPTJetsL2L3*process.myjetplustrack)
+# process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3Residual*process.myjetplustrack)
 
-process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3Residual*process.myjetplustrack)
-
-# process.p1 = cms.Path(process.ak5JTA*process.jetPlusTrackZSPCorJetAntiKt5*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
-
-# process.p1 = cms.Path(process.dump)

@@ -612,7 +612,7 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
 	   ic++;
 	   // do not count jets overlapped with muons
-	   if( (DR1 > 0.6) && (DR2 > 0.6) ) {
+	   if( (DR1 > 0.5) && (DR2 > 0.5) ) {
 	     pTjptIndex[jptjet->pt()] = &(*jptjet);
 	     /*
 	       cout <<" jet = " << ic << " pTj / etaj / phij = " << jptjet->pt() <<" " << jptjet->eta() <<" " << jptjet->phi() 
@@ -749,11 +749,14 @@ DiMuAnalysis_Data::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	   }
 	 }
 	 if(muontrack == 0) {
-	   if( (*ittrk)->eta() > eta_jmin + 0.5 && (*ittrk)->eta() < eta_jmax - 0.5) {
-	     //	     cout << eta_jmin + 0.5 << " < track eta = " << (*ittrk)->eta() <<" < " << eta_jmax - 0.5 << endl;
-	     if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
-	     if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
-	     if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
+	   if( (*ittrk)->eta() > eta_jmin && (*ittrk)->eta() < eta_jmax) {
+	     double DRtrkj1 = deltaR((*ittrk)->eta(), (*ittrk)->phi(), (*EtaJPT)[0], (*PhiJPT)[0]);
+	     double DRtrkj2 = deltaR((*ittrk)->eta(), (*ittrk)->phi(), (*EtaJPT)[1], (*PhiJPT)[1]);
+	     if(DRtrkj1 > 0.6 && DRtrkj2 > 0.6) {
+	       if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
+	       if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
+	       if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
+	     }
 	   }
 	 }
        }
