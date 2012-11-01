@@ -568,6 +568,48 @@ DiMuAnalysis_Taus::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
      DiscriminatorAgainstElectron       = 
        (*theCaloTauDiscriminatorAgainstElectron)[theCaloTauRef];
+
+     float pisol = 1000.;
+     if(DiscriminatorByLeadingTrackPtCut == 1.) { pisol = (*iTau).isolationECALhitsEtSum();}
+
+       // settings for tau isolation
+     double matchingConeSize  = 0.10;
+     double signalConeSize    = 0.07;
+     double isolationConeSize = 0.5;
+     //	 double isolationConeSize = 0.4;
+     double ptLeadingTrackMin = 0.;
+     double ptOtherTracksMin  = 0.;
+     //	 double ptLeadingTrackMin = 6.;
+     //	 double ptOtherTracksMin  = 1.;
+     string metric = "DR"; // can be DR,angle,area
+     unsigned int isolationAnnulus_Tracksmaxn = 0;
+       
+     CaloTauElementsOperators op(theCaloTau);
+
+     double d_trackIsolation = 
+       op.discriminatorByIsolTracksN(metric,
+				     matchingConeSize,
+				     ptLeadingTrackMin,
+				     ptOtherTracksMin,
+				     metric,
+				     signalConeSize,
+				     metric,
+				     isolationConeSize,
+				     isolationAnnulus_Tracksmaxn);
+
+     const TrackRef leadingTrack =op.leadTk(metric,matchingConeSize,ptLeadingTrackMin);
+
+     int ltr= 1;
+     if(leadingTrack.isNull()) ltr = 0;
+
+     if(ltr == 1) {
+       const TrackRefVector signalTracks = 
+	 op.tracksInCone(leadingTrack->momentum(),metric,signalConeSize,ptOtherTracksMin);
+       const TrackRefVector isolatTracks = 
+	 op.tracksInCone(leadingTrack->momentum(),metric,isolationConeSize,ptOtherTracksMin);
+       cout <<"      n signal tracks = " << signalTracks.size()
+	    <<" n isolation tracks = " << isolatTracks.size() << endl;
+     }
    }
 
    // reco vertex part
