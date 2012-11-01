@@ -1,4 +1,4 @@
-<library   name="UserCodeNikitenkoDPSPlugins" file="DiMuAnalysis_Data.cc, DPSAnalyser.cc">
+<library   name="UserCodeNikitenkoDPSPlugins" file="DiMuAnalysis_Data.cc, DPSAnalyser.cc, DiMuAnalysis_Taus.cc">
   <use   name="DataFormats/TauReco"/>
   <use   name="RecoTauTag/TauTagTools"/>
   <use   name="DataFormats/CaloTowers"/>
