@@ -813,8 +813,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
    //   if( mass_mumu >= 40. ) t1->Fill();
    
-   cout <<" MET in event / Type1 = " << met <<" "<< metType1 << endl;
-
    if( nvtx >= 1 & (L1ETM40 > 0 || VBF_AllJets > 0) ) t1->Fill();
 }
 //define this as a plug-in
