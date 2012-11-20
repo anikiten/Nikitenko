@@ -159,7 +159,7 @@ private:
   int     L1ETM40, VBF_AllJets, DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
   //
   double  DZmin, PVx, PVy, PVz;
-  double  pfmet, pfmetType1;
+  double  pfmet, pfmetType1,pfmetType2;
   // di muon pass
   double  mass_mumu;
   // muon eta/phi/pT
@@ -433,8 +433,13 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    pfmet = mets->front().pt();
 
    edm::Handle<reco::PFMETCollection> metsType1;
-   iEvent.getByLabel("metJESCorAK5PFJet", metsType1);
+   iEvent.getByLabel("pfType1CorrectedMet", metsType1);
    pfmetType1 = metsType1->front().pt();
+
+   edm::Handle<reco::PFMETCollection> metsType2;
+   iEvent.getByLabel("pfType1p2CorrectedMet", metsType2);
+   pfmetType2 = metsType2->front().pt();
+
 
   //  NPxlMaxPtTrk->clear();
   //  NSiIMaxPtTrk->clear();
