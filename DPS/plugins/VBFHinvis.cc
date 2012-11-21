@@ -73,6 +73,9 @@
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETFwd.h"
 
+#include "DataFormats/JetReco/interface/Jet.h"
+#include "DataFormats/JetReco/interface/JetTracksAssociation.h"
+
 // taus
 #include "DataFormats/TauReco/interface/CaloTau.h"
 #include "RecoTauTag/TauTagTools/interface/CaloTauElementsOperators.h"
@@ -398,14 +401,27 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // 'ak5JetID'
    
    // pf jets
-   edm::Handle<PFJetCollection> pfjetsakt5;
-   iEvent.getByLabel("ak5PFJets", pfjetsakt5);
+   edm::Handle<PFJetCollection> pfjets;
+   iEvent.getByLabel("ak5PFJets", pfjets);
+
+   // pf jets corrected
+   edm::Handle<edm::View <reco::Jet> > pfjetsl1l2l3;
+   //   edm::Handle<PFJetCollection> pfjetsl1l2l3;
+   iEvent.getByLabel("ak5PFJetsL1L2L3Residual", pfjetsl1l2l3);
+   reco::JetRefBaseProd pfjetref(*pfjetsl1l2l3);
+
+   // MVA PU PF jet discriminator
+   edm::Handle<edm::ValueMap<float> > puJetIdMVA;
+   iEvent.getByLabel("recoPuJetMva","fullDiscriminant",puJetIdMVA);
+   //
+   edm::Handle<edm::ValueMap<int> > puJetIdFlag;
+   iEvent.getByLabel("recoPuJetMva","fullId",puJetIdFlag);
    
    // JPT jets raw
    edm::Handle<reco::JPTJetCollection> jptjets;
    iEvent.getByLabel(JPTjetsSrc, jptjets);
-   
-  // JPT jets L1L2L3
+   //   
+   // JPT jets L1L2L3
    edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
    iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
 
@@ -519,6 +535,11 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //  std::map<double,int> pTjptIndex;
 
    std::map<double,const JPTJet*> pTjptIndex;
+
+   std::map<double,const PFJet*> pTpfIndex;
+   std::map<double,float> PuMVApfIndex;
+   std::map<double,int> PuIDpfIndex;
+
    std::map<double,const Muon*> pTMuonIndex;
    math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
    math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
@@ -530,9 +551,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      edm::InputTag PileupSrc_("addPileupInfo");
      Handle<std::vector< PileupSummaryInfo > >  PupInfo;
      iEvent.getByLabel(PileupSrc_, PupInfo);
-     // const float getTrueNumInteractions() - the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled for
-     // Fall 11 MC (CMSSW 4_2_8 and later)
-     
      std::vector<PileupSummaryInfo>::const_iterator PVI;
      for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
        //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getTrueNumInteractions() << std::endl;
@@ -564,7 +582,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	     //      ndof(PV)>=5.0
 	     //	     ntrkV = (*recVtxs)[ind].tracksSize();
 	     //	    reco::Vertex::trackRef_iterator ittk;
-	     //	    for(ittrk =(*recVtxs)[ind].tracks_begin();ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
+	     //	    for(ittrk =(*recVtxs)[ind].tracks_begin();
+	     //                 ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
 	     //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
 	     // access tracks from PV
 	   } else {
@@ -583,8 +602,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // access muons and jets
    if( nvtx >= 1 ) {
 
-     //    cout <<" nvertex = " << nvertex <<" DZmin = " << DZmin << endl;
-     
      // muons
      RecoMuons::const_iterator imuon = reco_muons->begin(); 
      RecoMuons::const_iterator jmuon = reco_muons->end();
@@ -602,14 +619,14 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        
      }
     
-    // fill muon variables
+     // fill muon variables
      map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
      map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
      int imu = 0;
      while (rmfirst != rmlast) {
-    
+       
        const Muon* muon = (*rmfirst).second;
-      
+       
        imu++;
        math::XYZTLorentzVector muonc(muon->innerTrack()->px(),
 				     muon->innerTrack()->py(), 
@@ -618,36 +635,28 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        EtaMu->push_back(muon->innerTrack()->eta());
        PhiMu->push_back(muon->innerTrack()->phi());
        PtMu->push_back(muon->innerTrack()->pt());
-       /*
-	 cout <<" muon " << imu <<" pT / eta / phi = " << muon->innerTrack()->pt() 
-	 <<" "<< muon->innerTrack()->eta() 
-	 <<" "<< muon->innerTrack()->phi()
-	 << endl;
-       */
        double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
        dzmuon->push_back(dzvtx);
        // muon isolation variables
        double muon_sumPt = muon->isolationR03().sumPt;
        double muon_emEt  = muon->isolationR03().emEt;
        double muon_hadEt = muon->isolationR03().hadEt;
-       //       double muon_isol  = (muon_sumPt + muon_emEt + muon_hadEt) / muon->innerTrack()->pt(); 
        muisol->push_back(muon_sumPt);
        if (imu == 1) muon1 = muonc; 
        if (imu == 2) muon2 = muonc; 
        rmfirst++;
      }
-     
+   
      if(imu >= 2) {
        math::XYZTLorentzVector twomuons = muon1 + muon2;
        mass_mumu = twomuons.M();
      }
      
-     // jets
+     // jpt jets
      if(jptjetsl1l2l3->size() != 0) {
 
        double DR1 = 10.;
        double DR2 = 10.;
-
        int ic = 0;
        for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); 
 	                                    jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
@@ -655,20 +664,40 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
 	   if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
 	   ic++;
-	   // do not count jets overlapped with muons
 	   if( (DR1 > 0.6) && (DR2 > 0.6) ) {
 	     pTjptIndex[jptjet->pt()] = &(*jptjet);
 	   }
 	 }
        }
      }
+    
+     for (unsigned ipfjet = 0; ipfjet < pfjetsl1l2l3->size(); ++ipfjet) {
+
+       const reco::PFJet* pfjet = dynamic_cast<const reco::PFJet*>(&(*pfjetsl1l2l3)[ipfjet]);
+
+       double DR1 = 10.;
+       double DR2 = 10.;
+       int ic = 0;
+       if(pfjet->pt() > 20.) {
+	 if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), pfjet->eta(), pfjet->phi());}
+	 if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), pfjet->eta(), pfjet->phi());}
+	 ic++;
+	 if( (DR1 > 0.6) && (DR2 > 0.6) ) {
+	   
+	   float mva  = (*puJetIdMVA)[pfjetref->refAt(ipfjet)];
+	   int idflag = (*puJetIdFlag)[pfjetref->refAt(ipfjet)];
+	   
+	   pTpfIndex[pfjet->pt()]    = pfjet;
+	   PuMVApfIndex[pfjet->pt()] = mva; 
+	   PuIDpfIndex[pfjet->pt()]  = idflag;
+	   cout <<"  pf jets pT = " << pfjet->pt() <<" mva = " << mva <<" idflag = " << idflag << endl;
+	 }
+       }
+     }
    }
 
-   //  cout <<" Selected jet size = " << pTjptIndex.size() << endl;
-   
-   // fill jet variables
+   // fill jpt jet variables
    int jc = 0;
-
    map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
    map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
    while (rfirst != rlast) {
@@ -699,6 +728,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
      int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
 
+     /*
      // find track with max pT and number of layers it crosses
      double pTMax = 0.;
      int NLayersPxl = 0;
@@ -731,8 +761,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                       (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
        }
      }
-
-     // cout <<" jet pT = " << jptjet->pt() <<" eta = " << jptjet->eta() <<" unc = " << unc << endl;
+     */
 
      //     jecUnc->setJetEta(jptjet->eta());
      //     jecUnc->setJetPt (jptjet->pt() ); 
@@ -747,28 +776,9 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      EtaJPT->push_back(jptjet->eta());
      PhiJPT->push_back(jptjet->phi());
      EtJPT->push_back(jptjet->pt());
-
      Ntrk->push_back(npions);
-
      jesunc->push_back(unc);
-
      beta->push_back(jptjet->getSpecific().Zch);
-
-     //    NPxlMaxPtTrk->push_back(NLayersPxl);
-     //    NSiIMaxPtTrk->push_back(NLayersSiI);
-     //    NSiOMaxPtTrk->push_back(NLayersSiO);
-
-     /*
-       cout <<" ---> jpt jet pT = " << jptjet->pt()
-       <<" jpt eta = " << jptjet->eta() 
-       <<" jpt phi = " << jptjet->phi() 
-       <<" raw pt = " << jptjetRef->pt()
-       <<" raw eta = " << jptjetRef->eta()
-       <<" raw phi = " << jptjetRef->phi() 
-       <<" Ntrk1 = " << pionsInVertexInCalo.size()
-       <<" Ntrk2 = " << pionsInVertexOutCalo.size()
-       <<" Zch = " << jptjet->getSpecific().Zch << endl; 
-     */
    }
 
    delete jecUnc;
@@ -815,9 +825,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      }
    }
    // fill tree
-   //  if( (mass_mumu >= 50.) && (pTjptIndex.size() != 0) ) t1->Fill();
    //   if( mass_mumu >= 40. ) t1->Fill();
-   
    if( nvtx >= 1 & (L1ETM40 > 0 || VBF_AllJets > 0) ) t1->Fill();
 }
 //define this as a plug-in

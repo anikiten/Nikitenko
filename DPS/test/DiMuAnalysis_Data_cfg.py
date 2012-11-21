@@ -30,14 +30,14 @@ process.load("CMGTools.External.pujetidsequence_cff")
 
 from CMGTools.External.pujetidsequence_cff import puJetId
 process.recoPuJetId = puJetId.clone(
-   jets = cms.InputTag("ak5PFJets"),
+   jets = cms.InputTag("ak5PFJetsL1L2L3Residual"),
    applyJec = cms.bool(False),
    inputIsCorrected = cms.bool(True)                
 )
 
 from CMGTools.External.pujetidsequence_cff import puJetMva
 process.recoPuJetMva = puJetMva.clone(
-   jets = cms.InputTag("ak5PFJets"),
+   jets = cms.InputTag("ak5PFJetsL1L2L3Residual"),
    jetids = cms.InputTag("recoPuJetId"),
    applyJec = cms.bool(False),
    inputIsCorrected = cms.bool(True)                
@@ -82,7 +82,7 @@ process.recoPuJetMva = puJetMva.clone(
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(1000)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -124,4 +124,8 @@ process.p1 = cms.Path(process.producePFMETCorrections*
 
 # process.p1 = cms.Path(process.metJESCorAK5PFJet*process.dump)
 
-# process.p1 = cms.Path(process.producePFMETCorrections*process.ak5PFJetsL1L2L3Residual*process.dump)
+#process.p1 = cms.Path(process.producePFMETCorrections*
+#                      process.ak5PFJetsL1L2L3Residual*
+#                      process.recoPuJetId*
+#                      process.recoPuJetMva*
+#                      process.dump)
