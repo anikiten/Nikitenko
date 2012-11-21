@@ -1,0 +1,81 @@
+From andrew.gilbert@cern.ch Mon Nov 19 11:56:35 2012
+Date: Mon, 19 Nov 2012 11:56:34 +0100
+From: Andrew Gilbert <andrew.gilbert@cern.ch>
+To: Alexandre Nikitenko <anikiten@mail.cern.ch>
+Subject: Re: ICHEP-style analysis for 7TeV
+
+Hi Sasha,
+
+I've made a small recipe for this - it should work with 5_3_X releases (i tested on 5_3_4).
+
+To get all the new tau discriminators you need to update these packages:
+
+cvs co -r V01-04-17 RecoTauTag/RecoTau
+cvs co -r V01-04-03 RecoTauTag/Configuration
+cvs co -r V00-04-01 CondFormats/EgammaObjects
+
+I put a minimal config on cvs:
+
+http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/ICHiggsTauTau/test/tauMETExample_cfg.py?revision=1.2&view=markup
+
+Where you can see running the HPS PF tau sequence and the type-1 met sequence is fairly straightforward.  The tau sequence here actually re-makes the PF Tau collection, which is not strictly necessary in 53X, but I couldn't find a simpler way to get the extra discriminators to run.
+
+To access the tau discriminators you can look the example Producer here:
+
+http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/ICHiggsTauTau/plugins/TauMETExample.cc?revision=1.1&view=markup
+http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/ICHiggsTauTau/plugins/TauMETExample.hh?view=markup
+
+No PAT anywhere!
+
+cheers,
+Andrew
+
+
+
+On 15 Nov 2012, at 10:39, Alexandre Nikitenko <anikiten@mail.cern.ch> wrote:
+
+> Hi Andrew,
+> 
+> yes, I would appreciate if you could make "non-PAT recipe" / example for
+> both cases when you have a time.
+> 
+> Cheers, Sasha.
+> 
+> On Thu, 15 Nov 2012, Andrew Gilbert wrote:
+> 
+>> Hi Sasha,
+>> 
+>> Unfortunately I only get taus and MET from PAT (actually in the long term I would like to stop using PAT too).  You can see the code here:
+>> 
+>> http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/AGilbert/plugins/AGTauProducer.cc?revision=1.6&view=markup
+>> 
+>> I expect the procedure will be fairly similar for getting pf taus directly.  The main difference will be that you need to load the edm::ValueMaps explicitly to get the id and isolation discriminators.
+>> If you'd like I could make a small example of this?
+>> 
+>> To get the type-1 corrected met I use the recipe from this twiki page:
+>> 
+>> https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis#Type_I_MET_Correction_for_Jet_En
+>> 
+>> Then my code (using PAT) is here:
+>> 
+>> http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/AGilbert/plugins/AGMetProducer.cc?revision=1.9&view=markup
+>> 
+>> Again, I can make a non-PAT recipe if you'd like.
+>> 
+>> cheers,
+>> Andrew
+>> 
+>> 
+>> On 15 Nov 2012, at 10:11, Alexandre Nikitenko <anikiten@mail.cern.ch> wrote:
+>> 
+>>> Hi Andrew,
+>>> 
+>>> can I find in your user code how to get PF taus from AOD/RECO ?
+>>> Also, is it there example on how get PFMet and PFMet Type 1 from AOD/RECO.
+>>> I do not use PAT.
+>>> 
+>>> Cheers, Sasha.
+>>> 
+>> 
+>> 
+
