@@ -72,7 +72,8 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETFwd.h"
-
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "CMGTools/External/interface/PileupJetIdAlgo.h"
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 
@@ -158,14 +159,19 @@ private:
   edm:: InputTag srcTriggerResults_;
 
   // variables to store in ntpl
-  int     run, event, nvertex, nsimvertex;
-  int     L1ETM40, VBF_AllJets, DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
   //
+  // run/event
+  int     run, event; 
+  // trigger flags
+  int     L1ETM40, VBF_AllJets, DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
+  // vertex
   double  DZmin, PVx, PVy, PVz;
+  int     nvertex, nsimvertex;
+  // MET
   double  pfmet, pfmetType1,pfmetType2;
   // di muon pass
   double  mass_mumu;
-  // muon eta/phi/pT
+  // muon eta/phi/pT/isolation/distance from PV in Z coordinate
   std::vector<double> *EtaMu;
   std::vector<double> *PhiMu;
   std::vector<double> *PtMu;
@@ -179,20 +185,22 @@ private:
   std::vector<double> *EtaJPT;
   std::vector<double> *PhiJPT;
   std::vector<double> *EtJPT;
-  // N in-vertex-cone tracks
+  // JPT N in-vertex-cone tracks
   std::vector<int>    *Ntrk;
-  // in-cone-in vertex track with max pT
+  // JPT JES uncertainty
   std::vector<double> *jesunc;
-  // beta
+  // JPT beta
   std::vector<double> *beta;
-  // tracks counting
+  // tracks counting: number of tracks between tagging jets
   int n_trk1GeV, n_trk2GeV, n_trk3GeV;
-
-  // number of Pxl and silicon inner and outer layers used for trk. measurement
-  //  std::vector<int>    *NPxlMaxPtTrk;  
-  //  std::vector<int>    *NSiIMaxPtTrk;  
-  //  std::vector<int>    *NSiOMaxPtTrk;  
-  // output root file and tree
+  // pf info
+  std::vector<double> *EtaPF;
+  std::vector<double> *PhiPF;
+  std::vector<double> *EtPF;
+  std::vector<float>  *MVAPF;
+  std::vector<int>    *IDPF;
+  std::vector<int>    *JTypePF;
+  //
   TFile*      hOutputFile ;
   TTree*      t1;
 };
@@ -227,9 +235,13 @@ VBFHinvis::beginJob()
   Ntrk         = new std::vector<int>();
   jesunc       = new std::vector<double>();
   beta         = new std::vector<double>();;
-  //  NPxlMaxPtTrk = new std::vector<int>();
-  //  NSiIMaxPtTrk = new std::vector<int>();
-  //  NSiOMaxPtTrk = new std::vector<int>();
+
+  EtaPF        = new std::vector<double>();
+  PhiPF        = new std::vector<double>();
+  EtPF         = new std::vector<double>();
+  MVAPF        = new std::vector<float>();
+  IDPF         = new std::vector<int>();
+  JTypePF      = new std::vector<int>();
 
   // creating a simple tree
 
@@ -277,9 +289,12 @@ VBFHinvis::beginJob()
   t1->Branch("n_trk2GeV",&n_trk2GeV,"n_trk2GeV/I");
   t1->Branch("n_trk3GeV",&n_trk3GeV,"n_trk3GeV/I");
 
-  //  t1->Branch("NPxlMaxPtTrk","vector<int>",&NPxlMaxPtTrk);
-  //  t1->Branch("NSiIMaxPtTrk","vector<int>",&NSiIMaxPtTrk);
-  //  t1->Branch("NSiOMaxPtTrk","vector<int>",&NSiOMaxPtTrk);
+  t1->Branch("EtaPF","vector<double>",&EtaPF);
+  t1->Branch("PhiPF","vector<double>",&PhiPF);
+  t1->Branch("EtPF" ,"vector<double>",&EtPF);
+  t1->Branch("MVAPF" ,"vector<float>",&MVAPF);
+  t1->Branch("IDPF","vector<int>",&IDPF);
+  t1->Branch("JTypePF","vector<int>",&JTypePF);
 
   return ;
 }
@@ -390,6 +405,14 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   n_trk1GeV = 0.;
   n_trk2GeV = 0.;
   n_trk3GeV = 0.;
+
+  EtaPF->clear();
+  PhiPF->clear();
+  EtPF->clear(); 
+  MVAPF->clear();
+  IDPF->clear(); 
+  JTypePF->clear();
+
 
   // muons
    edm::Handle<RecoMuons> reco_muons;
@@ -657,13 +680,11 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        double DR1 = 10.;
        double DR2 = 10.;
-       int ic = 0;
        for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); 
 	                                    jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
 	 if(jptjet->pt() > 20.) {
 	   if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
 	   if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
-	   ic++;
 	   if( (DR1 > 0.6) && (DR2 > 0.6) ) {
 	     pTjptIndex[jptjet->pt()] = &(*jptjet);
 	   }
@@ -677,11 +698,9 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        double DR1 = 10.;
        double DR2 = 10.;
-       int ic = 0;
        if(pfjet->pt() > 20.) {
 	 if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), pfjet->eta(), pfjet->phi());}
 	 if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), pfjet->eta(), pfjet->phi());}
-	 ic++;
 	 if( (DR1 > 0.6) && (DR2 > 0.6) ) {
 	   
 	   float mva  = (*puJetIdMVA)[pfjetref->refAt(ipfjet)];
@@ -690,11 +709,45 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   pTpfIndex[pfjet->pt()]    = pfjet;
 	   PuMVApfIndex[pfjet->pt()] = mva; 
 	   PuIDpfIndex[pfjet->pt()]  = idflag;
-	   cout <<"  pf jets pT = " << pfjet->pt() <<" mva = " << mva <<" idflag = " << idflag << endl;
 	 }
        }
      }
    }
+
+   // fill pf jet variables
+    map<double,const PFJet*>::reverse_iterator rfirstPF(pTpfIndex.end());
+    map<double,const PFJet*>::reverse_iterator rlastPF(pTpfIndex.begin());
+    while (rfirstPF != rlastPF) {
+      const PFJet* pfjet = (*rfirstPF).second;
+      rfirstPF++;
+
+      // pfjet id
+      if(  (*pfjet).neutralHadronEnergyFraction() > 0.99 )  continue;
+      if(  (*pfjet).neutralEmEnergyFraction() > 0.99 )  continue;
+      if(( (*pfjet).neutralMultiplicity() + (*pfjet).chargedMultiplicity() ) < 1 )  continue;
+      if( fabs((*pfjet).eta()) < 2.4) {
+	if( (*pfjet).chargedHadronEnergyFraction() < 0. )  continue;
+	if( (*pfjet).chargedMultiplicity() < 0. )  continue;
+	if( (*pfjet).chargedEmEnergyFraction() > 0.99 )  continue;
+      }
+      float mva  = (*PuMVApfIndex.find((*pfjet).pt())).second;
+      int idflag = (*PuIDpfIndex.find((*pfjet).pt())).second;
+
+      int pfjidtype = 0;
+      if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose )) 
+	{pfjidtype = 1;}
+      if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium )) 
+	{pfjidtype = 2;}
+      if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )) 
+	{pfjidtype = 3;}
+
+      EtaPF->push_back(pfjet->eta());
+      PhiPF->push_back(pfjet->phi());
+      EtPF->push_back(pfjet->pt());
+      MVAPF->push_back(mva);
+      IDPF->push_back(idflag);
+      JTypePF->push_back(pfjidtype);
+    }
 
    // fill jpt jet variables
    int jc = 0;
@@ -717,7 +770,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      
      jc++;
      rfirst++;
-     
+     // calo jet ID
      if(mEmf  < 0.01) continue;
      if(mfHPD > 0.98) continue;
      if(mfRBX > 0.98) continue;
@@ -826,7 +879,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
    // fill tree
    //   if( mass_mumu >= 40. ) t1->Fill();
-   if( nvtx >= 1 & (L1ETM40 > 0 || VBF_AllJets > 0) ) t1->Fill();
+   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0) ) t1->Fill();
 }
 //define this as a plug-in
 DEFINE_FWK_MODULE(VBFHinvis);
