@@ -24,10 +24,12 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
 # process.GlobalTag.globaltag = cms.string('GR_R_44_V14::All') 
 
-process.GlobalTag.globaltag = cms.string('GR_R_53_V13::All') 
+# process.GlobalTag.globaltag = cms.string('GR_R_53_V13::All') 
 
+process.GlobalTag.globaltag = cms.string('FT_53_V6_AN2::All') 
+
+# MVA PU jets ID
 process.load("CMGTools.External.pujetidsequence_cff")
-
 from CMGTools.External.pujetidsequence_cff import puJetId
 process.recoPuJetId = puJetId.clone(
    jets = cms.InputTag("ak5PFJetsL1L2L3Residual"),
@@ -43,46 +45,104 @@ process.recoPuJetMva = puJetMva.clone(
    inputIsCorrected = cms.bool(True)                
 )
 
+################## filters ##########################################################
 
-####################################################################################
+## The good primary vertex filter
+process.primaryVertexFilter = cms.EDFilter(
+    "VertexSelector",
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
+    filter = cms.bool(True)
+    ) 
+
+## The beam scraping filter
+process.noscraping = cms.EDFilter(
+    "FilterOutScraping",
+    applyfilter = cms.untracked.bool(True),
+    debugOn = cms.untracked.bool(False),
+    numtrack = cms.untracked.uint32(10),
+    thresh = cms.untracked.double(0.25)
+    )
+
+## The iso-based HBHE noise filter
+process.load('CommonTools.RecoAlgos.HBHENoiseFilter_cfi')
+
+## The CSC beam halo tight filter 
+process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
+
+## The HCAL laser filter 
+process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+process.MyhcalLaserEventFilter = process.hcalLaserEventFilter.clone()
+process.MyhcalLaserEventFilter.taggingMode  = cms.bool(True)
+
+## The ECAL dead cell trigger primitive filter
+process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
+process.MyEcalDeadCellTriggerPrimitiveFilter = process.EcalDeadCellTriggerPrimitiveFilter.clone()
+process.MyEcalDeadCellTriggerPrimitiveFilter.taggingMode  = cms.bool(True)
+
+## The EE bad SuperCrystal filter
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+process.MyeeBadScFilter = process.eeBadScFilter.clone()
+process.MyeeBadScFilter.taggingMode  = cms.bool(True)
+
+## The ECAL laser correction filter
+process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
+process.MyecalLaserCorrFilter = process.ecalLaserCorrFilter.clone()
+process.MyecalLaserCorrFilter.taggingMode  = cms.bool(True)
+
+## The Good vertices collection needed by the tracking failure filter
+process.goodVertices = cms.EDFilter(
+  "VertexSelector",
+  filter = cms.bool(False),
+  src = cms.InputTag("offlinePrimaryVertices"),
+  cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2")
+) 
+
+## The tracking failure filter
+process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
+process.MytrackingFailureFilter = process.trackingFailureFilter.clone()
+process.MytrackingFailureFilter.taggingMode  = cms.bool(True)
+
+## total sequence
+process.filtersSeq = cms.Sequence(
+   process.primaryVertexFilter *
+   process.noscraping *
+   process.HBHENoiseFilter *
+   process.CSCTightHaloFilter *
+   process.MyhcalLaserEventFilter *
+   process.MyEcalDeadCellTriggerPrimitiveFilter *
+   process.goodVertices * process.MytrackingFailureFilter *
+   process.MyeeBadScFilter *
+   process.MyecalLaserCorrFilter
+)
+
+
 #from CondCore.DBCommon.CondDBSetup_cfi import *
 #process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-#                           connect =
-#cms.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
-#                   toGet =  cms.VPSet(
+#                       connect =
+#                       cms.string("sqlite:Fall12_V1_DATA.db"),
+#                       toGet =  cms.VPSet(
 #                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
 #                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5Calo"),
+#cms.string("JetCorrectorParametersCollection_Fall12_V1_DATA_AK5Calo"),
 #                                label=cms.untracked.string("AK5Calo")),
 #                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
 #                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PF"),
+#cms.string("JetCorrectorParametersCollection_Fall12_V1_DATA_AK5PF"),
 #                                label=cms.untracked.string("AK5PF")),
 #                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
 #                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5PFchs"),
-#                                label=cms.untracked.string("AK5PFchs")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V7_AK5JPT"),
-#                                label=cms.untracked.string("AK5JPT")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V3_KT4Calo"),
-#                                label=cms.untracked.string("KT4Calo")),
-#                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                                tag =
-#cms.string("JetCorrectorParametersCollection_Jec11_V3_AK7Calo"),
-#                                label=cms.untracked.string("AK7Calo")),
+#cms.string("JetCorrectorParametersCollection_Fall12_V1_DATA_AK5JPT"),
+#                                label=cms.untracked.string("AK5JPT"))
 #                       )
-#
 #                   )
 #process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
+#
 #process.ak5JPTL1Offset.algorithm = 'AK5JPT'
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -113,19 +173,21 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
-process.p1 = cms.Path(process.producePFMETCorrections*
-                      process.ak5PFJetsL1L2L3Residual*
-                      process.recoPuJetId*
-                      process.recoPuJetMva*
-                      process.ak5JTA*
-                      process.jetPlusTrackZSPCorJetAntiKt5*
-                      process.ak5JPTJetsL1L2L3Residual*
-                      process.myjetplustrack)
-
-# process.p1 = cms.Path(process.metJESCorAK5PFJet*process.dump)
-
-#process.p1 = cms.Path(process.producePFMETCorrections*
+#process.p1 = cms.Path(process.MyhcalLaserEventFilter*
+#                      process.producePFMETCorrections*
 #                      process.ak5PFJetsL1L2L3Residual*
 #                      process.recoPuJetId*
 #                      process.recoPuJetMva*
-#                      process.dump)
+#                      process.ak5JTA*
+#                      process.jetPlusTrackZSPCorJetAntiKt5*
+#                      process.ak5JPTJetsL1L2L3Residual*
+#                      process.myjetplustrack)
+
+# process.p1 = cms.Path(process.metJESCorAK5PFJet*process.dump)
+
+process.p1 = cms.Path(process.filtersSeq*
+                      process.producePFMETCorrections*
+                      process.ak5PFJetsL1L2L3Residual*
+                      process.recoPuJetId*
+                      process.recoPuJetMva*
+                      process.dump)
