@@ -173,21 +173,21 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
-#process.p1 = cms.Path(process.MyhcalLaserEventFilter*
-#                      process.producePFMETCorrections*
-#                      process.ak5PFJetsL1L2L3Residual*
-#                      process.recoPuJetId*
-#                      process.recoPuJetMva*
-#                      process.ak5JTA*
-#                      process.jetPlusTrackZSPCorJetAntiKt5*
-#                      process.ak5JPTJetsL1L2L3Residual*
-#                      process.myjetplustrack)
-
-# process.p1 = cms.Path(process.metJESCorAK5PFJet*process.dump)
-
-process.p1 = cms.Path(process.filtersSeq*
+process.p1 = cms.Path(filtersSeq*
                       process.producePFMETCorrections*
                       process.ak5PFJetsL1L2L3Residual*
                       process.recoPuJetId*
                       process.recoPuJetMva*
-                      process.dump)
+                      process.ak5JTA*
+                      process.jetPlusTrackZSPCorJetAntiKt5*
+                      process.ak5JPTJetsL1L2L3Residual*
+                      process.myjetplustrack)
+
+# process.p1 = cms.Path(process.metJESCorAK5PFJet*process.dump)
+
+#process.p1 = cms.Path(process.filtersSeq*
+#                      process.producePFMETCorrections*
+#                      process.ak5PFJetsL1L2L3Residual*
+#                      process.recoPuJetId*
+#                      process.recoPuJetMva*
+#                      process.dump)
