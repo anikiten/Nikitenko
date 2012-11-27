@@ -162,6 +162,8 @@ private:
   //
   // run/event
   int     run, event; 
+  //
+  bool    f1, f2, f3, f4, f5;  
   // trigger flags
   int     L1ETM40, VBF_AllJets, DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
   // vertex
@@ -253,6 +255,12 @@ VBFHinvis::beginJob()
   t1->Branch("event",&event,"event/I");
   t1->Branch("nvertex",&nvertex,"nvertex/I");
   t1->Branch("nsimvertex",&nsimvertex,"nsimvertex/I");
+
+  t1->Branch("f1",&f1,"f1/I");
+  t1->Branch("f2",&f2,"f2/I");
+  t1->Branch("f3",&f3,"f3/I");
+  t1->Branch("f4",&f4,"f4/I");
+  t1->Branch("f5",&f5,"f5/I");
 
   t1->Branch("L1ETM40",&L1ETM40,"L1ETM40/I");
   t1->Branch("VBF_AllJets",&VBF_AllJets,"VBF_AllJets/I");
@@ -370,6 +378,12 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   nvertex = 0;
   nsimvertex = 0;
 
+  f1 = 0;
+  f2 = 0;
+  f3 = 0;
+  f4 = 0;
+  f5 = 0;
+
   L1ETM40 = 0;
   VBF_AllJets = 0;
   DoubleMu7   = 0;
@@ -475,10 +489,26 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByLabel("pfType1CorrectedMet", metsType1);
    pfmetType1 = metsType1->front().pt();
 
-   edm::Handle<reco::PFMETCollection> metsType2;
-   iEvent.getByLabel("pfType1p2CorrectedMet", metsType2);
-   pfmetType2 = metsType2->front().pt();
-
+   // MET filters
+   edm::Handle<bool> filter1;
+   iEvent.getByLabel("MyEcalDeadCellTriggerPrimitiveFilter", filter1);
+   f1 = filter1.product();
+   //
+   edm::Handle<bool> filter2;
+   iEvent.getByLabel("MyecalLaserCorrFilter", filter2);
+   f2 = filter2.product();
+   //
+   edm::Handle<bool> filter3;
+   iEvent.getByLabel("MyeeBadScFilter", filter3);
+   f3 = filter3.product();
+   //
+   edm::Handle<bool> filter4;
+   iEvent.getByLabel("MyhcalLaserEventFilter", filter4);
+   f4 = filter4.product();
+   //
+   edm::Handle<bool> filter5;
+   iEvent.getByLabel("MytrackingFailureFilter", filter5);
+   f5 = filter5.product();
 
   //  NPxlMaxPtTrk->clear();
   //  NSiIMaxPtTrk->clear();
@@ -879,6 +909,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
    // fill tree
    //   if( mass_mumu >= 40. ) t1->Fill();
+
    if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0) ) t1->Fill();
 }
 //define this as a plug-in

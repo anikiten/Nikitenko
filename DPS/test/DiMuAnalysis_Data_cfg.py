@@ -103,6 +103,9 @@ process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 process.MytrackingFailureFilter = process.trackingFailureFilter.clone()
 process.MytrackingFailureFilter.taggingMode  = cms.bool(True)
 
+## filter laser HCAL 2012 events
+process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi")
+
 ## total sequence
 process.filtersSeq = cms.Sequence(
    process.primaryVertexFilter *
@@ -113,7 +116,8 @@ process.filtersSeq = cms.Sequence(
    process.MyEcalDeadCellTriggerPrimitiveFilter *
    process.goodVertices * process.MytrackingFailureFilter *
    process.MyeeBadScFilter *
-   process.MyecalLaserCorrFilter
+   process.MyecalLaserCorrFilter*
+   process.hcallasereventfilter2012	
 )
 
 
