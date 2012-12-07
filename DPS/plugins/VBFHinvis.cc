@@ -163,7 +163,7 @@ private:
   // run/event
   int     run, event; 
   //
-  bool    f1, f2, f3, f4, f5;  
+  int     f1, f2, f3, f4, f5;  
   // trigger flags
   int     L1ETM40, VBF_AllJets, DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
   // vertex
@@ -178,7 +178,8 @@ private:
   std::vector<double> *PhiMu;
   std::vector<double> *PtMu;
   std::vector<double> *dzmuon;
-  std::vector<double> *muisol;
+  std::vector<double> *mutrkisol;
+  std::vector<double> *mupfisol;
   // eta/phi/pt of raw calo jet from JPT
   std::vector<double> *EtaRaw;
   std::vector<double> *PhiRaw;
@@ -226,7 +227,8 @@ VBFHinvis::beginJob()
   PhiMu        = new std::vector<double>();
   PtMu         = new std::vector<double>();
   dzmuon       = new std::vector<double>();
-  muisol       = new std::vector<double>();
+  mutrkisol    = new std::vector<double>();
+  mupfisol     = new std::vector<double>();
 
   EtaRaw       = new std::vector<double>();  
   PhiRaw       = new std::vector<double>();
@@ -281,7 +283,8 @@ VBFHinvis::beginJob()
   t1->Branch("PhiMu","vector<double>",&PhiMu);
   t1->Branch("PtMu" ,"vector<double>",&PtMu);
   t1->Branch("dzmuon" ,"vector<double>",&dzmuon);
-  t1->Branch("muisol" ,"vector<double>",&muisol);
+  t1->Branch("mutrkisol" ,"vector<double>",&mutrkisol);
+  t1->Branch("mupfisol" ,"vector<double>",&mupfisol);
 
   t1->Branch("EtaRaw","vector<double>",&EtaRaw);
   t1->Branch("PhiRaw","vector<double>",&PhiRaw);
@@ -404,7 +407,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   PhiMu->clear();
   PtMu->clear();
   dzmuon->clear();
-  muisol->clear();
+  mutrkisol->clear();
+  mupfisol->clear();
 
   EtaRaw->clear();
   PhiRaw->clear();
@@ -492,23 +496,23 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // MET filters
    edm::Handle<bool> filter1;
    iEvent.getByLabel("MyEcalDeadCellTriggerPrimitiveFilter", filter1);
-   f1 = filter1.product();
+   f1 = (int)(*(filter1.product()));
    //
    edm::Handle<bool> filter2;
    iEvent.getByLabel("MyecalLaserCorrFilter", filter2);
-   f2 = filter2.product();
+   f2 = (int)(*(filter2.product()));
    //
    edm::Handle<bool> filter3;
    iEvent.getByLabel("MyeeBadScFilter", filter3);
-   f3 = filter3.product();
+   f3 = (int)(*(filter3.product()));
    //
    edm::Handle<bool> filter4;
    iEvent.getByLabel("MyhcalLaserEventFilter", filter4);
-   f4 = filter4.product();
+   f4 = (int)(*(filter4.product()));
    //
    edm::Handle<bool> filter5;
    iEvent.getByLabel("MytrackingFailureFilter", filter5);
-   f5 = filter5.product();
+   f5 = (int)(*(filter5.product()));
 
   //  NPxlMaxPtTrk->clear();
   //  NSiIMaxPtTrk->clear();
@@ -659,15 +663,18 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      RecoMuons::const_iterator imuon = reco_muons->begin(); 
      RecoMuons::const_iterator jmuon = reco_muons->end();
      for ( ; imuon != jmuon; ++imuon ) {
-       if ( imuon->innerTrack().isNull() ||
+       if(!muon::isTightMuon(*imuon,(*recVtxs)[0])) {continue;}
+       /* 2011 tight muons
+	  if ( imuon->innerTrack().isNull() ||
 	    
-	    // (*imuon).charge()
-	    !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
-	    imuon->numberOfMatchedStations() <= 1 ||
-	    imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
-	    imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
-	    fabs(imuon->innerTrack()->dxy(bs)) > 0.2 ) { continue; }
-       
+	  // (*imuon).charge()
+	  !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
+	  imuon->numberOfMatchedStations() <= 1 ||
+	  imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
+	  imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
+	  fabs(imuon->innerTrack()->dxy(bs)) > 0.2 ) { continue; }
+       */
+
        pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
        
      }
@@ -690,11 +697,17 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        PtMu->push_back(muon->innerTrack()->pt());
        double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
        dzmuon->push_back(dzvtx);
-       // muon isolation variables
-       double muon_sumPt = muon->isolationR03().sumPt;
-       double muon_emEt  = muon->isolationR03().emEt;
-       double muon_hadEt = muon->isolationR03().hadEt;
-       muisol->push_back(muon_sumPt);
+       // tracker muon isolation variables
+       double muon_sumTrkPt = muon->isolationR03().sumPt;
+       //       double muon_emEt  = muon->isolationR03().emEt;
+       //       double muon_hadEt = muon->isolationR03().hadEt;
+       mutrkisol->push_back(muon_sumTrkPt);
+       // pf isolation variable
+       const MuonPFIsolation pfisol = muon->pfIsolationR04();
+       double muon_sumPFPt = pfisol.sumChargedHadronPt +
+       	 max(0.,pfisol.sumNeutralHadronEt+pfisol.sumPhotonEt-0.5*pfisol.sumPUPt);
+       mupfisol->push_back(muon_sumPFPt);
+
        if (imu == 1) muon1 = muonc; 
        if (imu == 2) muon2 = muonc; 
        rmfirst++;
@@ -910,7 +923,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // fill tree
    //   if( mass_mumu >= 40. ) t1->Fill();
 
-   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0) ) t1->Fill();
+   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0 || mass_mumu >= 40) ) t1->Fill();
 }
 //define this as a plug-in
 DEFINE_FWK_MODULE(VBFHinvis);
