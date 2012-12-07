@@ -180,6 +180,7 @@ private:
   std::vector<double> *dzmuon;
   std::vector<double> *mutrkisol;
   std::vector<double> *mupfisol;
+  std::vector<int>    *mucharge;
   // eta/phi/pt of raw calo jet from JPT
   std::vector<double> *EtaRaw;
   std::vector<double> *PhiRaw;
@@ -229,6 +230,7 @@ VBFHinvis::beginJob()
   dzmuon       = new std::vector<double>();
   mutrkisol    = new std::vector<double>();
   mupfisol     = new std::vector<double>();
+  mucharge     = new std::vector<int>();
 
   EtaRaw       = new std::vector<double>();  
   PhiRaw       = new std::vector<double>();
@@ -285,6 +287,7 @@ VBFHinvis::beginJob()
   t1->Branch("dzmuon" ,"vector<double>",&dzmuon);
   t1->Branch("mutrkisol" ,"vector<double>",&mutrkisol);
   t1->Branch("mupfisol" ,"vector<double>",&mupfisol);
+  t1->Branch("mucharge" ,"vector<int>",&mucharge);
 
   t1->Branch("EtaRaw","vector<double>",&EtaRaw);
   t1->Branch("PhiRaw","vector<double>",&PhiRaw);
@@ -409,6 +412,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   dzmuon->clear();
   mutrkisol->clear();
   mupfisol->clear();
+  mucharge->clear();
 
   EtaRaw->clear();
   PhiRaw->clear();
@@ -659,26 +663,26 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // access muons and jets
    if( nvtx >= 1 ) {
 
-     // muons
+     // tight and loose muons
      RecoMuons::const_iterator imuon = reco_muons->begin(); 
      RecoMuons::const_iterator jmuon = reco_muons->end();
      for ( ; imuon != jmuon; ++imuon ) {
-       if(!muon::isTightMuon(*imuon,(*recVtxs)[0])) {continue;}
-       /* 2011 tight muons
-	  if ( imuon->innerTrack().isNull() ||
-	    
-	  // (*imuon).charge()
-	  !muon::isGoodMuon(*imuon,muon::GlobalMuonPromptTight) ||
-	  imuon->numberOfMatchedStations() <= 1 ||
-	  imuon->innerTrack()->hitPattern().numberOfValidTrackerHits() <= 10 ||
-	  imuon->innerTrack()->hitPattern().numberOfValidPixelHits() == 0 ||
-	  fabs(imuon->innerTrack()->dxy(bs)) > 0.2 ) { continue; }
-       */
-
-       pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
-       
+       // tight muons
+       if(muon::isTightMuon(*imuon,(*recVtxs)[0])) {
+	 pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
+       }
+       // loose muons
+       if( (*imuon).isPFMuon() && ((*imuon).isGlobalMuon() || (*imuon).isTrackerMuon()) ) {
+	 double pT  = (*imuon).pt(); 
+	 double eta = (*imuon).eta(); 
+	 double phi = (*imuon).phi(); 
+	 double muon_sumTrkPt = (*imuon).isolationR03().sumPt;
+	 const MuonPFIsolation pfisol = (*imuon).pfIsolationR04();
+	 double muon_sumPFPt = pfisol.sumChargedHadronPt +
+	   max(0.,pfisol.sumNeutralHadronEt+pfisol.sumPhotonEt-0.5*pfisol.sumPUPt);
+       }
      }
-    
+
      // fill muon variables
      map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
      map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
@@ -695,6 +699,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        EtaMu->push_back(muon->innerTrack()->eta());
        PhiMu->push_back(muon->innerTrack()->phi());
        PtMu->push_back(muon->innerTrack()->pt());
+       mucharge->push_back(muon->charge());
        double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
        dzmuon->push_back(dzvtx);
        // tracker muon isolation variables
