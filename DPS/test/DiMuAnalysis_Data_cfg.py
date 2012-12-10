@@ -120,7 +120,8 @@ process.filtersSeq = cms.Sequence(
    process.hcallasereventfilter2012	
 )
 
-
+## for usage of JES from JetMET latest development
+## see on https://twiki.cern.ch/twiki/bin/view/CMS/JetPlusTracksCorrections
 #from CondCore.DBCommon.CondDBSetup_cfi import *
 #process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
 #                       connect =
