@@ -692,15 +692,16 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        const Muon* muon = (*rmfirst).second;
        
        imu++;
-       math::XYZTLorentzVector muonc(muon->innerTrack()->px(),
-				     muon->innerTrack()->py(), 
-				     muon->innerTrack()->pz(), 
-				     muon->innerTrack()->p()); 
-       EtaMu->push_back(muon->innerTrack()->eta());
-       PhiMu->push_back(muon->innerTrack()->phi());
-       PtMu->push_back(muon->innerTrack()->pt());
+       math::XYZTLorentzVector muonc(muon->px(),
+				     muon->py(), 
+				     muon->pz(), 
+				     muon->p()); 
+
+       EtaMu->push_back(muon->eta());
+       PhiMu->push_back(muon->phi());
+       PtMu->push_back(muon->pt());
        mucharge->push_back(muon->charge());
-       double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
+       double dzvtx = fabs(muon->muonBestTrack()->dz((*recVtxs)[0].position()) );
        dzmuon->push_back(dzvtx);
        // tracker muon isolation variables
        double muon_sumTrkPt = muon->isolationR03().sumPt;
