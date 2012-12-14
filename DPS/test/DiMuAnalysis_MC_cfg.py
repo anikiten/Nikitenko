@@ -3,16 +3,34 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("RECO3")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.GlobalTag.globaltag = cms.string('START44_V13::All') 
+process.GlobalTag.globaltag = cms.string('START53_V15::All') 
+
+# MVA PU jets ID
+process.load("CMGTools.External.pujetidsequence_cff")
+from CMGTools.External.pujetidsequence_cff import puJetId
+process.recoPuJetId = puJetId.clone(
+   jets = cms.InputTag("ak5PFJetsL1L2L3"),
+   applyJec = cms.bool(False),
+   inputIsCorrected = cms.bool(True)                
+)
+
+from CMGTools.External.pujetidsequence_cff import puJetMva
+process.recoPuJetMva = puJetMva.clone(
+   jets = cms.InputTag("ak5PFJetsL1L2L3"),
+   jetids = cms.InputTag("recoPuJetId"),
+   applyJec = cms.bool(False),
+   inputIsCorrected = cms.bool(True)                
+)
 
 process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
+process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
 from CondCore.DBCommon.CondDBSetup_cfi import *
 process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
@@ -51,8 +69,8 @@ fileNames = cms.untracked.vstring(
 )
 
 
-process.myjetplustrack = cms.EDAnalyzer("DiMuAnalysis_Data",
-    HistOutFile = cms.untracked.string('DiMuAnalysis_MC.root'),
+process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
+    HistOutFile = cms.untracked.string('VBFHinvis.root'),
     DataOrMC = cms.untracked.int32(1),
     Muons    = cms.InputTag("muons"),	
     calojets = cms.InputTag("ak5CaloJets"),
@@ -71,6 +89,13 @@ process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
 # process.p1 = cms.Path(process.dump)
 
+#process.p1 = cms.Path(process.ak5JTA*process.recoJPTJets*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
 
-process.p1 = cms.Path(process.ak5JTA*process.recoJPTJets*process.ak5JPTJetsL1L2L3*process.myjetplustrack)
-
+process.p1 = cms.Path(process.producePFMETCorrections*
+                      process.ak5PFJetsL1L2L3*
+                      process.recoPuJetId*
+                      process.recoPuJetMva*
+                      process.ak5JTA*
+                      process.jetPlusTrackZSPCorJetAntiKt5*
+                      process.ak5JPTJetsL1L2L3*
+                      process.myjetplustrack)

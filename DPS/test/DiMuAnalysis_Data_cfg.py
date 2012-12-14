@@ -26,7 +26,7 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
 # process.GlobalTag.globaltag = cms.string('GR_R_53_V13::All') 
 
-process.GlobalTag.globaltag = cms.string('FT_53_V6_AN2::All') 
+process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
 
 # MVA PU jets ID
 process.load("CMGTools.External.pujetidsequence_cff")
