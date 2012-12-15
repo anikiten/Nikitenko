@@ -7,7 +7,8 @@ process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.GlobalTag.globaltag = cms.string('START53_V15::All') 
+#process.GlobalTag.globaltag = cms.string('START53_V15::All') 
+process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
 
 # MVA PU jets ID
 process.load("CMGTools.External.pujetidsequence_cff")
@@ -32,31 +33,6 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
-from CondCore.DBCommon.CondDBSetup_cfi import *
-process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-                                connect =
-cms.string("sqlite:src/CondFormats/JetMETObjects/data/Fall11.db"),
-                                toGet =  cms.VPSet(
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Fall11_AK5Calo"),
-                                label=cms.untracked.string("AK5Calo")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Fall11_AK5PF"),
-                                label=cms.untracked.string("AK5PF")),
-                       cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                                tag =
-cms.string("JetCorrectorParametersCollection_Fall11_AK5JPT"),
-                                label=cms.untracked.string("AK5JPT"))
-                       )
-                   )
-process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
-
-process.ak5JPTL1Offset.algorithm = 'AK5JPT'
-process.ak5JetTracksAssociatorAtVertex.useAssigned = cms.bool(True)
-process.ak5JetTracksAssociatorAtVertex.pvSrc = cms.InputTag("offlinePrimaryVertices")
-
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
 )
@@ -65,7 +41,8 @@ process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
 # '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
 #  'rfio:/castor/cern.ch/user/a/anikiten/di_muon_mc44/di_muon_mc44x_1_1_YUh.root')
-  'file:/tmp/anikiten/dymadgraph.root')	
+#  'file:/tmp/anikiten/dymadgraph.root')	
+  'file:/localscratch/MET_PD_test/MET_PD_test_1_1_JAH.root')
 )
 
 
@@ -77,6 +54,7 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
     JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),
+    PFjetsL1L2L3 = cms.InputTag("ak5PFJetsL1L2L3"),
     TriggerResults = cms.InputTag("TriggerResults","","HLT")	
 )
 
