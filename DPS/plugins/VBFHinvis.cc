@@ -151,6 +151,8 @@ private:
   edm::InputTag JPTjetsSrc;
   // JPT jets L1L2L3 corr
   edm::InputTag JPTjetsL1L2L3Src;
+  // PF jets L1L2L3 corr
+  edm::InputTag PFjetsL1L2L3Src;  
   // MC jet corrections
   //  string JetCorrectionMC;
   // PF jet corrections
@@ -346,6 +348,8 @@ VBFHinvis::VBFHinvis(const edm::ParameterSet& iConfig)
   JPTjetsSrc       = iConfig.getParameter<edm::InputTag>("JPTjets");
   // JPT L1L2L3 corrected
   JPTjetsL1L2L3Src = iConfig.getParameter<edm::InputTag>("JPTjetsL1L2L3");
+  // PF L1L2L3 corrected
+  PFjetsL1L2L3Src = iConfig.getParameter<edm::InputTag>("PFjetsL1L2L3");
   // calo jets
   calojetsSrc      = iConfig.getParameter<edm::InputTag>("calojets");
   // MC corrections
@@ -452,7 +456,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // pf jets corrected
    edm::Handle<edm::View <reco::Jet> > pfjetsl1l2l3;
    //   edm::Handle<PFJetCollection> pfjetsl1l2l3;
-   iEvent.getByLabel("ak5PFJetsL1L2L3Residual", pfjetsl1l2l3);
+   iEvent.getByLabel(PFjetsL1L2L3Src, pfjetsl1l2l3);
    reco::JetRefBaseProd pfjetref(*pfjetsl1l2l3);
 
    // MVA PU PF jet discriminator
