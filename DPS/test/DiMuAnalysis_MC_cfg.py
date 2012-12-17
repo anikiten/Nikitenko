@@ -7,8 +7,8 @@ process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-#process.GlobalTag.globaltag = cms.string('START53_V15::All') 
-process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
+process.GlobalTag.globaltag = cms.string('START53_V15::All') 
+#process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
 
 # MVA PU jets ID
 process.load("CMGTools.External.pujetidsequence_cff")
