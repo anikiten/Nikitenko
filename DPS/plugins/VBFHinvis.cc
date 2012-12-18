@@ -196,6 +196,7 @@ private:
   std::vector<double> *EtaJPT;
   std::vector<double> *PhiJPT;
   std::vector<double> *EtJPT;
+  std::vector<float>  *MVAJPT;
   // JPT N in-vertex-cone tracks
   std::vector<int>    *Ntrk;
   // JPT JES uncertainty
@@ -251,6 +252,7 @@ VBFHinvis::beginJob()
   EtaJPT       = new std::vector<double>();
   PhiJPT       = new std::vector<double>();
   EtJPT        = new std::vector<double>();
+  MVAJPT       = new std::vector<float>();
   Ntrk         = new std::vector<int>();
   jesunc       = new std::vector<double>();
   beta         = new std::vector<double>();;
@@ -308,6 +310,7 @@ VBFHinvis::beginJob()
   t1->Branch("EtaJPT","vector<double>",&EtaJPT);
   t1->Branch("PhiJPT","vector<double>",&PhiJPT);
   t1->Branch("EtJPT" ,"vector<double>",&EtJPT);
+  t1->Branch("MVAJPT" ,"vector<float>",&MVAJPT);
   t1->Branch("Ntrk","vector<int>",&Ntrk);
   t1->Branch("jesunc" ,"vector<double>",&jesunc);
   t1->Branch("beta" ,"vector<double>",&beta);
@@ -473,6 +476,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   EtaJPT->clear();
   PhiJPT->clear();
   EtJPT->clear();
+  MVAJPT->clear();
   Ntrk->clear();
   jesunc->clear(); 
   beta->clear(); 
@@ -998,64 +1002,43 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       dAxis1t = x1tr;
       dAxis2t = x2tr;
       // Run MVA PUID
-      float mva_ = 1.;
+      float jptmva = 1.;
       if(fabs(EtaJ)<2.6) {
-	mva_ = reader_->EvaluateMVA( "BDTG method" );
+	jptmva = reader_->EvaluateMVA( "BDTG method" );
       } else {
-        mva_ = readerF_->EvaluateMVA( "BDTG method" );
+        jptmva = readerF_->EvaluateMVA( "BDTG method" );
       }
 
-     /*
-     // find track with max pT and number of layers it crosses
-     double pTMax = 0.;
-     int NLayersPxl = 0;
-     int NLayersSiI = 0;
-     int NLayersSiO = 0;
-     // loop over in-vertex-in calo tracks
-     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexInCalo.begin(); 
-	  iInConeVtxTrk != pionsInVertexInCalo.end(); ++iInConeVtxTrk) {
-       const double pt  = (*iInConeVtxTrk)->pt();
-       if(pt > pTMax) {
-	 pTMax = pt;
-	 NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	 NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+
-	              (*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	 NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+
-	              (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-       }
-     }
-    
-     // loop over in-vertex-out of calo tracks
-     for (reco::TrackRefVector::const_iterator iInConeVtxTrk = pionsInVertexOutCalo.begin(); 
-	  iInConeVtxTrk != pionsInVertexOutCalo.end(); ++iInConeVtxTrk) {
-       const double pt  = (*iInConeVtxTrk)->pt();
-       if(pt > pTMax) {
-	 pTMax = pt;
-	 NLayersPxl = (*iInConeVtxTrk)->hitPattern().pixelLayersWithMeasurement();
-	 NLayersSiI = (*iInConeVtxTrk)->hitPattern().stripTIBLayersWithMeasurement()+
-                      (*iInConeVtxTrk)->hitPattern().stripTIDLayersWithMeasurement();
-	 NLayersSiO = (*iInConeVtxTrk)->hitPattern().stripTOBLayersWithMeasurement()+
-                      (*iInConeVtxTrk)->hitPattern().stripTECLayersWithMeasurement();
-       }
-     }
-     */
+      cout <<" jet jc = " << jc 
+	   <<" Nvtx = " << Nvtx
+	   <<" PtJ = " << PtJ
+	   <<" EtaJ = " << EtaJ
+	   <<" Beta = " << Beta
+	   <<" MultCalo = " << MultCalo
+	   <<" dAxis1c = " << dAxis1c
+	   <<" dAxis2c = " << dAxis2c
+	   <<" MultTr = " << MultTr
+	   <<" dAxis1t = " << dAxis1t
+	   <<" dAxis2t = " << dAxis2t << endl;
+      // THE HAPPY END OF MVA PU ID story for JPT
 
-     //     jecUnc->setJetEta(jptjet->eta());
-     //     jecUnc->setJetPt (jptjet->pt() ); 
-     //     double unc = jecUnc->getUncertainty(true);
+      //     jecUnc->setJetEta(jptjet->eta());
+      //     jecUnc->setJetPt (jptjet->pt() ); 
+      //     double unc = jecUnc->getUncertainty(true);
    
-     double unc = 0.;
-     // fill variables for user ntpl
-     EtaRaw->push_back(jptjetRef->eta());
-     PhiRaw->push_back(jptjetRef->phi());
-     EtRaw->push_back(jptjetRef->pt());
+      double unc = 0.;
+      // fill variables for user ntpl
+      EtaRaw->push_back(jptjetRef->eta());
+      PhiRaw->push_back(jptjetRef->phi());
+      EtRaw->push_back(jptjetRef->pt());
 
-     EtaJPT->push_back(jptjet->eta());
-     PhiJPT->push_back(jptjet->phi());
-     EtJPT->push_back(jptjet->pt());
-     Ntrk->push_back(npions);
-     jesunc->push_back(unc);
-     beta->push_back(jptjet->getSpecific().Zch);
+      EtaJPT->push_back(jptjet->eta());
+      PhiJPT->push_back(jptjet->phi());
+      EtJPT->push_back(jptjet->pt());
+      MVAJPT->push_back(jptmva);
+      Ntrk->push_back(npions);
+      jesunc->push_back(unc);
+      beta->push_back(jptjet->getSpecific().Zch);
    }
 
    delete jecUnc;

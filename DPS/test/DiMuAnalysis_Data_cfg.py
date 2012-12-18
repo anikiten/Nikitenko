@@ -167,6 +167,7 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
     jetsID  = cms.InputTag("ak5JetID"),
     JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
     JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
+    PFjetsL1L2L3 = cms.InputTag("ak5PFJetsL1L2L3Residual"),
 #    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),
     TriggerResults = cms.InputTag("TriggerResults","","HLT")	
 )
