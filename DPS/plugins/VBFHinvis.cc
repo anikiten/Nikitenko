@@ -5,11 +5,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+// MVA
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
 // /CMSSW/Calibration/HcalAlCaRecoProducers/src/AlCaIsoTracksProducer.cc  track propagator
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-
+//
 #include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -43,6 +46,7 @@
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/GenVector/PxPyPzE4D.h"
 #include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Math/interface/deltaPhi.h"
 //double dR = deltaR( c1, c2 );
 //
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
@@ -60,6 +64,7 @@
 #include "DataFormats/JetReco/interface/JPTJet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -207,6 +212,12 @@ private:
   std::vector<int>    *IDPF;
   std::vector<int>    *JTypePF;
   //
+  // MVA variables 
+  float Nvtx,PtJ,EtaJ,Beta,MultCalo,dAxis1c,dAxis2c,MultTr,dAxis1t,dAxis2t;
+  TMVA::Reader * reader_; 
+  TMVA::Reader * readerF_;
+  std::string    tmvaWeights_, tmvaWeightsF_, tmvaMethod_;
+  //
   TFile*      hOutputFile ;
   TTree*      t1;
 };
@@ -312,6 +323,44 @@ VBFHinvis::beginJob()
   t1->Branch("IDPF","vector<int>",&IDPF);
   t1->Branch("JTypePF","vector<int>",&JTypePF);
 
+  // MVA staff 
+  // Read TMVA tree
+  std::string mvaw     = "CondFormats/JetMETObjects/data/TMVAClassification_BDTG.weights.xml";       
+  std::string mvawF    = "CondFormats/JetMETObjects/data/TMVAClassification_BDTG.weights_F.xml";
+  tmvaWeights_         = edm::FileInPath(mvaw).fullPath();
+  tmvaWeightsF_        = edm::FileInPath(mvawF).fullPath();
+  tmvaMethod_          = "BDTG method";
+  //
+  std::cout<<" TMVA method "<<tmvaMethod_.c_str()<<" "<<tmvaWeights_.c_str()<<std::endl;
+  //
+  //#########################################################################
+  // make variables used for |eta_j| < 2.6 known for MVA:
+  reader_ = new TMVA::Reader( "!Color:!Silent" );
+  //  
+  reader_->AddVariable( "Nvtx", &Nvtx );
+  reader_->AddVariable( "PtJ", &PtJ );
+  reader_->AddVariable( "EtaJ", &EtaJ );
+  reader_->AddVariable( "Beta", &Beta );
+  reader_->AddVariable( "MultCalo", &MultCalo );
+  reader_->AddVariable( "dAxis1c", &dAxis1c );
+  reader_->AddVariable( "dAxis2c", &dAxis2c );
+  reader_->AddVariable( "MultTr", &MultTr );
+  reader_->AddVariable( "dAxis1t", &dAxis1t );
+  reader_->AddVariable( "dAxis2t", &dAxis2t );
+  //
+  reader_->BookMVA(tmvaMethod_.c_str(), tmvaWeights_.c_str());
+  //#########################################################################
+  // make variables used for |eta_j| > 2.6 known for MVA:
+  readerF_ = new TMVA::Reader( "!Color:!Silent" );
+  //
+  readerF_->AddVariable( "Nvtx", &Nvtx );
+  readerF_->AddVariable( "PtJ", &PtJ );
+  readerF_->AddVariable( "EtaJ", &EtaJ );
+  readerF_->AddVariable( "MultCalo", &MultCalo );
+  readerF_->AddVariable( "dAxis1c", &dAxis1c );
+  readerF_->AddVariable( "dAxis2c", &dAxis2c );
+  //
+  readerF_->BookMVA(tmvaMethod_.c_str(), tmvaWeightsF_.c_str());
   return ;
 }
 
@@ -501,26 +550,29 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByLabel("pfType1CorrectedMet", metsType1);
    pfmetType1 = metsType1->front().pt();
 
-   // MET filters
-   edm::Handle<bool> filter1;
-   iEvent.getByLabel("MyEcalDeadCellTriggerPrimitiveFilter", filter1);
-   f1 = (int)(*(filter1.product()));
-   //
-   edm::Handle<bool> filter2;
-   iEvent.getByLabel("MyecalLaserCorrFilter", filter2);
-   f2 = (int)(*(filter2.product()));
-   //
-   edm::Handle<bool> filter3;
-   iEvent.getByLabel("MyeeBadScFilter", filter3);
-   f3 = (int)(*(filter3.product()));
-   //
-   edm::Handle<bool> filter4;
-   iEvent.getByLabel("MyhcalLaserEventFilter", filter4);
-   f4 = (int)(*(filter4.product()));
-   //
-   edm::Handle<bool> filter5;
-   iEvent.getByLabel("MytrackingFailureFilter", filter5);
-   f5 = (int)(*(filter5.product()));
+   if(DataOrMCSrc == 0) {
+
+     // MET filters
+     edm::Handle<bool> filter1;
+     iEvent.getByLabel("MyEcalDeadCellTriggerPrimitiveFilter", filter1);
+     f1 = (int)(*(filter1.product()));
+     //
+     edm::Handle<bool> filter2;
+     iEvent.getByLabel("MyecalLaserCorrFilter", filter2);
+     f2 = (int)(*(filter2.product()));
+     //
+     edm::Handle<bool> filter3;
+     iEvent.getByLabel("MyeeBadScFilter", filter3);
+     f3 = (int)(*(filter3.product()));
+     //
+     edm::Handle<bool> filter4;
+     iEvent.getByLabel("MyhcalLaserEventFilter", filter4);
+     f4 = (int)(*(filter4.product()));
+     //
+     edm::Handle<bool> filter5;
+     iEvent.getByLabel("MytrackingFailureFilter", filter5);
+     f5 = (int)(*(filter5.product()));
+   }
 
   //  NPxlMaxPtTrk->clear();
   //  NSiIMaxPtTrk->clear();
@@ -834,6 +886,125 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
      int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
 
+     // prepare variables for MVA PU jet ID 
+     //
+     // Get MVA variables with calotowers
+     int ncalotowers=0.;
+     double sumpt=0.;
+     double dphi2=0.;
+     double deta2=0.;
+     double dphi1=0.;
+     double deta1=0.;
+     double dphideta=0.;
+     std::vector <CaloTowerPtr> calotwrs = (*rawcalojet).getCaloConstituents();
+      for(std::vector <CaloTowerPtr>::const_iterator icalot = calotwrs.begin();
+                                                     icalot!= calotwrs.end(); icalot++) {
+
+	double  deta = (*jptjet).eta()-(*icalot)->eta();
+        double  dphi = deltaPhi((*jptjet).phi(),(*icalot)->phi());
+	double  dr   = deltaR(jptjet->eta(),jptjet->phi(),(*icalot)->eta(),(*icalot)->phi());
+        sumpt = sumpt + (*icalot)->pt();
+        dphi2 = dphi2 + dphi*dphi*(*icalot)->pt();
+        deta2 = deta2 + deta*deta*(*icalot)->pt();      
+        dphi1 = dphi1 + dphi*(*icalot)->pt();
+        deta1 = deta1 + deta*(*icalot)->pt();   
+        dphideta = dphideta + dphi*deta*(*icalot)->pt();  
+	ncalotowers++;
+      }
+      if( sumpt > 0.) {
+	deta1 = deta1/sumpt;
+	dphi1 = dphi1/sumpt;
+	deta2 = deta2/sumpt;
+	dphi2 = dphi2/sumpt;
+	dphideta = dphideta/sumpt;
+      }
+      // W.r.t. principal axis
+      double detavar = deta2-deta1*deta1;
+      double dphivar = dphi2-dphi1*dphi1;
+      double dphidetacov = dphideta - deta1*dphi1;
+      
+      double det = (detavar-dphivar)*(detavar-dphivar)+4*dphidetacov*dphidetacov;
+      double x1 = (detavar+dphivar+sqrt(det))/2.;
+      double x2 = (detavar+dphivar-sqrt(det))/2.;
+      //
+      // Get MVA variables with tracks
+      int ntracks=0.;
+      double sumpttr=0.;
+      double dphitr2=0.;
+      double detatr2=0.;
+      double dphitr1=0.;
+      double detatr1=0.;
+      double dphidetatr=0.;
+      // in vertex, in calo tracks     
+      const reco::TrackRefVector pioninin = (*jptjet).getPionsInVertexInCalo();
+      for(reco::TrackRefVector::const_iterator it = pioninin.begin(); 
+	  it != pioninin.end(); it++) {      
+	if ((*it)->pt() > 0.5 && ((*it)->ptError()/(*it)->pt()) < 0.05 )
+	  {              
+	    ntracks++;
+	    sumpttr = sumpttr + (*it)->pt();       
+	    double  deta = (*jptjet).eta()-(*it)->eta();
+	    double  dphi = deltaPhi((*jptjet).phi(),(*it)->phi());
+	    dphitr2 = dphitr2 + dphi*dphi*(*it)->pt();
+	    detatr2 = detatr2 + deta*deta*(*it)->pt();     
+	    dphitr1 = dphitr1 + dphi*(*it)->pt();
+	    detatr1 = detatr1 + deta*(*it)->pt();  
+	    dphidetatr = dphidetatr + dphi*deta*(*it)->pt();
+	  }      
+      }	
+
+      const reco::TrackRefVector pioninout = (*jptjet).getPionsInVertexOutCalo();
+      
+      for(reco::TrackRefVector::const_iterator it = pioninout.begin(); 
+	  it != pioninout.end(); it++) {      
+	if ((*it)->pt() > 0.5 && ((*it)->ptError()/(*it)->pt()) < 0.05 )
+	  {              
+	    ntracks++;
+	    sumpttr = sumpttr + (*it)->pt();       
+	    double  deta = (*jptjet).eta()-(*it)->eta();
+	    double  dphi = deltaPhi((*jptjet).phi(),(*it)->phi());
+	    dphitr2 = dphitr2 + dphi*dphi*(*it)->pt();
+	    detatr2 = detatr2 + deta*deta*(*it)->pt();     
+	    dphitr1 = dphitr1 + dphi*(*it)->pt();
+	    detatr1 = detatr1 + deta*(*it)->pt();  
+	    dphidetatr = dphidetatr + dphi*deta*(*it)->pt();       
+	  }
+      }
+
+      if( sumpttr > 0.) {
+	detatr1 = detatr1/sumpttr;
+	dphitr1 = dphitr1/sumpttr;
+	detatr2 = detatr2/sumpttr;
+	dphitr2 = dphitr2/sumpttr;
+	dphidetatr = dphidetatr/sumpttr;
+      }
+      // W.r.t. principal axis
+      double detavart = detatr2-detatr1*detatr1;
+      double dphivart = dphitr2-dphitr1*dphitr1;
+      double dphidetacovt = dphidetatr - detatr1*dphitr1;
+      double dettr = (detavart-dphivart)*(detavart-dphivart)+4*dphidetacovt*dphidetacovt;
+      double x1tr = (detavart+dphivart+sqrt(dettr))/2.;
+      double x2tr = (detavart+dphivart-sqrt(dettr))/2.;
+      //
+      // Fill variables for MVA
+      Nvtx = nvertex; 
+      PtJ  = (*jptjet).pt();
+      EtaJ = (*jptjet).eta();
+      Beta = (*jptjet).getSpecific().Zch;
+      MultCalo = ncalotowers;
+      dAxis1c = x1;
+      dAxis2c = x2;
+      MultTr = ntracks;
+      dAxis1t = x1tr;
+      dAxis2t = x2tr;
+      // Run MVA PUID
+      float mva_ = 1.;
+      if(fabs(EtaJ)<2.6) {
+	mva_ = reader_->EvaluateMVA( "BDTG method" );
+      } else {
+        mva_ = readerF_->EvaluateMVA( "BDTG method" );
+      }
+
      /*
      // find track with max pT and number of layers it crosses
      double pTMax = 0.;
@@ -874,7 +1045,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      //     double unc = jecUnc->getUncertainty(true);
    
      double unc = 0.;
-
+     // fill variables for user ntpl
      EtaRaw->push_back(jptjetRef->eta());
      PhiRaw->push_back(jptjetRef->phi());
      EtRaw->push_back(jptjetRef->pt());
