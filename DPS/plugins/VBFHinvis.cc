@@ -890,7 +890,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
      int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
 
-     // prepare variables for MVA PU jet ID 
+     // prepare variables for MVA PU jet ID for JPT jets 
      //
      // Get MVA variables with calotowers
      int ncalotowers=0.;
@@ -1008,7 +1008,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       } else {
         jptmva = readerF_->EvaluateMVA( "BDTG method" );
       }
-
+      /*
       cout <<" jet jc = " << jc 
 	   <<" Nvtx = " << Nvtx
 	   <<" PtJ = " << PtJ
@@ -1019,7 +1019,9 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   <<" dAxis2c = " << dAxis2c
 	   <<" MultTr = " << MultTr
 	   <<" dAxis1t = " << dAxis1t
-	   <<" dAxis2t = " << dAxis2t << endl;
+	   <<" dAxis2t = " << dAxis2t 
+	   <<" jptmva = " << jptmva << endl;
+      */
       // THE HAPPY END OF MVA PU ID story for JPT
 
       //     jecUnc->setJetEta(jptjet->eta());
