@@ -28,6 +28,21 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
 process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
 
+# ############# electrons #################################################################
+# rho value for isolation
+#
+from RecoJets.JetProducers.kt4PFJets_cfi import *
+process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
+#
+# particle flow isolation
+#
+from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
+process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
+###########################################################################################
+
+
 # MVA PU jets ID
 process.load("CMGTools.External.pujetidsequence_cff")
 from CMGTools.External.pujetidsequence_cff import puJetId
@@ -161,15 +176,20 @@ fileNames = cms.untracked.vstring(
 
 process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
     HistOutFile = cms.untracked.string('VBFHinvis.root'),
-    DataOrMC = cms.untracked.int32(0),
-    Muons    = cms.InputTag("muons"),	
-    calojets = cms.InputTag("ak5CaloJets"),
-    jetsID  = cms.InputTag("ak5JetID"),
-    JPTjets = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
-    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
-    PFjetsL1L2L3 = cms.InputTag("ak5PFJetsL1L2L3Residual"),
-#    JPTjetsL1L2L3 = cms.InputTag("ak5JPTJetsL1L2L3"),
-    TriggerResults = cms.InputTag("TriggerResults","","HLT")	
+    DataOrMC            = cms.untracked.int32(0),
+    Muons               = cms.InputTag("muons"),
+    electronsInputTag   = cms.InputTag("gsfElectrons"),
+    conversionsInputTag = cms.InputTag("allConversions"),
+    rhoIsoInputTag      = cms.InputTag("kt6PFJetsForIsolation", "rho"),
+    isoValInputTags     = cms.VInputTag(cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
+                                        cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
+                                        cms.InputTag('elPFIsoValueNeutral03PFIdPFIso')),
+    calojets            = cms.InputTag("ak5CaloJets"),
+    jetsID              = cms.InputTag("ak5JetID"),
+    JPTjets             = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
+    JPTjetsL1L2L3       = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
+    PFjetsL1L2L3        = cms.InputTag("ak5PFJetsL1L2L3Residual"),
+    TriggerResults      = cms.InputTag("TriggerResults","","HLT")	
 )
 
 # JPTjetsL2L3 = cms.InputTag("ak5JPTJetsL2L3"),
@@ -187,13 +207,8 @@ process.p1 = cms.Path(process.filtersSeq*
                       process.ak5JTA*
                       process.jetPlusTrackZSPCorJetAntiKt5*
                       process.ak5JPTJetsL1L2L3Residual*
+	              process.kt6PFJetsForIsolation* 
+	              process.pfiso*
                       process.myjetplustrack)
-
-# process.p1 = cms.Path(process.metJESCorAK5PFJet*process.dump)
-
-#process.p1 = cms.Path(process.filtersSeq*
-#                      process.producePFMETCorrections*
-#                      process.ak5PFJetsL1L2L3Residual*
-#                      process.recoPuJetId*
-#                      process.recoPuJetMva*
 #                      process.dump)
+

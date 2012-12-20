@@ -57,6 +57,13 @@
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
+// electrons
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+#include "DataFormats/EgammaCandidates/interface/Conversion.h"
+#include "EGamma/EGammaAnalysisTools/interface/EGammaCutBasedEleId.h"
+// isolation
+#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 //jets
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
@@ -141,6 +148,7 @@ private:
   virtual void endJob() ;
 
   // ----------member data ---------------------------
+  // input tags
   // output root file
   string fOutputFileName ;
   // data or MC
@@ -158,12 +166,14 @@ private:
   edm::InputTag JPTjetsL1L2L3Src;
   // PF jets L1L2L3 corr
   edm::InputTag PFjetsL1L2L3Src;  
-  // MC jet corrections
-  //  string JetCorrectionMC;
-  // PF jet corrections
-  //  string JetCorrectionPF;
   // HLT result
-  edm:: InputTag srcTriggerResults_;
+  edm::InputTag srcTriggerResults_;
+  // electrons
+  edm::InputTag electronsInputTag_;
+  edm::InputTag conversionsInputTag_;
+  edm::InputTag rhoIsoInputTag;
+  std::vector<edm::InputTag> isoValInputTags_;
+
 
   // variables to store in ntpl
   //
@@ -226,6 +236,9 @@ private:
 //
 // constants, enums and typedefs
 //
+
+typedef std::vector< edm::Handle< edm::ValueMap<reco::IsoDeposit> > >   IsoDepositMaps;
+typedef std::vector< edm::Handle< edm::ValueMap<double> > >             IsoDepositVals;
 
 //
 // static data member definitions
@@ -401,15 +414,16 @@ VBFHinvis::VBFHinvis(const edm::ParameterSet& iConfig)
   // JPT L1L2L3 corrected
   JPTjetsL1L2L3Src = iConfig.getParameter<edm::InputTag>("JPTjetsL1L2L3");
   // PF L1L2L3 corrected
-  PFjetsL1L2L3Src = iConfig.getParameter<edm::InputTag>("PFjetsL1L2L3");
+  PFjetsL1L2L3Src  = iConfig.getParameter<edm::InputTag>("PFjetsL1L2L3");
   // calo jets
   calojetsSrc      = iConfig.getParameter<edm::InputTag>("calojets");
-  // MC corrections
-  //  JetCorrectionMC  = iConfig.getParameter< std::string > ("JetCorrectionMC");
-  // PF corrections
-  //  JetCorrectionPF  = iConfig.getParameter< std::string > ("JetCorrectionPF");
   // HLT results
   srcTriggerResults_ = iConfig.getParameter<edm::InputTag> ("TriggerResults");
+  // electrons, conversions and isolation
+  electronsInputTag_      = iConfig.getParameter<edm::InputTag>("electronsInputTag");
+  conversionsInputTag_    = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
+  rhoIsoInputTag          = iConfig.getParameter<edm::InputTag>("rhoIsoInputTag");
+  isoValInputTags_        = iConfig.getParameter<std::vector<edm::InputTag> >("isoValInputTags");
 }
 
 
@@ -492,72 +506,143 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   IDPF->clear(); 
   JTypePF->clear();
 
-
-  // muons
-   edm::Handle<RecoMuons> reco_muons;
-   iEvent.getByLabel(muonsSrc, reco_muons );
-   
-   // get jet ID map
-   edm::Handle<ValueMap<reco::JetID> > jetsID;
-   iEvent.getByLabel(jetsIDSrc,jetsID);
-   // 'ak5JetID'
-   
-   // pf jets
-   edm::Handle<PFJetCollection> pfjets;
-   iEvent.getByLabel("ak5PFJets", pfjets);
-
-   // pf jets corrected
-   edm::Handle<edm::View <reco::Jet> > pfjetsl1l2l3;
-   //   edm::Handle<PFJetCollection> pfjetsl1l2l3;
-   iEvent.getByLabel(PFjetsL1L2L3Src, pfjetsl1l2l3);
-   reco::JetRefBaseProd pfjetref(*pfjetsl1l2l3);
-
-   // MVA PU PF jet discriminator
-   edm::Handle<edm::ValueMap<float> > puJetIdMVA;
-   iEvent.getByLabel("recoPuJetMva","fullDiscriminant",puJetIdMVA);
-   //
-   edm::Handle<edm::ValueMap<int> > puJetIdFlag;
-   iEvent.getByLabel("recoPuJetMva","fullId",puJetIdFlag);
-   
-   // JPT jets raw
-   edm::Handle<reco::JPTJetCollection> jptjets;
-   iEvent.getByLabel(JPTjetsSrc, jptjets);
-   //   
-   // JPT jets L1L2L3
-   edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
-   iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
-
-  // JES uncertainty
-   std::string JEC_PATH("CondFormats/JetMETObjects/data/");
-   edm::FileInPath fip(JEC_PATH+"GR_R_53_V13_Uncertainty_AK5JPT.txt");
-   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fip.fullPath());
-   //   delete jecUnc;
+  // electrons
+  edm::Handle<reco::GsfElectronCollection> els_h;
+  iEvent.getByLabel(electronsInputTag_, els_h);
   
-  // Calo jets
-   edm::Handle<CaloJetCollection> calojets;
-   iEvent.getByLabel(calojetsSrc, calojets);
+  // conversions
+  edm::Handle<reco::ConversionCollection> conversions_h;
+  iEvent.getByLabel(conversionsInputTag_, conversions_h);
+
+  // iso deposits
+  IsoDepositVals isoVals(isoValInputTags_.size());
+  for (size_t j = 0; j < isoValInputTags_.size(); ++j) {
+    iEvent.getByLabel(isoValInputTags_[j], isoVals[j]);
+  }
+  
+  // rho for isolation
+  edm::Handle<double> rhoIso_h;
+  iEvent.getByLabel(rhoIsoInputTag, rhoIso_h);
+  double rhoIso = *(rhoIso_h.product());
 
   // get vertex
-   edm::Handle<reco::VertexCollection> recVtxs;
-   iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
-
+  edm::Handle<reco::VertexCollection> recVtxs;
+  iEvent.getByLabel("offlinePrimaryVertices",recVtxs);
+  
   // get beam spot
-   edm::Handle<reco::BeamSpot> beamSpot_;
-   iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
-   const reco::BeamSpot& bs = *(beamSpot_.product());
+  edm::Handle<reco::BeamSpot> beamSpot_;
+  iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
+  const reco::BeamSpot& bs = *(beamSpot_.product());
+  
+  // loop on electrons
+  unsigned int n = els_h->size();
+  for(unsigned int i = 0; i < n; ++i) {
+    // get reference to electron
+    reco::GsfElectronRef ele(els_h, i);
+    //
+    // get particle flow isolation
+    //
+    double iso_ch =  (*(isoVals)[0])[ele];
+    double iso_em = (*(isoVals)[1])[ele];
+    double iso_nh = (*(isoVals)[2])[ele];
 
-   edm::Handle<reco::PFMETCollection> mets;
-   iEvent.getByLabel("pfMet", mets);
-   pfmet = mets->front().pt();
+    bool isEB = ele->isEB();
+    bool isEE = ele->isEE();
+    bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
 
-   edm::Handle<reco::PFMETCollection> metsType1;
-   iEvent.getByLabel("pfType1CorrectedMet", metsType1);
-   pfmetType1 = metsType1->front().pt();
-
-   if(DataOrMCSrc == 0) {
-
-     // MET filters
-     edm::Handle<bool> filter1;
+    //
+    // test ID
+    //
+    
+    // working points
+    bool veto       = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, 
+						  ele, 
+						  conversions_h, 
+						  bs, 
+						  recVtxs, 
+						  iso_ch, iso_em, iso_nh, rhoIso);
+    bool loose      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, 
+						  ele, 
+						  conversions_h, 
+						  bs, 
+						  recVtxs, 
+						  iso_ch, iso_em, iso_nh, rhoIso);
+    bool medium     = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, 
+						  ele, conversions_h, 
+						  bs, 
+						  recVtxs, 
+						  iso_ch, iso_em, iso_nh, rhoIso);
+    bool tight      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, 
+						  ele, 
+						  conversions_h, 
+						  bs, 
+						  recVtxs, 
+						  iso_ch, iso_em, iso_nh, rhoIso);
+    /*
+    cout <<" ele " << i 
+	 <<" pt = " << ele->pt()
+	 <<" veto = " << (int)veto
+	 <<" loose = " << (int)loose
+	 <<" medium = " << (int)medium
+	 <<" tight = " << (int)tight << endl;
+    */
+  }
+  // muons
+  edm::Handle<RecoMuons> reco_muons;
+  iEvent.getByLabel(muonsSrc, reco_muons );
+   
+  // get jet ID map
+  edm::Handle<ValueMap<reco::JetID> > jetsID;
+  iEvent.getByLabel(jetsIDSrc,jetsID);
+  // 'ak5JetID'
+  
+  // pf jets
+  edm::Handle<PFJetCollection> pfjets;
+  iEvent.getByLabel("ak5PFJets", pfjets);
+  
+  // pf jets corrected
+  edm::Handle<edm::View <reco::Jet> > pfjetsl1l2l3;
+  //   edm::Handle<PFJetCollection> pfjetsl1l2l3;
+  iEvent.getByLabel(PFjetsL1L2L3Src, pfjetsl1l2l3);
+  reco::JetRefBaseProd pfjetref(*pfjetsl1l2l3);
+  
+  // MVA PU PF jet discriminator
+  edm::Handle<edm::ValueMap<float> > puJetIdMVA;
+  iEvent.getByLabel("recoPuJetMva","fullDiscriminant",puJetIdMVA);
+  //
+  edm::Handle<edm::ValueMap<int> > puJetIdFlag;
+  iEvent.getByLabel("recoPuJetMva","fullId",puJetIdFlag);
+  
+  // JPT jets raw
+  edm::Handle<reco::JPTJetCollection> jptjets;
+  iEvent.getByLabel(JPTjetsSrc, jptjets);
+  //   
+  // JPT jets L1L2L3
+  edm::Handle<reco::JPTJetCollection> jptjetsl1l2l3;
+  iEvent.getByLabel(JPTjetsL1L2L3Src, jptjetsl1l2l3);
+  
+  // JES uncertainty
+  std::string JEC_PATH("CondFormats/JetMETObjects/data/");
+  edm::FileInPath fip(JEC_PATH+"GR_R_53_V13_Uncertainty_AK5JPT.txt");
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fip.fullPath());
+  //   delete jecUnc;
+  
+  // Calo jets
+  edm::Handle<CaloJetCollection> calojets;
+  iEvent.getByLabel(calojetsSrc, calojets);
+  
+  edm::Handle<reco::PFMETCollection> mets;
+  iEvent.getByLabel("pfMet", mets);
+  pfmet = mets->front().pt();
+  
+  edm::Handle<reco::PFMETCollection> metsType1;
+  iEvent.getByLabel("pfType1CorrectedMet", metsType1);
+  pfmetType1 = metsType1->front().pt();
+  
+  if(DataOrMCSrc == 0) {
+    
+    // MET filters
+    edm::Handle<bool> filter1;
      iEvent.getByLabel("MyEcalDeadCellTriggerPrimitiveFilter", filter1);
      f1 = (int)(*(filter1.product()));
      //
@@ -623,105 +708,105 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    */
 
    // HLT
-   edm::Handle<TriggerResults> triggerResults;
-   iEvent.getByLabel(srcTriggerResults_,triggerResults);
+  edm::Handle<TriggerResults> triggerResults;
+  iEvent.getByLabel(srcTriggerResults_,triggerResults);
 
-   const edm::TriggerNames & triggerNames = iEvent.triggerNames(*triggerResults);
-
-   unsigned index = triggerNames.triggerIndex("HLT_PhysicsDeclared");
-   bool physdecl= (index<triggerNames.size()&&triggerResults->accept(index)) ? 1 : 0;
-
-   for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
-
-     if( (int)(triggerNames.triggerName(ihlt)).find("DoubleMu7")  > 0 ) 
-       {DoubleMu7  = triggerResults->accept(ihlt);}
-     if( (int)(triggerNames.triggerName(ihlt)).find("Mu13_Mu8")   > 0 ) 
-       {Mu13_Mu8   = triggerResults->accept(ihlt);}
-     if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_Mu8")   > 0 ) 
-       {Mu17_Mu8   = triggerResults->accept(ihlt);}
-     if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_TkMu8") > 0 ) 
-       {Mu17_TkMu8 = triggerResults->accept(ihlt);}
-
-     if((int)(triggerNames.triggerName(ihlt)).find("L1ETM40")>0) 
-       {L1ETM40  = triggerResults->accept(ihlt);}
-     if((int)(triggerNames.triggerName(ihlt)).find("DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets")>0) 
-       {VBF_AllJets  = triggerResults->accept(ihlt);}
-
-     /*
-     std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-	       <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
-     */
-   }
-
+  const edm::TriggerNames & triggerNames = iEvent.triggerNames(*triggerResults);
+  
+  unsigned index = triggerNames.triggerIndex("HLT_PhysicsDeclared");
+  bool physdecl= (index<triggerNames.size()&&triggerResults->accept(index)) ? 1 : 0;
+  
+  for(unsigned ihlt = 0; ihlt < triggerNames.size(); ihlt++) {
+    
+    if( (int)(triggerNames.triggerName(ihlt)).find("DoubleMu7")  > 0 ) 
+      {DoubleMu7  = triggerResults->accept(ihlt);}
+    if( (int)(triggerNames.triggerName(ihlt)).find("Mu13_Mu8")   > 0 ) 
+      {Mu13_Mu8   = triggerResults->accept(ihlt);}
+    if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_Mu8")   > 0 ) 
+      {Mu17_Mu8   = triggerResults->accept(ihlt);}
+    if( (int)(triggerNames.triggerName(ihlt)).find("Mu17_TkMu8") > 0 ) 
+      {Mu17_TkMu8 = triggerResults->accept(ihlt);}
+    
+    if((int)(triggerNames.triggerName(ihlt)).find("L1ETM40")>0) 
+      {L1ETM40  = triggerResults->accept(ihlt);}
+    if((int)(triggerNames.triggerName(ihlt)).find("DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets")>0) 
+      {VBF_AllJets  = triggerResults->accept(ihlt);}
+    
+    /*
+      std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
+      <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
+    */
+  }
+  
   //  std::map<double,int> pTjptIndex;
-
-   std::map<double,const JPTJet*> pTjptIndex;
-
-   std::map<double,const PFJet*> pTpfIndex;
-   std::map<double,float> PuMVApfIndex;
-   std::map<double,int> PuIDpfIndex;
-
-   std::map<double,const Muon*> pTMuonIndex;
-   math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
-   math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
-   
+  
+  std::map<double,const JPTJet*> pTjptIndex;
+  
+  std::map<double,const PFJet*> pTpfIndex;
+  std::map<double,float> PuMVApfIndex;
+  std::map<double,int> PuIDpfIndex;
+  
+  std::map<double,const Muon*> pTMuonIndex;
+  math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
+  math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
+  
   
   // PU info
-   if(DataOrMCSrc == 1) {
-
-     edm::InputTag PileupSrc_("addPileupInfo");
-     Handle<std::vector< PileupSummaryInfo > >  PupInfo;
-     iEvent.getByLabel(PileupSrc_, PupInfo);
-     std::vector<PileupSummaryInfo>::const_iterator PVI;
-     for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-       //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getTrueNumInteractions() << std::endl;
-       //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
-       //       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
-       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getTrueNumInteractions();
-     }
-   }
+  if(DataOrMCSrc == 1) {
+    
+    edm::InputTag PileupSrc_("addPileupInfo");
+    Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+    iEvent.getByLabel(PileupSrc_, PupInfo);
+    std::vector<PileupSummaryInfo>::const_iterator PVI;
+    for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+      //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getTrueNumInteractions() << std::endl;
+      //       std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+      //       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
+      if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getTrueNumInteractions();
+    }
+  }
    
-   // reco vertex part
-   int nvtx = 0;
-   unsigned ntrkV = 0;
-   double cDVZmin = 1000.;
-   for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
-     {
-       if ( !((*recVtxs)[ind].isFake()) && ((*recVtxs)[ind].ndof() > 4) )
-	 {
-	   
-	   nvtx = nvtx + 1;
-	   
-	   double cPVx  = (*recVtxs)[ind].x();
-	   double cPVy  = (*recVtxs)[ind].y();
-	   double cPVz  = (*recVtxs)[ind].z();
-	   
-	   if(nvtx == 1) {
-	     PVx  = cPVx;
-	     PVy  = cPVy;
-	     PVz  = cPVz;
-	     //      ndof(PV)>=5.0
-	     //	     ntrkV = (*recVtxs)[ind].tracksSize();
-	     //	    reco::Vertex::trackRef_iterator ittk;
-	     //	    for(ittrk =(*recVtxs)[ind].tracks_begin();
-	     //                 ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
-	     //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
-	     // access tracks from PV
-	   } else {
-	     double DZ = fabs(cPVz - PVz);
-	     if(DZ < cDVZmin) 
-	       {
-		 cDVZmin = DZ;
-	       } 
-	   }
-	 }
-     }
-   
-   nvertex = nvtx;
-   DZmin = cDVZmin;
+  // reco vertex part
+  int nvtx = 0;
+  unsigned ntrkV = 0;
+  double cDVZmin = 1000.;
+  for(unsigned int ind = 0; ind < recVtxs->size(); ind++) 
+    {
+      if ( !((*recVtxs)[ind].isFake()) && ((*recVtxs)[ind].ndof() > 4) )
+	{
+	  
+	  nvtx = nvtx + 1;
+	  
+	  double cPVx  = (*recVtxs)[ind].x();
+	  double cPVy  = (*recVtxs)[ind].y();
+	  double cPVz  = (*recVtxs)[ind].z();
+	  
+	  if(nvtx == 1) {
+	    PVx  = cPVx;
+	    PVy  = cPVy;
+	    PVz  = cPVz;
+	    //      ndof(PV)>=5.0
+	    //	     ntrkV = (*recVtxs)[ind].tracksSize();
+	    //	    reco::Vertex::trackRef_iterator ittk;
+	    //	    for(ittrk =(*recVtxs)[ind].tracks_begin();
+	    //                 ittrk != (*recVtxs)[ind].tracks_end(); ++ittrk) 
+	    //	      if( (*recVtxs)[ind].trackWeight(*ittrk)>0.5 ) ntrkV++;
+	    // access tracks from PV
+	  } else {
+	    double DZ = fabs(cPVz - PVz);
+	    if(DZ < cDVZmin) 
+	      {
+		cDVZmin = DZ;
+	      } 
+	  }
+	}
+    }
+  
+  nvertex = nvtx;
+  DZmin = cDVZmin;
 
   // access muons and jets
-   if( nvtx >= 1 ) {
+  if( nvtx >= 1 ) {
 
      // tight and loose muons
      RecoMuons::const_iterator imuon = reco_muons->begin(); 

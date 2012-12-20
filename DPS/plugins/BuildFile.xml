@@ -9,6 +9,8 @@
   <use   name="DataFormats/EcalDetId"/>
   <use   name="DataFormats/EcalRecHit"/>
   <use   name="DataFormats/EgammaReco"/>
+  <use   name="DataFormats/EgammaCandidates"/>
+  <use   name="EGamma/EGammaAnalysisTools"/>
   <use   name="DataFormats/HcalDetId"/>
   <use   name="DataFormats/HcalRecHit"/>
   <use   name="DataFormats/JetReco"/>
@@ -40,6 +42,9 @@
   <use   name="SimTracker/TrackerHitAssociation"/>
   <use   name="TrackingTools/TrackAssociator"/>
   <use   name="TrackingTools/TrajectoryState"/>
+  <use   name="RecoEgamma/EgammaTools"/>  
+  <use   name="TrackingTools/IPTools"/>  
+  <use   name="RecoEcal/EgammaCoreTools"/>	
   <use   name="RecoJets/JetPlusTracks"/>
   <use   name="DataFormats/L1Trigger"/>
   <use   name="L1Trigger/GlobalTriggerAnalyzer"/>
