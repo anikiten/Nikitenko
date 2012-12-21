@@ -188,9 +188,9 @@ private:
   int     nvertex, nsimvertex;
   // MET
   double  pfmet, pfmetType1,pfmetType2;
-  // di muon pass
-  double  mass_mumu;
-  // muon eta/phi/pT/isolation/distance from PV in Z coordinate
+  // di muon pass and di electron mass of two high pT objects
+  double  mass_mumu, mass_ee;
+  // muon eta/phi/pT/isolation/charge/distance from PV in Z coordinate
   std::vector<double> *EtaMu;
   std::vector<double> *PhiMu;
   std::vector<double> *PtMu;
@@ -198,6 +198,13 @@ private:
   std::vector<double> *mutrkisol;
   std::vector<double> *mupfisol;
   std::vector<int>    *mucharge;
+  // electron eta/phi/pT/isolation/charge/id
+  std::vector<double> *EtaEl;
+  std::vector<double> *PhiEl;
+  std::vector<double> *PtEl;
+  std::vector<double> *eltrkisol;
+  std::vector<int>    *elcharge;
+  std::vector<int>    *elid;
   // eta/phi/pt of raw calo jet from JPT
   std::vector<double> *EtaRaw;
   std::vector<double> *PhiRaw;
@@ -259,6 +266,13 @@ VBFHinvis::beginJob()
   mupfisol     = new std::vector<double>();
   mucharge     = new std::vector<int>();
 
+  EtaEl        = new std::vector<double>();
+  PhiEl        = new std::vector<double>();
+  PtEl         = new std::vector<double>();
+  eltrkisol    = new std::vector<double>();
+  elcharge     = new std::vector<int>();
+  elid         = new std::vector<int>();
+
   EtaRaw       = new std::vector<double>();  
   PhiRaw       = new std::vector<double>();
   EtRaw        = new std::vector<double>();
@@ -316,6 +330,14 @@ VBFHinvis::beginJob()
   t1->Branch("mutrkisol" ,"vector<double>",&mutrkisol);
   t1->Branch("mupfisol" ,"vector<double>",&mupfisol);
   t1->Branch("mucharge" ,"vector<int>",&mucharge);
+
+  t1->Branch("mass_ee",&mass_ee,"mass_ee/D");
+  t1->Branch("EtaEl","vector<double>",&EtaEl);
+  t1->Branch("PhiEl","vector<double>",&PhiEl);
+  t1->Branch("PtEl" ,"vector<double>",&PtEl);
+  t1->Branch("eltrkisol" ,"vector<double>",&eltrkisol);
+  t1->Branch("elcharge" ,"vector<int>",&elcharge);
+  t1->Branch("elid" ,"vector<int>",&elid);
 
   t1->Branch("EtaRaw","vector<double>",&EtaRaw);
   t1->Branch("PhiRaw","vector<double>",&PhiRaw);
@@ -484,6 +506,14 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   mupfisol->clear();
   mucharge->clear();
 
+  mass_ee = 0.;
+  EtaEl->clear();
+  PhiEl->clear();
+  PtEl->clear();
+  eltrkisol->clear();
+  elcharge->clear();
+  elid->clear();
+
   EtaRaw->clear();
   PhiRaw->clear();
   EtRaw->clear();
@@ -542,50 +572,74 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //
     // get particle flow isolation
     //
-    double iso_ch =  (*(isoVals)[0])[ele];
+    double iso_ch = (*(isoVals)[0])[ele];
     double iso_em = (*(isoVals)[1])[ele];
     double iso_nh = (*(isoVals)[2])[ele];
 
     bool isEB = ele->isEB();
     bool isEE = ele->isEE();
-    bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
 
-    //
-    // test ID
-    //
-    
-    // working points
-    bool veto       = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, 
-						  ele, 
-						  conversions_h, 
-						  bs, 
-						  recVtxs, 
-						  iso_ch, iso_em, iso_nh, rhoIso);
-    bool loose      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, 
-						  ele, 
-						  conversions_h, 
-						  bs, 
-						  recVtxs, 
-						  iso_ch, iso_em, iso_nh, rhoIso);
-    bool medium     = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, 
-						  ele, conversions_h, 
-						  bs, 
-						  recVtxs, 
-						  iso_ch, iso_em, iso_nh, rhoIso);
-    bool tight      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, 
-						  ele, 
-						  conversions_h, 
-						  bs, 
-						  recVtxs, 
-						  iso_ch, iso_em, iso_nh, rhoIso);
-    /*
-    cout <<" ele " << i 
-	 <<" pt = " << ele->pt()
-	 <<" veto = " << (int)veto
-	 <<" loose = " << (int)loose
-	 <<" medium = " << (int)medium
-	 <<" tight = " << (int)tight << endl;
-    */
+    bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
+    if(inAcceptance) {
+
+      if(ele->pt() > 10.) {
+      //
+      // test ID
+      //
+      
+	int electronID = 0;
+      
+	// working points
+	bool veto       = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, 
+						      ele, 
+						      conversions_h, 
+						      bs, 
+						      recVtxs, 
+						      iso_ch, iso_em, iso_nh, rhoIso);
+	bool loose      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, 
+						      ele, 
+						      conversions_h, 
+						      bs, 
+						      recVtxs, 
+						      iso_ch, iso_em, iso_nh, rhoIso);
+	bool medium     = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, 
+						      ele, conversions_h, 
+						      bs, 
+						      recVtxs, 
+						      iso_ch, iso_em, iso_nh, rhoIso);
+	bool tight      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, 
+						      ele, 
+						      conversions_h, 
+						      bs, 
+						      recVtxs, 
+						      iso_ch, iso_em, iso_nh, rhoIso);
+	if(veto)   {electronID = 1;}
+	if(loose)  {electronID = 2;}
+	if(medium) {electronID = 3;}
+	if(tight)  {electronID = 4;}
+	
+	if(electronID >= 2) {
+	  // fill electron variables into ntpl	  
+	  
+	  EtaEl->push_back(ele->eta());
+	  PhiEl->push_back(ele->phi());
+	  PtEl->push_back(ele->pt());
+	  eltrkisol->push_back(ele->dr03TkSumPt());
+	  elcharge->push_back(ele->charge());
+	  elid->push_back(electronID);
+  
+	}
+
+      /*
+	cout <<" ele " << i 
+	<<" pt = " << ele->pt()
+	<<" veto = " << (int)veto
+	<<" loose = " << (int)loose
+	<<" medium = " << (int)medium
+	<<" tight = " << (int)tight << endl;
+      */
+      }
+    }
   }
   // muons
   edm::Handle<RecoMuons> reco_muons;
