@@ -564,11 +564,17 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
   const reco::BeamSpot& bs = *(beamSpot_.product());
   
+  math::XYZTLorentzVector  el1(0.,0.,0.,0.);
+  math::XYZTLorentzVector  el2(0.,0.,0.,0.);
+  int iel = 0;
   // loop on electrons
+  std::map<double,const GsfElectron*> pTElectronIndex;
+
   unsigned int n = els_h->size();
   for(unsigned int i = 0; i < n; ++i) {
     // get reference to electron
     reco::GsfElectronRef ele(els_h, i);
+    pTElectronIndex[ele->pt()] = &(*ele);
     //
     // get particle flow isolation
     //
@@ -620,6 +626,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	if(electronID >= 2) {
 	  // fill electron variables into ntpl	  
+	  iel++;
+	  math::XYZTLorentzVector elc(ele->px(),ele->py(),ele->pz(),ele->p()); 
 	  
 	  EtaEl->push_back(ele->eta());
 	  PhiEl->push_back(ele->phi());
@@ -627,7 +635,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  eltrkisol->push_back(ele->dr03TkSumPt());
 	  elcharge->push_back(ele->charge());
 	  elid->push_back(electronID);
-  
+	  if (iel == 1) el1 = elc; 
+	  if (iel == 2) el2 = elc; 
 	}
 
       /*
@@ -641,6 +650,11 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
   }
+  if(iel >= 2) {
+    math::XYZTLorentzVector twoelectrons = el1 + el2;
+    mass_ee = twoelectrons.M();
+  }
+
   // muons
   edm::Handle<RecoMuons> reco_muons;
   iEvent.getByLabel(muonsSrc, reco_muons );
@@ -891,10 +905,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        const Muon* muon = (*rmfirst).second;
        
        imu++;
-       math::XYZTLorentzVector muonc(muon->px(),
-				     muon->py(), 
-				     muon->pz(), 
-				     muon->p()); 
+       math::XYZTLorentzVector muonc(muon->px(),muon->py(),muon->pz(),muon->p()); 
 
        EtaMu->push_back(muon->eta());
        PhiMu->push_back(muon->phi());
@@ -1228,7 +1239,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // fill tree
    //   if( mass_mumu >= 40. ) t1->Fill();
 
-   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0 || mass_mumu >= 40) ) t1->Fill();
+   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0 
+		      || mass_mumu >= 40. || mass_ee >= 40.) ) t1->Fill();
 }
 //define this as a plug-in
 DEFINE_FWK_MODULE(VBFHinvis);
