@@ -198,6 +198,7 @@ private:
   std::vector<double> *mutrkisol;
   std::vector<double> *mupfisol;
   std::vector<int>    *mucharge;
+  std::vector<int>    *muid;
   // electron eta/phi/pT/isolation/charge/id
   std::vector<double> *EtaEl;
   std::vector<double> *PhiEl;
@@ -265,6 +266,7 @@ VBFHinvis::beginJob()
   mutrkisol    = new std::vector<double>();
   mupfisol     = new std::vector<double>();
   mucharge     = new std::vector<int>();
+  muid         = new std::vector<int>();
 
   EtaEl        = new std::vector<double>();
   PhiEl        = new std::vector<double>();
@@ -330,6 +332,7 @@ VBFHinvis::beginJob()
   t1->Branch("mutrkisol" ,"vector<double>",&mutrkisol);
   t1->Branch("mupfisol" ,"vector<double>",&mupfisol);
   t1->Branch("mucharge" ,"vector<int>",&mucharge);
+  t1->Branch("muid" ,"vector<int>",&muid);
 
   t1->Branch("mass_ee",&mass_ee,"mass_ee/D");
   t1->Branch("EtaEl","vector<double>",&EtaEl);
@@ -425,8 +428,6 @@ VBFHinvis::VBFHinvis(const edm::ParameterSet& iConfig)
   fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
   // DataOrMC
   DataOrMCSrc     = iConfig.getUntrackedParameter<int>("DataOrMC");
-  //
-  // get names of input object collections
   // muons
   muonsSrc         = iConfig.getParameter<edm::InputTag>("Muons");
   // raw calo jets
@@ -505,6 +506,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   mutrkisol->clear();
   mupfisol->clear();
   mucharge->clear();
+  muid->clear();
 
   mass_ee = 0.;
   EtaEl->clear();
@@ -564,97 +566,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel( "offlineBeamSpot", beamSpot_);
   const reco::BeamSpot& bs = *(beamSpot_.product());
   
-  math::XYZTLorentzVector  el1(0.,0.,0.,0.);
-  math::XYZTLorentzVector  el2(0.,0.,0.,0.);
-  int iel = 0;
-  // loop on electrons
-  std::map<double,const GsfElectron*> pTElectronIndex;
-
-  unsigned int n = els_h->size();
-  for(unsigned int i = 0; i < n; ++i) {
-    // get reference to electron
-    reco::GsfElectronRef ele(els_h, i);
-    pTElectronIndex[ele->pt()] = &(*ele);
-    //
-    // get particle flow isolation
-    //
-    double iso_ch = (*(isoVals)[0])[ele];
-    double iso_em = (*(isoVals)[1])[ele];
-    double iso_nh = (*(isoVals)[2])[ele];
-
-    bool isEB = ele->isEB();
-    bool isEE = ele->isEE();
-
-    bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
-    if(inAcceptance) {
-
-      if(ele->pt() > 10.) {
-      //
-      // test ID
-      //
-      
-	int electronID = 0;
-      
-	// working points
-	bool veto       = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, 
-						      ele, 
-						      conversions_h, 
-						      bs, 
-						      recVtxs, 
-						      iso_ch, iso_em, iso_nh, rhoIso);
-	bool loose      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, 
-						      ele, 
-						      conversions_h, 
-						      bs, 
-						      recVtxs, 
-						      iso_ch, iso_em, iso_nh, rhoIso);
-	bool medium     = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, 
-						      ele, conversions_h, 
-						      bs, 
-						      recVtxs, 
-						      iso_ch, iso_em, iso_nh, rhoIso);
-	bool tight      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, 
-						      ele, 
-						      conversions_h, 
-						      bs, 
-						      recVtxs, 
-						      iso_ch, iso_em, iso_nh, rhoIso);
-	if(veto)   {electronID = 1;}
-	if(loose)  {electronID = 2;}
-	if(medium) {electronID = 3;}
-	if(tight)  {electronID = 4;}
-	
-	if(electronID >= 2) {
-	  // fill electron variables into ntpl	  
-	  iel++;
-	  math::XYZTLorentzVector elc(ele->px(),ele->py(),ele->pz(),ele->p()); 
-	  
-	  EtaEl->push_back(ele->eta());
-	  PhiEl->push_back(ele->phi());
-	  PtEl->push_back(ele->pt());
-	  eltrkisol->push_back(ele->dr03TkSumPt());
-	  elcharge->push_back(ele->charge());
-	  elid->push_back(electronID);
-	  if (iel == 1) el1 = elc; 
-	  if (iel == 2) el2 = elc; 
-	}
-
-      /*
-	cout <<" ele " << i 
-	<<" pt = " << ele->pt()
-	<<" veto = " << (int)veto
-	<<" loose = " << (int)loose
-	<<" medium = " << (int)medium
-	<<" tight = " << (int)tight << endl;
-      */
-      }
-    }
-  }
-  if(iel >= 2) {
-    math::XYZTLorentzVector twoelectrons = el1 + el2;
-    mass_ee = twoelectrons.M();
-  }
-
   // muons
   edm::Handle<RecoMuons> reco_muons;
   iEvent.getByLabel(muonsSrc, reco_muons );
@@ -731,9 +642,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      f5 = (int)(*(filter5.product()));
    }
 
-  //  NPxlMaxPtTrk->clear();
-  //  NSiIMaxPtTrk->clear();
-  //  NSiOMaxPtTrk->clear();
   /*
   // L1
    edm::Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
@@ -799,27 +707,16 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {L1ETM40  = triggerResults->accept(ihlt);}
     if((int)(triggerNames.triggerName(ihlt)).find("DiPFJet40_PFMETnoMu65_MJJ800VBF_AllJets")>0) 
       {VBF_AllJets  = triggerResults->accept(ihlt);}
-    
-    /*
-      std::cout <<" HLT bit " << ihlt <<" name = " << triggerNames.triggerName(ihlt) 
-      <<" accepted = " << triggerResults->accept(ihlt) <<" index = " << index << std::endl; 
-    */
   }
   
   //  std::map<double,int> pTjptIndex;
   
   std::map<double,const JPTJet*> pTjptIndex;
-  
   std::map<double,const PFJet*> pTpfIndex;
   std::map<double,float> PuMVApfIndex;
   std::map<double,int> PuIDpfIndex;
   
-  std::map<double,const Muon*> pTMuonIndex;
-  math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
-  math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
-  
-  
-  // PU info
+    // PU info
   if(DataOrMCSrc == 1) {
     
     edm::InputTag PileupSrc_("addPileupInfo");
@@ -873,374 +770,465 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   nvertex = nvtx;
   DZmin = cDVZmin;
 
-  // access muons and jets
+  // access electrons, muons and jets
   if( nvtx >= 1 ) {
 
-     // tight and loose muons
-     RecoMuons::const_iterator imuon = reco_muons->begin(); 
-     RecoMuons::const_iterator jmuon = reco_muons->end();
-     for ( ; imuon != jmuon; ++imuon ) {
-       // tight muons
-       if(muon::isTightMuon(*imuon,(*recVtxs)[0])) {
-	 pTMuonIndex[imuon->innerTrack()->pt()] = &(*imuon);
-       }
-       // loose muons
-       if( (*imuon).isPFMuon() && ((*imuon).isGlobalMuon() || (*imuon).isTrackerMuon()) ) {
-	 double pT  = (*imuon).pt(); 
-	 double eta = (*imuon).eta(); 
-	 double phi = (*imuon).phi(); 
-	 double muon_sumTrkPt = (*imuon).isolationR03().sumPt;
-	 const MuonPFIsolation pfisol = (*imuon).pfIsolationR04();
-	 double muon_sumPFPt = pfisol.sumChargedHadronPt +
-	   max(0.,pfisol.sumNeutralHadronEt+pfisol.sumPhotonEt-0.5*pfisol.sumPUPt);
-       }
-     }
-
-     // fill muon variables
-     map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
-     map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
-     int imu = 0;
-     while (rmfirst != rmlast) {
-       
-       const Muon* muon = (*rmfirst).second;
-       
-       imu++;
-       math::XYZTLorentzVector muonc(muon->px(),muon->py(),muon->pz(),muon->p()); 
-
-       EtaMu->push_back(muon->eta());
-       PhiMu->push_back(muon->phi());
-       PtMu->push_back(muon->pt());
-       mucharge->push_back(muon->charge());
-       double dzvtx = fabs(muon->muonBestTrack()->dz((*recVtxs)[0].position()) );
-       dzmuon->push_back(dzvtx);
-       // tracker muon isolation variables
-       double muon_sumTrkPt = muon->isolationR03().sumPt;
-       //       double muon_emEt  = muon->isolationR03().emEt;
-       //       double muon_hadEt = muon->isolationR03().hadEt;
-       mutrkisol->push_back(muon_sumTrkPt);
-       // pf isolation variable
-       const MuonPFIsolation pfisol = muon->pfIsolationR04();
-       double muon_sumPFPt = pfisol.sumChargedHadronPt +
-       	 max(0.,pfisol.sumNeutralHadronEt+pfisol.sumPhotonEt-0.5*pfisol.sumPUPt);
-       mupfisol->push_back(muon_sumPFPt);
-
-       if (imu == 1) muon1 = muonc; 
-       if (imu == 2) muon2 = muonc; 
-       rmfirst++;
-     }
-   
-     if(imu >= 2) {
-       math::XYZTLorentzVector twomuons = muon1 + muon2;
-       mass_mumu = twomuons.M();
-     }
-     
-     // jpt jets
-     if(jptjetsl1l2l3->size() != 0) {
-
-       double DR1 = 10.;
-       double DR2 = 10.;
-       for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); 
-	                                    jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
-	 if(jptjet->pt() > 20.) {
-	   if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
-	   if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
-	   if( (DR1 > 0.6) && (DR2 > 0.6) ) {
-	     pTjptIndex[jptjet->pt()] = &(*jptjet);
-	   }
-	 }
-       }
-     }
-    
-     for (unsigned ipfjet = 0; ipfjet < pfjetsl1l2l3->size(); ++ipfjet) {
-
-       const reco::PFJet* pfjet = dynamic_cast<const reco::PFJet*>(&(*pfjetsl1l2l3)[ipfjet]);
-
-       double DR1 = 10.;
-       double DR2 = 10.;
-       if(pfjet->pt() > 20.) {
-	 if(imu >= 1) { DR1 = deltaR(muon1.Eta(), muon1.Phi(), pfjet->eta(), pfjet->phi());}
-	 if(imu >= 2) { DR2 = deltaR(muon2.Eta(), muon2.Phi(), pfjet->eta(), pfjet->phi());}
-	 if( (DR1 > 0.6) && (DR2 > 0.6) ) {
-	   
-	   float mva  = (*puJetIdMVA)[pfjetref->refAt(ipfjet)];
-	   int idflag = (*puJetIdFlag)[pfjetref->refAt(ipfjet)];
-	   
-	   pTpfIndex[pfjet->pt()]    = pfjet;
-	   PuMVApfIndex[pfjet->pt()] = mva; 
-	   PuIDpfIndex[pfjet->pt()]  = idflag;
-	 }
-       }
-     }
-   }
-
-   // fill pf jet variables
-    map<double,const PFJet*>::reverse_iterator rfirstPF(pTpfIndex.end());
-    map<double,const PFJet*>::reverse_iterator rlastPF(pTpfIndex.begin());
-    while (rfirstPF != rlastPF) {
-      const PFJet* pfjet = (*rfirstPF).second;
-      rfirstPF++;
-
-      // pfjet id
-      if(  (*pfjet).neutralHadronEnergyFraction() > 0.99 )  continue;
-      if(  (*pfjet).neutralEmEnergyFraction() > 0.99 )  continue;
-      if(( (*pfjet).neutralMultiplicity() + (*pfjet).chargedMultiplicity() ) < 1 )  continue;
-      if( fabs((*pfjet).eta()) < 2.4) {
-	if( (*pfjet).chargedHadronEnergyFraction() < 0. )  continue;
-	if( (*pfjet).chargedMultiplicity() < 0. )  continue;
-	if( (*pfjet).chargedEmEnergyFraction() > 0.99 )  continue;
+    // electrons
+    math::XYZTLorentzVector  el1(0.,0.,0.,0.);
+    math::XYZTLorentzVector  el2(0.,0.,0.,0.);
+    // loop on electrons
+    std::map<double, unsigned int> pTElectronIndex;
+    unsigned int n = els_h->size();
+    for(unsigned int i = 0; i < n; ++i) {
+      // get reference to electron
+      reco::GsfElectronRef ele(els_h, i);
+      bool isEB = ele->isEB();
+      bool isEE = ele->isEE();
+      bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
+      if(inAcceptance && ele->pt() > 10.) {
+	pTElectronIndex[ele->pt()] = i;
       }
-      float mva  = (*PuMVApfIndex.find((*pfjet).pt())).second;
-      int idflag = (*PuIDpfIndex.find((*pfjet).pt())).second;
-
-      int pfjidtype = 0;
-      if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose )) 
-	{pfjidtype = 1;}
-      if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium )) 
-	{pfjidtype = 2;}
-      if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )) 
-	{pfjidtype = 3;}
-
-      EtaPF->push_back(pfjet->eta());
-      PhiPF->push_back(pfjet->phi());
-      EtPF->push_back(pfjet->pt());
-      MVAPF->push_back(mva);
-      IDPF->push_back(idflag);
-      JTypePF->push_back(pfjidtype);
+    }
+    // fill electron variables
+    map<double,unsigned int>::reverse_iterator refirst(pTElectronIndex.end());
+    map<double,unsigned int>::reverse_iterator relast(pTElectronIndex.begin());
+    int iel = 0;
+    while (refirst != relast) {
+      
+      unsigned int i = (*refirst).second;
+      reco::GsfElectronRef ele(els_h, i);
+      //
+      // get particle flow isolation
+      //
+      double iso_ch = (*(isoVals)[0])[ele];
+      double iso_em = (*(isoVals)[1])[ele];
+      double iso_nh = (*(isoVals)[2])[ele];
+      //
+      // test ID
+      //
+      int electronID = 0;
+      // working points
+      bool veto       = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, 
+						    ele, 
+						    conversions_h, 
+						    bs, 
+						    recVtxs, 
+						    iso_ch, iso_em, iso_nh, rhoIso);
+      bool loose      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, 
+						    ele, 
+						    conversions_h, 
+						    bs, 
+						    recVtxs, 
+						    iso_ch, iso_em, iso_nh, rhoIso);
+      bool medium     = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, 
+						    ele, conversions_h, 
+						    bs, 
+						    recVtxs, 
+						    iso_ch, iso_em, iso_nh, rhoIso);
+      bool tight      = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, 
+						    ele, 
+						    conversions_h, 
+						    bs, 
+						    recVtxs, 
+						    iso_ch, iso_em, iso_nh, rhoIso);
+      if(veto)   {electronID = 1;}
+      if(loose)  {electronID = 2;}
+      if(medium) {electronID = 3;}
+      if(tight)  {electronID = 4;}
+      
+      if(electronID >= 2) {
+	// fill electron variables into ntpl	  
+	iel++;
+	math::XYZTLorentzVector elc(ele->px(),ele->py(),ele->pz(),ele->p()); 
+	EtaEl->push_back(ele->eta());
+	PhiEl->push_back(ele->phi());
+	PtEl->push_back(ele->pt());
+	eltrkisol->push_back(ele->dr03TkSumPt());
+	elcharge->push_back(ele->charge());
+	elid->push_back(electronID);
+	if (iel == 1) el1 = elc; 
+	if (iel == 2) el2 = elc; 
+      }
+      refirst++;
+    }
+    if(iel >= 2) {
+      math::XYZTLorentzVector twoelectrons = el1 + el2;
+      mass_ee = twoelectrons.M();
     }
 
-   // fill jpt jet variables
-   int jc = 0;
-   map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
-   map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
-   while (rfirst != rlast) {
-     
-     const JPTJet* jptjet = (*rfirst).second;
-     RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
-     reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
-     
-     //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
-     
-     double mN90Hits  = (*jetsID)[jptjetRef].n90Hits;
-     double mfHPD     = (*jetsID)[jptjetRef].fHPD;
-     double mfRBX     = (*jetsID)[jptjetRef].fRBX;
-     
-     double mN90      = rawcalojet->n90();
-     double mEmf      = rawcalojet->emEnergyFraction(); 	
-     
-     jc++;
-     rfirst++;
-     // calo jet ID
-     if(mEmf  < 0.01) continue;
-     if(mfHPD > 0.98) continue;
-     if(mfRBX > 0.98) continue;
-     if(mN90  < 2) continue;
-     
-     // access tracks used in JPT
-     TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
-     TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
-     int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
-
-     // prepare variables for MVA PU jet ID for JPT jets 
-     //
-     // Get MVA variables with calotowers
-     int ncalotowers=0.;
-     double sumpt=0.;
-     double dphi2=0.;
-     double deta2=0.;
-     double dphi1=0.;
-     double deta1=0.;
-     double dphideta=0.;
-     std::vector <CaloTowerPtr> calotwrs = (*rawcalojet).getCaloConstituents();
-      for(std::vector <CaloTowerPtr>::const_iterator icalot = calotwrs.begin();
-                                                     icalot!= calotwrs.end(); icalot++) {
-
-	double  deta = (*jptjet).eta()-(*icalot)->eta();
-        double  dphi = deltaPhi((*jptjet).phi(),(*icalot)->phi());
-	double  dr   = deltaR(jptjet->eta(),jptjet->phi(),(*icalot)->eta(),(*icalot)->phi());
-        sumpt = sumpt + (*icalot)->pt();
-        dphi2 = dphi2 + dphi*dphi*(*icalot)->pt();
-        deta2 = deta2 + deta*deta*(*icalot)->pt();      
-        dphi1 = dphi1 + dphi*(*icalot)->pt();
-        deta1 = deta1 + deta*(*icalot)->pt();   
-        dphideta = dphideta + dphi*deta*(*icalot)->pt();  
-	ncalotowers++;
+    // muons
+    std::map<double,const Muon*> pTMuonIndex;
+    math::XYZTLorentzVector  muon1(0.,0.,0.,0.);
+    math::XYZTLorentzVector  muon2(0.,0.,0.,0.);
+    // tight and loose muons
+    RecoMuons::const_iterator imuon = reco_muons->begin(); 
+    RecoMuons::const_iterator jmuon = reco_muons->end();
+    for ( ; imuon != jmuon; ++imuon ) {
+      if(imuon->pt() > 10.) {
+	pTMuonIndex[imuon->pt()] = &(*imuon);
       }
-      if( sumpt > 0.) {
-	deta1 = deta1/sumpt;
-	dphi1 = dphi1/sumpt;
-	deta2 = deta2/sumpt;
-	dphi2 = dphi2/sumpt;
-	dphideta = dphideta/sumpt;
-      }
-      // W.r.t. principal axis
-      double detavar = deta2-deta1*deta1;
-      double dphivar = dphi2-dphi1*dphi1;
-      double dphidetacov = dphideta - deta1*dphi1;
+    }
+    // fill muon variables
+    map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
+    map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
+    int imu = 0;
+    while (rmfirst != rmlast) {
       
-      double det = (detavar-dphivar)*(detavar-dphivar)+4*dphidetacov*dphidetacov;
-      double x1 = (detavar+dphivar+sqrt(det))/2.;
-      double x2 = (detavar+dphivar-sqrt(det))/2.;
-      //
-      // Get MVA variables with tracks
-      int ntracks=0.;
-      double sumpttr=0.;
-      double dphitr2=0.;
-      double detatr2=0.;
-      double dphitr1=0.;
-      double detatr1=0.;
-      double dphidetatr=0.;
-      // in vertex, in calo tracks     
-      const reco::TrackRefVector pioninin = (*jptjet).getPionsInVertexInCalo();
-      for(reco::TrackRefVector::const_iterator it = pioninin.begin(); 
-	  it != pioninin.end(); it++) {      
-	if ((*it)->pt() > 0.5 && ((*it)->ptError()/(*it)->pt()) < 0.05 )
-	  {              
-	    ntracks++;
-	    sumpttr = sumpttr + (*it)->pt();       
-	    double  deta = (*jptjet).eta()-(*it)->eta();
-	    double  dphi = deltaPhi((*jptjet).phi(),(*it)->phi());
-	    dphitr2 = dphitr2 + dphi*dphi*(*it)->pt();
-	    detatr2 = detatr2 + deta*deta*(*it)->pt();     
-	    dphitr1 = dphitr1 + dphi*(*it)->pt();
-	    detatr1 = detatr1 + deta*(*it)->pt();  
-	    dphidetatr = dphidetatr + dphi*deta*(*it)->pt();
-	  }      
-      }	
+      const Muon* muon = (*rmfirst).second;
 
-      const reco::TrackRefVector pioninout = (*jptjet).getPionsInVertexOutCalo();
-      
-      for(reco::TrackRefVector::const_iterator it = pioninout.begin(); 
-	  it != pioninout.end(); it++) {      
-	if ((*it)->pt() > 0.5 && ((*it)->ptError()/(*it)->pt()) < 0.05 )
-	  {              
-	    ntracks++;
-	    sumpttr = sumpttr + (*it)->pt();       
-	    double  deta = (*jptjet).eta()-(*it)->eta();
-	    double  dphi = deltaPhi((*jptjet).phi(),(*it)->phi());
-	    dphitr2 = dphitr2 + dphi*dphi*(*it)->pt();
-	    detatr2 = detatr2 + deta*deta*(*it)->pt();     
-	    dphitr1 = dphitr1 + dphi*(*it)->pt();
-	    detatr1 = detatr1 + deta*(*it)->pt();  
-	    dphidetatr = dphidetatr + dphi*deta*(*it)->pt();       
-	  }
+      // loose muons
+      int muonID = 0;
+      if( (*imuon).isPFMuon() && ((*imuon).isGlobalMuon() || (*imuon).isTrackerMuon()) ) {
+	muonID = 2;
+      }
+      // tight muons
+      if(muon::isTightMuon(*imuon,(*recVtxs)[0])) {
+	muonID = 4;
       }
 
-      if( sumpttr > 0.) {
-	detatr1 = detatr1/sumpttr;
-	dphitr1 = dphitr1/sumpttr;
-	detatr2 = detatr2/sumpttr;
-	dphitr2 = dphitr2/sumpttr;
-	dphidetatr = dphidetatr/sumpttr;
-      }
-      // W.r.t. principal axis
-      double detavart = detatr2-detatr1*detatr1;
-      double dphivart = dphitr2-dphitr1*dphitr1;
-      double dphidetacovt = dphidetatr - detatr1*dphitr1;
-      double dettr = (detavart-dphivart)*(detavart-dphivart)+4*dphidetacovt*dphidetacovt;
-      double x1tr = (detavart+dphivart+sqrt(dettr))/2.;
-      double x2tr = (detavart+dphivart-sqrt(dettr))/2.;
-      //
-      // Fill variables for MVA
-      Nvtx = nvertex; 
-      PtJ  = (*jptjet).pt();
-      EtaJ = (*jptjet).eta();
-      Beta = (*jptjet).getSpecific().Zch;
-      MultCalo = ncalotowers;
-      dAxis1c = x1;
-      dAxis2c = x2;
-      MultTr = ntracks;
-      dAxis1t = x1tr;
-      dAxis2t = x2tr;
-      // Run MVA PUID
-      float jptmva = 1.;
-      if(fabs(EtaJ)<2.6) {
-	jptmva = reader_->EvaluateMVA( "BDTG method" );
-      } else {
-        jptmva = readerF_->EvaluateMVA( "BDTG method" );
-      }
-      /*
-      cout <<" jet jc = " << jc 
-	   <<" Nvtx = " << Nvtx
-	   <<" PtJ = " << PtJ
-	   <<" EtaJ = " << EtaJ
-	   <<" Beta = " << Beta
-	   <<" MultCalo = " << MultCalo
-	   <<" dAxis1c = " << dAxis1c
-	   <<" dAxis2c = " << dAxis2c
-	   <<" MultTr = " << MultTr
-	   <<" dAxis1t = " << dAxis1t
-	   <<" dAxis2t = " << dAxis2t 
-	   <<" jptmva = " << jptmva << endl;
-      */
-      // THE HAPPY END OF MVA PU ID story for JPT
-
-      //     jecUnc->setJetEta(jptjet->eta());
-      //     jecUnc->setJetPt (jptjet->pt() ); 
-      //     double unc = jecUnc->getUncertainty(true);
+      imu++;
+      math::XYZTLorentzVector muonc(muon->px(),muon->py(),muon->pz(),muon->p()); 
+      muid->push_back(muonID);
+      EtaMu->push_back(muon->eta());
+      PhiMu->push_back(muon->phi());
+      PtMu->push_back(muon->pt());
+      mucharge->push_back(muon->charge());
+      double dzvtx = fabs(muon->muonBestTrack()->dz((*recVtxs)[0].position()) );
+      dzmuon->push_back(dzvtx);
+      // tracker muon isolation variables
+      double muon_sumTrkPt = muon->isolationR03().sumPt;
+      //       double muon_emEt  = muon->isolationR03().emEt;
+      //       double muon_hadEt = muon->isolationR03().hadEt;
+      mutrkisol->push_back(muon_sumTrkPt);
+      // pf isolation variable
+      const MuonPFIsolation pfisol = muon->pfIsolationR04();
+      double muon_sumPFPt = pfisol.sumChargedHadronPt +
+	max(0.,pfisol.sumNeutralHadronEt+pfisol.sumPhotonEt-0.5*pfisol.sumPUPt);
+      mupfisol->push_back(muon_sumPFPt);
+      if (imu == 1) muon1 = muonc; 
+      if (imu == 2) muon2 = muonc; 
+      rmfirst++;
+    }
    
-      double unc = 0.;
-      // fill variables for user ntpl
-      EtaRaw->push_back(jptjetRef->eta());
-      PhiRaw->push_back(jptjetRef->phi());
-      EtRaw->push_back(jptjetRef->pt());
+    if(imu >= 2) {
+      math::XYZTLorentzVector twomuons = muon1 + muon2;
+      mass_mumu = twomuons.M();
+    }
+    
+    // jpt jets
+    if(jptjetsl1l2l3->size() != 0) {
 
-      EtaJPT->push_back(jptjet->eta());
-      PhiJPT->push_back(jptjet->phi());
-      EtJPT->push_back(jptjet->pt());
-      MVAJPT->push_back(jptmva);
-      Ntrk->push_back(npions);
-      jesunc->push_back(unc);
-      beta->push_back(jptjet->getSpecific().Zch);
-   }
+      double DRmu1 = 10.;
+      double DRmu2 = 10.;
+      double DRel1 = 10.;
+      double DRel2 = 10.;
+      for(JPTJetCollection::const_iterator jptjet = jptjetsl1l2l3->begin(); 
+	  jptjet != jptjetsl1l2l3->end(); ++jptjet ) { 
+	if(jptjet->pt() > 20.) {
+	  if(imu >= 1) { DRmu1 = deltaR(muon1.Eta(), muon1.Phi(), jptjet->eta(), jptjet->phi());}
+	  if(imu >= 2) { DRmu2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
+	  if(iel >= 1) { DRel1 = deltaR(el1.Eta(),   el1.Phi(),   jptjet->eta(), jptjet->phi());}
+	  if(iel >= 2) { DRel2 = deltaR(el2.Eta(),   el2.Phi(),   jptjet->eta(), jptjet->phi());}
+	  if( (DRmu1 > 0.6) && (DRmu2 > 0.6) && (DRel1 > 0.6) && (DRel2 > 0.6) ) {
+	    pTjptIndex[jptjet->pt()] = &(*jptjet);
+	  }
+	}
+      }
+    }
+    
+    for (unsigned ipfjet = 0; ipfjet < pfjetsl1l2l3->size(); ++ipfjet) {
+      
+      const reco::PFJet* pfjet = dynamic_cast<const reco::PFJet*>(&(*pfjetsl1l2l3)[ipfjet]);
+      
+      double DRmu1 = 10.;
+      double DRmu2 = 10.;
+      double DRel1 = 10.;
+      double DRel2 = 10.;
+      if(pfjet->pt() > 20.) {
+	if(imu >= 1) { DRmu1 = deltaR(muon1.Eta(), muon1.Phi(), pfjet->eta(), pfjet->phi());}
+	if(imu >= 2) { DRmu2 = deltaR(muon2.Eta(), muon2.Phi(), pfjet->eta(), pfjet->phi());}
+	if(iel >= 1) { DRel1 = deltaR(el1.Eta(),   el1.Phi(),   pfjet->eta(), pfjet->phi());}
+	if(iel >= 2) { DRel2 = deltaR(el2.Eta(),   el2.Phi(),   pfjet->eta(), pfjet->phi());}
+	if( (DRmu1 > 0.6) && (DRmu2 > 0.6) && (DRel1 > 0.6) && (DRel2 > 0.6) ) {
+	  float mva  = (*puJetIdMVA)[pfjetref->refAt(ipfjet)];
+	  int idflag = (*puJetIdFlag)[pfjetref->refAt(ipfjet)];
+	  pTpfIndex[pfjet->pt()]    = pfjet;
+	  PuMVApfIndex[pfjet->pt()] = mva; 
+	  PuIDpfIndex[pfjet->pt()]  = idflag;
+	}
+      }
+    }
+  }
+  // END OF REQUIREMENT NVTX >= 1
 
-   delete jecUnc;
+  // fill pf jet variables
+  map<double,const PFJet*>::reverse_iterator rfirstPF(pTpfIndex.end());
+  map<double,const PFJet*>::reverse_iterator rlastPF(pTpfIndex.begin());
+  while (rfirstPF != rlastPF) {
+    const PFJet* pfjet = (*rfirstPF).second;
+    rfirstPF++;
+    
+    // pfjet id
+    if(  (*pfjet).neutralHadronEnergyFraction() > 0.99 )  continue;
+    if(  (*pfjet).neutralEmEnergyFraction() > 0.99 )  continue;
+    if(( (*pfjet).neutralMultiplicity() + (*pfjet).chargedMultiplicity() ) < 1 )  continue;
+    if( fabs((*pfjet).eta()) < 2.4) {
+      if( (*pfjet).chargedHadronEnergyFraction() < 0. )  continue;
+      if( (*pfjet).chargedMultiplicity() < 0. )  continue;
+      if( (*pfjet).chargedEmEnergyFraction() > 0.99 )  continue;
+    }
+    float mva  = (*PuMVApfIndex.find((*pfjet).pt())).second;
+    int idflag = (*PuIDpfIndex.find((*pfjet).pt())).second;
+    
+    int pfjidtype = 0;
+    if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose )) 
+      {pfjidtype = 1;}
+    if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium )) 
+      {pfjidtype = 2;}
+    if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )) 
+      {pfjidtype = 3;}
+    
+    EtaPF->push_back(pfjet->eta());
+    PhiPF->push_back(pfjet->phi());
+    EtPF->push_back(pfjet->pt());
+    MVAPF->push_back(mva);
+    IDPF->push_back(idflag);
+    JTypePF->push_back(pfjidtype);
+  }
 
-   // code to calculate variables for track counting veto: n_trk1GeV, n_trk3GeV, n_trk1GeV
-   // 
+  // fill jpt jet variables
+  int jc = 0;
+  map<double,const JPTJet*>::reverse_iterator rfirst(pTjptIndex.end());
+  map<double,const JPTJet*>::reverse_iterator rlast(pTjptIndex.begin());
+  while (rfirst != rlast) {
+    
+    const JPTJet* jptjet = (*rfirst).second;
+    RefToBase<Jet> jptjetRef = jptjet->getCaloJetRef();
+    reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
+    
+    //    RefToBase<Jet> jetRef(Ref<CaloJetCollection>(calojets,jc));
+    
+    double mN90Hits  = (*jetsID)[jptjetRef].n90Hits;
+    double mfHPD     = (*jetsID)[jptjetRef].fHPD;
+    double mfRBX     = (*jetsID)[jptjetRef].fRBX;
+    
+    double mN90      = rawcalojet->n90();
+    double mEmf      = rawcalojet->emEnergyFraction(); 	
+    
+    jc++;
+    rfirst++;
+    // calo jet ID
+    if(mEmf  < 0.01) continue;
+    if(mfHPD > 0.98) continue;
+    if(mfRBX > 0.98) continue;
+    if(mN90  < 2) continue;
+    
+    // access tracks used in JPT
+    TrackRefVector pionsInVertexInCalo  = jptjet->getPionsInVertexInCalo();
+    TrackRefVector pionsInVertexOutCalo = jptjet->getPionsInVertexOutCalo();
+    int npions = pionsInVertexInCalo.size()+pionsInVertexOutCalo.size();
+    
+    // prepare variables for MVA PU jet ID for JPT jets 
+    //
+    // Get MVA variables with calotowers
+    int ncalotowers=0.;
+    double sumpt=0.;
+    double dphi2=0.;
+    double deta2=0.;
+    double dphi1=0.;
+    double deta1=0.;
+    double dphideta=0.;
+    std::vector <CaloTowerPtr> calotwrs = (*rawcalojet).getCaloConstituents();
+    for(std::vector <CaloTowerPtr>::const_iterator icalot = calotwrs.begin();
+	icalot!= calotwrs.end(); icalot++) {
+      
+      double  deta = (*jptjet).eta()-(*icalot)->eta();
+      double  dphi = deltaPhi((*jptjet).phi(),(*icalot)->phi());
+      double  dr   = deltaR(jptjet->eta(),jptjet->phi(),(*icalot)->eta(),(*icalot)->phi());
+      sumpt = sumpt + (*icalot)->pt();
+      dphi2 = dphi2 + dphi*dphi*(*icalot)->pt();
+      deta2 = deta2 + deta*deta*(*icalot)->pt();      
+      dphi1 = dphi1 + dphi*(*icalot)->pt();
+      deta1 = deta1 + deta*(*icalot)->pt();   
+      dphideta = dphideta + dphi*deta*(*icalot)->pt();  
+      ncalotowers++;
+    }
+    if( sumpt > 0.) {
+      deta1 = deta1/sumpt;
+      dphi1 = dphi1/sumpt;
+      deta2 = deta2/sumpt;
+      dphi2 = dphi2/sumpt;
+      dphideta = dphideta/sumpt;
+    }
+    // W.r.t. principal axis
+    double detavar = deta2-deta1*deta1;
+    double dphivar = dphi2-dphi1*dphi1;
+    double dphidetacov = dphideta - deta1*dphi1;
+    
+    double det = (detavar-dphivar)*(detavar-dphivar)+4*dphidetacov*dphidetacov;
+    double x1 = (detavar+dphivar+sqrt(det))/2.;
+    double x2 = (detavar+dphivar-sqrt(det))/2.;
+    //
+    // Get MVA variables with tracks
+    int ntracks=0.;
+    double sumpttr=0.;
+    double dphitr2=0.;
+    double detatr2=0.;
+    double dphitr1=0.;
+    double detatr1=0.;
+    double dphidetatr=0.;
+    // in vertex, in calo tracks     
+    const reco::TrackRefVector pioninin = (*jptjet).getPionsInVertexInCalo();
+    for(reco::TrackRefVector::const_iterator it = pioninin.begin(); 
+	it != pioninin.end(); it++) {      
+      if ((*it)->pt() > 0.5 && ((*it)->ptError()/(*it)->pt()) < 0.05 )
+	{              
+	  ntracks++;
+	  sumpttr = sumpttr + (*it)->pt();       
+	  double  deta = (*jptjet).eta()-(*it)->eta();
+	  double  dphi = deltaPhi((*jptjet).phi(),(*it)->phi());
+	  dphitr2 = dphitr2 + dphi*dphi*(*it)->pt();
+	  detatr2 = detatr2 + deta*deta*(*it)->pt();     
+	  dphitr1 = dphitr1 + dphi*(*it)->pt();
+	  detatr1 = detatr1 + deta*(*it)->pt();  
+	  dphidetatr = dphidetatr + dphi*deta*(*it)->pt();
+	}      
+    }	
+    
+    const reco::TrackRefVector pioninout = (*jptjet).getPionsInVertexOutCalo();
+    
+    for(reco::TrackRefVector::const_iterator it = pioninout.begin(); 
+	it != pioninout.end(); it++) {      
+      if ((*it)->pt() > 0.5 && ((*it)->ptError()/(*it)->pt()) < 0.05 )
+	{              
+	  ntracks++;
+	  sumpttr = sumpttr + (*it)->pt();       
+	  double  deta = (*jptjet).eta()-(*it)->eta();
+	  double  dphi = deltaPhi((*jptjet).phi(),(*it)->phi());
+	  dphitr2 = dphitr2 + dphi*dphi*(*it)->pt();
+	  detatr2 = detatr2 + deta*deta*(*it)->pt();     
+	  dphitr1 = dphitr1 + dphi*(*it)->pt();
+	  detatr1 = detatr1 + deta*(*it)->pt();  
+	  dphidetatr = dphidetatr + dphi*deta*(*it)->pt();       
+	}
+    }
+    
+    if( sumpttr > 0.) {
+      detatr1 = detatr1/sumpttr;
+      dphitr1 = dphitr1/sumpttr;
+      detatr2 = detatr2/sumpttr;
+      dphitr2 = dphitr2/sumpttr;
+      dphidetatr = dphidetatr/sumpttr;
+    }
+    // W.r.t. principal axis
+    double detavart = detatr2-detatr1*detatr1;
+    double dphivart = dphitr2-dphitr1*dphitr1;
+    double dphidetacovt = dphidetatr - detatr1*dphitr1;
+    double dettr = (detavart-dphivart)*(detavart-dphivart)+4*dphidetacovt*dphidetacovt;
+    double x1tr = (detavart+dphivart+sqrt(dettr))/2.;
+    double x2tr = (detavart+dphivart-sqrt(dettr))/2.;
+    //
+    // Fill variables for MVA
+    Nvtx = nvertex; 
+    PtJ  = (*jptjet).pt();
+    EtaJ = (*jptjet).eta();
+    Beta = (*jptjet).getSpecific().Zch;
+    MultCalo = ncalotowers;
+    dAxis1c = x1;
+    dAxis2c = x2;
+    MultTr = ntracks;
+    dAxis1t = x1tr;
+    dAxis2t = x2tr;
+    // Run MVA PUID
+    float jptmva = 1.;
+    if(fabs(EtaJ)<2.6) {
+      jptmva = reader_->EvaluateMVA( "BDTG method" );
+    } else {
+      jptmva = readerF_->EvaluateMVA( "BDTG method" );
+    }
+    /*
+      cout <<" jet jc = " << jc 
+      <<" Nvtx = " << Nvtx
+      <<" PtJ = " << PtJ
+      <<" EtaJ = " << EtaJ
+      <<" Beta = " << Beta
+      <<" MultCalo = " << MultCalo
+      <<" dAxis1c = " << dAxis1c
+      <<" dAxis2c = " << dAxis2c
+      <<" MultTr = " << MultTr
+      <<" dAxis1t = " << dAxis1t
+      <<" dAxis2t = " << dAxis2t 
+      <<" jptmva = " << jptmva << endl;
+    */
+    // THE HAPPY END OF MVA PU ID story for JPT
+    
+    //     jecUnc->setJetEta(jptjet->eta());
+    //     jecUnc->setJetPt (jptjet->pt() ); 
+    //     double unc = jecUnc->getUncertainty(true);
+    
+    double unc = 0.;
+    // fill variables for user ntpl
+    EtaRaw->push_back(jptjetRef->eta());
+    PhiRaw->push_back(jptjetRef->phi());
+    EtRaw->push_back(jptjetRef->pt());
+    
+    EtaJPT->push_back(jptjet->eta());
+    PhiJPT->push_back(jptjet->phi());
+    EtJPT->push_back(jptjet->pt());
+    MVAJPT->push_back(jptmva);
+    Ntrk->push_back(npions);
+    jesunc->push_back(unc);
+    beta->push_back(jptjet->getSpecific().Zch);
+  }
+  
+  delete jecUnc;
+  
+  // code to calculate variables for track counting veto: n_trk1GeV, n_trk3GeV, n_trk1GeV
+  // 
+  
 
+  if( (EtJPT->size() >= 2) && ( (*EtaJPT)[0] * (*EtaJPT)[1] < 0.0) ) {
+    
+    const std::string trkqualiti = "highPurity";
+    
+    RecoMuons::const_iterator imuon = reco_muons->begin(); 
+    RecoMuons::const_iterator jmuon = reco_muons->end();
+    
+    double eta_jmin = (*EtaJPT)[0]; 
+    double eta_jmax = (*EtaJPT)[1]; 
+    if( (*EtaJPT)[0] > (*EtaJPT)[1] ) {
+      eta_jmin = (*EtaJPT)[1]; 
+      eta_jmax = (*EtaJPT)[0]; 
+    }
+    // loop over tracks in vertex
+    reco::Vertex::trackRef_iterator ittrk;
+    for(ittrk =(*recVtxs)[0].tracks_begin(); ittrk != (*recVtxs)[0].tracks_end(); ++ittrk) {
+      //       cout <<" track weight = " << (*recVtxs)[0].trackWeight(*ittrk) << endl;
+      if( (*recVtxs)[0].trackWeight(*ittrk) > 0.5 && 
+	  (*ittrk)->quality(reco::TrackBase::qualityByName(trkqualiti)) )  {
+	int muontrack = 0;
+	for ( ; imuon != jmuon; ++imuon ) {
+	  if ( imuon->innerTrack().isNull() ) {continue;}
+	  const reco::TrackBaseRef ttr1(imuon->innerTrack());
+	  if ( *ittrk == ttr1 ) {
+	    muontrack = 1; 
+	  }
+	}
+	if(muontrack == 0) {
+	  if( (*ittrk)->eta() > eta_jmin + 0.5 && (*ittrk)->eta() < eta_jmax - 0.5) {
+	    if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
+	    if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
+	    if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
+	  }
+	}
+      }
+    }
+  }
+  // fill tree
+  //   if( mass_mumu >= 40. ) t1->Fill();
 
-   if( (EtJPT->size() >= 2) && ( (*EtaJPT)[0] * (*EtaJPT)[1] < 0.0) ) {
-
-     const std::string trkqualiti = "highPurity";
-
-     RecoMuons::const_iterator imuon = reco_muons->begin(); 
-     RecoMuons::const_iterator jmuon = reco_muons->end();
-
-     double eta_jmin = (*EtaJPT)[0]; 
-     double eta_jmax = (*EtaJPT)[1]; 
-     if( (*EtaJPT)[0] > (*EtaJPT)[1] ) {
-       eta_jmin = (*EtaJPT)[1]; 
-       eta_jmax = (*EtaJPT)[0]; 
-     }
-     // loop over tracks in vertex
-     reco::Vertex::trackRef_iterator ittrk;
-     for(ittrk =(*recVtxs)[0].tracks_begin(); ittrk != (*recVtxs)[0].tracks_end(); ++ittrk) {
-       //       cout <<" track weight = " << (*recVtxs)[0].trackWeight(*ittrk) << endl;
-       if( (*recVtxs)[0].trackWeight(*ittrk) > 0.5 && 
-	   (*ittrk)->quality(reco::TrackBase::qualityByName(trkqualiti)) )  {
-	 int muontrack = 0;
-	 for ( ; imuon != jmuon; ++imuon ) {
-	   if ( imuon->innerTrack().isNull() ) {continue;}
-	   const reco::TrackBaseRef ttr1(imuon->innerTrack());
-	   if ( *ittrk == ttr1 ) {
-	     muontrack = 1; 
-	   }
-	 }
-	 if(muontrack == 0) {
-	   if( (*ittrk)->eta() > eta_jmin + 0.5 && (*ittrk)->eta() < eta_jmax - 0.5) {
-	     if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
-	     if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
-	     if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
-	   }
-	 }
-       }
-     }
-   }
-   // fill tree
-   //   if( mass_mumu >= 40. ) t1->Fill();
-
-   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0 
-		      || mass_mumu >= 40. || mass_ee >= 40.) ) t1->Fill();
+  if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0 
+		     || mass_mumu >= 40. || mass_ee >= 40.) ) t1->Fill();
 }
 //define this as a plug-in
 DEFINE_FWK_MODULE(VBFHinvis);
