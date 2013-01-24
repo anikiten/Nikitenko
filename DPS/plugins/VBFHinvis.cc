@@ -472,7 +472,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   run = iEvent.id().run();
   event = iEvent.id().event();
 
-  //  cout <<" ====== run/event " << run <<" "<< event << endl;
+  //  cout <<" ======> run/event " << run <<" "<< event << endl;
 
   nvertex = 0;
   nsimvertex = 0;
@@ -772,7 +772,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // access electrons, muons and jets
   if( nvtx >= 1 ) {
-
+ 
     // electrons
     math::XYZTLorentzVector  el1(0.,0.,0.,0.);
     math::XYZTLorentzVector  el2(0.,0.,0.,0.);
@@ -864,13 +864,17 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     RecoMuons::const_iterator imuon = reco_muons->begin(); 
     RecoMuons::const_iterator jmuon = reco_muons->end();
     for ( ; imuon != jmuon; ++imuon ) {
-      if(imuon->pt() > 10.) {
-	pTMuonIndex[imuon->pt()] = &(*imuon);
+      if( (*imuon).isPFMuon() && ((*imuon).isGlobalMuon() || (*imuon).isTrackerMuon()) ) {
+	if(imuon->pt() > 10.) {
+	  pTMuonIndex[imuon->pt()] = &(*imuon);
+	}
       }
     }
+
     // fill muon variables
     map<double,const Muon*>::reverse_iterator rmfirst(pTMuonIndex.end());
     map<double,const Muon*>::reverse_iterator rmlast(pTMuonIndex.begin());
+
     int imu = 0;
     while (rmfirst != rmlast) {
       
@@ -878,11 +882,11 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // loose muons
       int muonID = 0;
-      if( (*imuon).isPFMuon() && ((*imuon).isGlobalMuon() || (*imuon).isTrackerMuon()) ) {
+      if( (*muon).isPFMuon() && ((*muon).isGlobalMuon() || (*muon).isTrackerMuon()) ) {
 	muonID = 2;
       }
       // tight muons
-      if(muon::isTightMuon(*imuon,(*recVtxs)[0])) {
+      if(muon::isTightMuon(*muon,(*recVtxs)[0])) {
 	muonID = 4;
       }
 
@@ -893,7 +897,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       PhiMu->push_back(muon->phi());
       PtMu->push_back(muon->pt());
       mucharge->push_back(muon->charge());
-      double dzvtx = fabs(muon->muonBestTrack()->dz((*recVtxs)[0].position()) );
+      //      double dzvtx = fabs(muon->muonBestTrack()->dz((*recVtxs)[0].position()) );
+      double dzvtx = fabs(muon->innerTrack()->dz((*recVtxs)[0].position()) );
       dzmuon->push_back(dzvtx);
       // tracker muon isolation variables
       double muon_sumTrkPt = muon->isolationR03().sumPt;
@@ -959,6 +964,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
   }
+
   // END OF REQUIREMENT NVTX >= 1
 
   // fill pf jet variables
@@ -1186,39 +1192,41 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // code to calculate variables for track counting veto: n_trk1GeV, n_trk3GeV, n_trk1GeV
   // 
   
+  if( nvtx >= 1 ) {
 
-  if( (EtJPT->size() >= 2) && ( (*EtaJPT)[0] * (*EtaJPT)[1] < 0.0) ) {
+    if( (EtJPT->size() >= 2) && ( (*EtaJPT)[0] * (*EtaJPT)[1] < 0.0) ) {
     
-    const std::string trkqualiti = "highPurity";
+      const std::string trkqualiti = "highPurity";
     
-    RecoMuons::const_iterator imuon = reco_muons->begin(); 
-    RecoMuons::const_iterator jmuon = reco_muons->end();
+      RecoMuons::const_iterator imuon = reco_muons->begin(); 
+      RecoMuons::const_iterator jmuon = reco_muons->end();
     
-    double eta_jmin = (*EtaJPT)[0]; 
-    double eta_jmax = (*EtaJPT)[1]; 
-    if( (*EtaJPT)[0] > (*EtaJPT)[1] ) {
-      eta_jmin = (*EtaJPT)[1]; 
-      eta_jmax = (*EtaJPT)[0]; 
-    }
-    // loop over tracks in vertex
-    reco::Vertex::trackRef_iterator ittrk;
-    for(ittrk =(*recVtxs)[0].tracks_begin(); ittrk != (*recVtxs)[0].tracks_end(); ++ittrk) {
-      //       cout <<" track weight = " << (*recVtxs)[0].trackWeight(*ittrk) << endl;
-      if( (*recVtxs)[0].trackWeight(*ittrk) > 0.5 && 
-	  (*ittrk)->quality(reco::TrackBase::qualityByName(trkqualiti)) )  {
-	int muontrack = 0;
-	for ( ; imuon != jmuon; ++imuon ) {
-	  if ( imuon->innerTrack().isNull() ) {continue;}
-	  const reco::TrackBaseRef ttr1(imuon->innerTrack());
-	  if ( *ittrk == ttr1 ) {
-	    muontrack = 1; 
+      double eta_jmin = (*EtaJPT)[0]; 
+      double eta_jmax = (*EtaJPT)[1]; 
+      if( (*EtaJPT)[0] > (*EtaJPT)[1] ) {
+	eta_jmin = (*EtaJPT)[1]; 
+	eta_jmax = (*EtaJPT)[0]; 
+      }
+      // loop over tracks in vertex
+      reco::Vertex::trackRef_iterator ittrk;
+      for(ittrk =(*recVtxs)[0].tracks_begin(); ittrk != (*recVtxs)[0].tracks_end(); ++ittrk) {
+	//       cout <<" track weight = " << (*recVtxs)[0].trackWeight(*ittrk) << endl;
+	if( (*recVtxs)[0].trackWeight(*ittrk) > 0.5 && 
+	    (*ittrk)->quality(reco::TrackBase::qualityByName(trkqualiti)) )  {
+	  int muontrack = 0;
+	  for ( ; imuon != jmuon; ++imuon ) {
+	    if ( imuon->innerTrack().isNull() ) {continue;}
+	    const reco::TrackBaseRef ttr1(imuon->innerTrack());
+	    if ( *ittrk == ttr1 ) {
+	      muontrack = 1; 
+	    }
 	  }
-	}
-	if(muontrack == 0) {
-	  if( (*ittrk)->eta() > eta_jmin + 0.5 && (*ittrk)->eta() < eta_jmax - 0.5) {
-	    if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
-	    if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
-	    if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
+	  if(muontrack == 0) {
+	    if( (*ittrk)->eta() > eta_jmin + 0.5 && (*ittrk)->eta() < eta_jmax - 0.5) {
+	      if( (*ittrk)->pt() >= 1.0) {n_trk1GeV++;}
+	      if( (*ittrk)->pt() >= 2.0) {n_trk2GeV++;}
+	      if( (*ittrk)->pt() >= 3.0) {n_trk3GeV++;}
+	    }
 	  }
 	}
       }
