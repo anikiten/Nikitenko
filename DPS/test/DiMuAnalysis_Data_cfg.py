@@ -15,19 +15,27 @@ process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
 # process.load('JetMETCorrections.Type1MET.MetType1Corrections_cff')
 process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
-# process.GlobalTag.globaltag = cms.string('START311_V2::All')
-# process.GlobalTag.globaltag = cms.string('MC_311_V1::All')
-# process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
-
-# process.GlobalTag.globaltag = cms.string('FT_R_42_V13A::All') 
-# process.GlobalTag.globaltag = cms.string('GR_R_44_V4::All')
-
-# process.GlobalTag.globaltag = cms.string('GR_R_44_V14::All') 
-
-# process.GlobalTag.globaltag = cms.string('GR_R_53_V13::All') 
-
-process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
-
+# 1.    Run2012A-13Jul2012 Re-reco....................GT: FT_53_V6_AN3
+# process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
+#
+# 2.    Run2012A-recover-06Aug2012  Re-reco ..........GT: FT_53_V6C_AN3
+# process.GlobalTag.globaltag = cms.string('FT_53_V6C_AN3::All') 
+#
+# 3.    Run2012B-13Jul2012 Re-reco ...................GT: FT_53_V6_AN3
+# process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
+#
+# 4.    Run2012C-ReReco 24Aug.........................GT: FT_53_V10_AN3
+# process.GlobalTag.globaltag = cms.string('FT_53_V10_AN3::All') 
+#
+# 5.    Run2012C-PromptReco-v2 ...................... GT: GR_P_V42_AN3 
+# process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
+#
+# 6.    Run2012C-EcalRecover_11Dec2012................GT: FT_P_V42C_AN3
+# process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
+#
+# 7.    Run2012D-PromptReco-v1........................GT: GR_P_V42_AN3 
+process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
+#
 # ############# electrons #################################################################
 # rho value for isolation
 #
