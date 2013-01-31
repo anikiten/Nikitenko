@@ -187,7 +187,7 @@ private:
   double  DZmin, PVx, PVy, PVz;
   int     nvertex, nsimvertex;
   // MET
-  double  pfmet, pfmetType1,pfmetType2;
+  double  pfmet, pfmetType1, pfmetType1x, pfmetType1y;
   // di muon pass and di electron mass of two high pT objects
   double  mass_mumu, mass_ee;
   // muon eta/phi/pT/isolation/charge/distance from PV in Z coordinate
@@ -323,6 +323,8 @@ VBFHinvis::beginJob()
   t1->Branch("PVz",&PVz,"PVz/D");
   t1->Branch("pfmet",&pfmet,"pfmet/D");
   t1->Branch("pfmetType1",&pfmetType1,"pfmetType1/D");
+  t1->Branch("pfmetType1x",&pfmetType1x,"pfmetType1x/D");
+  t1->Branch("pfmetType1y",&pfmetType1y,"pfmetType1y/D");
 
   t1->Branch("mass_mumu",&mass_mumu,"mass_mumu/D");
   t1->Branch("EtaMu","vector<double>",&EtaMu);
@@ -497,6 +499,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   pfmet = 0.;
   pfmetType1 = 0.;
+  pfmetType1x = 0.;
+  pfmetType1y = 0.;
 
   mass_mumu = 0.;
   EtaMu->clear();
@@ -617,6 +621,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::PFMETCollection> metsType1;
   iEvent.getByLabel("pfType1CorrectedMet", metsType1);
   pfmetType1 = metsType1->front().pt();
+  pfmetType1x = metsType1->front().px();
+  pfmetType1y = metsType1->front().py();
   
   if(DataOrMCSrc == 0) {
     
