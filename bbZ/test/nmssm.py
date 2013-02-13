@@ -39,7 +39,7 @@ from GeneratorInterface.ExternalDecays.TauolaSettings_cff import *
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10000)
 )
 
 # Input source
@@ -51,7 +51,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('QCD_Pt_80_120_7TeV.cfi nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -89,7 +89,7 @@ process.ak5PartonJets  =  process.ak5GenJets.clone()
 process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 
 process.nmssmanalysis = cms.EDAnalyzer("nmssm",
-    HistOutFile = cms.untracked.string('nmssm.root'),
+    HistOutFile = cms.untracked.string('nmssm_mh50.root'),
     parton_jets = cms.InputTag("ak5PartonJets")
 )
 
@@ -138,7 +138,7 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
             'RMSS(16)= 2000.  ! At',
             'RMSS(17)= 2000.  ! Atau',
             # Higgs masses
-            'PMAS(25,1)=20.   ! mh',
+            'PMAS(25,1)=50.   ! mh',
             'PMAS(35,1)=125.  ! mH',
             # Switch off / on desirable channels for H->hh
             'MDME(334,1)=0  ! Higgs(H) decay into d              dbar', 
@@ -151,7 +151,7 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
             'MDME(341,1)=0  ! Higgs(H) decay into t              tbar', 
             'MDME(342,1)=0  ! Higgs(H) decay into e-             e+', 
             'MDME(343,1)=0  ! Higgs(H) decay into mu-            mu+', 
-            'MDME(344,1)=1  ! Higgs(H) decay into tau-           tau+', 
+            'MDME(344,1)=0  ! Higgs(H) decay into tau-           tau+', 
             'MDME(345,1)=0  ! Higgs(H) decay into tau-           tau+', 
             'MDME(346,1)=0  ! Higgs(H) decay into g              g', 
             'MDME(347,1)=0  ! Higgs(H) decay into gamma          gamma', 
@@ -328,7 +328,9 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 # Schedule definition
 # process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step)
 
-process.an = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.nmssmanalysis)
+#process.an = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.nmssmanalysis)
+
+process.an = cms.Path(process.nmssmanalysis)
 
 process.schedule = cms.Schedule(process.generation_step,process.an)
 
