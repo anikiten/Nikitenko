@@ -67,18 +67,13 @@ private:
   // names of modules, producing object collections
   edm::InputTag partonjetsSrc; 
   // variables to store in ntpl
-  int    nbjets;
-  double pTH, yH;
-  double pTb, yb;
-  //  std::vector<double> *EtaRaw;
-  // output root file and tree
+  double ptb1, etab1, phib1;
+  double ptb2, etab2, phib2;
+  double ptmu, etamu, phimu;
+  double pttauh, etatauh, phitauh;
+  //
   TFile*      hOutputFile ;
   TTree*      t1;
-
-  int nbq0, nbq1, nbq2;
-  int nbj0, nbj1, nbj2;
-  int ntot;
-
 };
 
 //
@@ -96,17 +91,18 @@ nmssm::beginJob()
 {
   using namespace edm;
 
-  nbq0 = 0; 
-  nbq1 = 0;
-  nbq2 = 0;
-
-  nbj0 = 0; 
-  nbj1 = 0; 
-  nbj2 = 0;
-
-  ntot = 0;
-
-  //  EtaRaw       = new std::vector<double>();
+  ptb1    = 0.; 
+  etab1   = 0.; 
+  phib1   = 0.;
+  ptb2    = 0.; 
+  etab2   = 0.; 
+  phib2   = 0.;
+  ptmu    = 0.; 
+  etamu   = 0.; 
+  phimu   = 0.;
+  pttauh  = 0.; 
+  etatauh = 0.; 
+  phitauh = 0.;
 
   // creating a simple tree
 
@@ -114,11 +110,21 @@ nmssm::beginJob()
 
   t1 = new TTree("t1","analysis tree");
 
-  t1->Branch("nbjets",&nbjets,"nbjets/I");
-  t1->Branch("pTH",&pTH,"pTH/D");
-  t1->Branch("yH",&yH,"yH/D");
-  t1->Branch("pTb",&pTb,"pTb/D");
-  t1->Branch("yb",&yb,"yb/D");
+  t1->Branch("ptb1",&ptb1,"ptb1/D");
+  t1->Branch("etab1",&etab1,"etab1/D");
+  t1->Branch("phib1",&phib1,"phib1/D");
+  //
+  t1->Branch("pt2",&ptb2,"ptb2/D");
+  t1->Branch("etab2",&etab2,"etab2/D");
+  t1->Branch("phib2",&phib2,"phib2/D");
+  //
+  t1->Branch("ptmu",&ptmu,"ptmu/D");
+  t1->Branch("etamu",&etamu,"etamu/D");
+  t1->Branch("phimu",&phimu,"phimu/D");
+  //
+  t1->Branch("pttauh",&pttauh,"pttauh/D");
+  t1->Branch("etatauh",&etatauh,"etatauh/D");
+  t1->Branch("phitauh",&phitauh,"phitauh/D");
   //  t1->Branch("EtaRaw","vector<double>",&EtaRaw);
 
   return ;
@@ -130,23 +136,6 @@ nmssm::endJob() {
 
   hOutputFile->Write() ;
   hOutputFile->Close() ;
-  
-  cout <<" Results for b quarks and jets " << endl;
-  cout <<" " << endl;
-
-  cout <<"   total number of events processed = " << ntot << endl;
-  cout <<" " << endl;
-  cout <<" b-quark / jet selections: pTb > 20 GeV , |eta| < 2.4 " << endl;
-  cout <<" " << endl;
- 
-  cout <<" zero b quarks = " << nbq0 
-       <<"    >= 1 b quarks = " << nbq1 
-       <<"    = 2 b quarks = "  << nbq2 << endl;
-
-  cout <<" " << endl;
-  cout <<" zero b jets = " << nbj0 
-       <<"    >= 1 b jets = " << nbj1 
-       <<"    = 2 b jets = "  << nbj2 << endl;
 
   return ;
 }
@@ -213,91 +202,102 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::GenParticleCollection> genparticles;
   iEvent.getByLabel("genParticles", genparticles);
 
-  int nbquarks = 0; 
+  math::XYZTLorentzVector  tauh(0.,0.,0.,0.);
 
   for( size_t i = 0; i < genparticles->size(); i++)
     {
       const reco::GenParticle & p = (*genparticles)[i];
 
+      int motherID = 0;
+      int motherSt = 0;
+
+      int grmotherID = 0;
+      int grmotherSt = 0;
+
+      int grgrmotherID = 0;
+      int grgrmotherSt = 0;
+      double grgrmotherpx = 0.;
+
+      const Candidate * moth = p.mother();
+      if(moth) {
+	motherID = moth->pdgId();
+	motherSt = moth->status();	
+	const Candidate * grmoth = moth->mother();
+	if(grmoth) {
+	  grmotherID = grmoth->pdgId();
+	  grmotherSt = grmoth->status();
+	  const Candidate * grgrmoth = grmoth->mother();
+	  if(grgrmoth) {
+	    grgrmotherID = grgrmoth->pdgId();
+	    grgrmotherSt = grgrmoth->status();
+	    grgrmotherpx = grgrmoth->px();
+	  }	  
+	}
+      }
+
       /*
-      cout <<" i = " << i 
-	   <<" ID = " << p.pdgId() 
-	   <<" status = " << p.status() 
-	   <<" rapidity = " << p.y() 
-	   <<" eta = " << p.eta() << endl;
+      cout <<" i " << i 
+	   <<" ID " << p.pdgId() 
+	   <<" status " << p.status() 
+	   <<" motherID " << motherID 
+	   <<" motherST " << motherSt
+	   <<" grmotherID " << grmotherID 
+	   <<" grmotherST " << grmotherSt 
+	   <<" grgrmotherID " << grgrmotherID 
+	   <<" grgrmotherST " << grgrmotherSt
+	   <<" grgrmotherpx " << grgrmotherpx << endl;
       */
-      
-      if( p.pdgId() == 36 &&  p.status() == 2) {
-	pTH = p.pt();
-	yH  = p.y();
-	//	cout <<" Higgs ID = " << p.pdgId() <<" pTH = " << pTH <<" y = " << yH << endl;
+
+      // select muon from tau->mu nu from h->2tau
+      if(abs(p.pdgId()) == 13 && p.status() == 1 &&
+	 abs(motherID) == 15 && motherSt == 2 &&
+	 abs(grmotherID) == 15 && grmotherSt == 3 &&
+	 grgrmotherID == 25) {
+	ptmu  = p.pt();
+	etamu = p.eta();
+	phimu = p.phi();
       }
 
-      
-      if( fabs(p.pdgId()) == 5 && p.status() == 3 && p.pt() > 20. &&  fabs(p.eta()) < 2.4 ) {
-	++nbquarks;
-	//	cout <<" good b quark i = " << i 
-	//     <<" id = " << p.pdgId() 
-	//    <<" status = " << p.status() 
-	//   <<" pt / eta = " << p.pt() <<" " << p.eta() << endl;
-	// if(p.status() == 2) {
-	//  const Candidate * moth = p.mother();
-	//  if(moth) {
-	//    cout <<"         mother = " << moth->pdgId() << endl;
-	//  }
+      // select tau_h decay products from h->2tau
+      if(abs(p.pdgId()) != 13 && abs(p.pdgId()) != 16 & 
+	 abs(p.pdgId()) != 14 && abs(p.pdgId()) != 24 &
+	 abs(motherID) == 15 && motherSt == 2 &&
+	 abs(grmotherID) == 15 && grmotherSt == 3 &&
+	 grgrmotherID == 25) {
+	math::XYZTLorentzVector tauh_c(p.px(),p.py(), p.pz(), p.p());
+	tauh += tauh_c;
       }
-    }
 
-  if(nbquarks == 0) {++nbq0;}
-  if(nbquarks == 1) {++nbq1;}
-  if(nbquarks == 2) {++nbq2;}
+      // select tau_h decay products from h->2tau
+      if(abs(p.pdgId()) != 13 && abs(p.pdgId()) != 16 & 
+	 abs(p.pdgId()) != 14 && abs(p.pdgId()) != 24 &
+	 abs(motherID)     == 24  &&
+	 abs(grmotherID)   == 15 && grmotherSt   == 2 &&
+	 abs(grgrmotherID) == 15 && grgrmotherSt == 3) 
+	{
+	  math::XYZTLorentzVector tauh_c(p.px(),p.py(), p.pz(), p.p());
+	  tauh += tauh_c;
+	}
 
-  // parton jets
-  edm::Handle<GenJetCollection> partonjets;
-  iEvent.getByLabel(partonjetsSrc, partonjets);
+      // select b quarks
+      if(p.pdgId() == 5 && motherID == 25 && motherSt == 3) {
+	ptb1  = p.pt();
+	etab1 = p.eta();
+	phib1 = p.phi();
+      }
 
-  ++ntot;
-
-  double pTbmax = 0.;
-  yb  = 0.;
-  pTb = 0.;
-  nbjets = 0; 
-
-  if( partonjets->size() != 0) {
-    
-    for(GenJetCollection::const_iterator partonjet = partonjets->begin();  partonjet != partonjets->end(); ++partonjet ) { 
-      int nb = 0;
-      if( ( partonjet->pt() > 20. ) && ( fabs(partonjet->eta()) ) < 2.4 ) {
-	    std::vector<const reco::Candidate*> partons = partonjet->getJetConstituentsQuick();
-	    for (unsigned int i = 0; i < partons.size(); ++i) {
-	      const reco::Candidate* parton = partons[i];
-	      //	      cout <<"   jet constituent i = " << i <<" ID " << parton->pdgId() << endl;
-	      if( fabs(parton->pdgId()) == 5 ) {
-		++nb;
-		if(partonjet->pt() > pTbmax) {
-		  pTbmax = partonjet->pt();
-		  pTb    = partonjet->pt();
-		  yb     = partonjet->y();
-		}
-	      }
-	    }
-	    //	    cout <<"   n bquarks in jet = " << nb << endl;
-	    if( nb > 0 ) {++nbjets;}
-	    //	    cout <<" parton jet pt / eta = " << partonjet->pt() <<" "<< partonjet->eta() <<" nb = " << nb <<  endl; 
+      // select b_bar quarks
+      if(p.pdgId() == -5 && motherID == 25 && motherSt == 3) {
+	ptb2  = p.pt();
+	etab2 = p.eta();
+	phib2 = p.phi();
       }
     }
-  }
 
-  //  cout <<" ===> nbjets = " << nbjets <<" pTb = " << pTb <<" yb = " << yb << endl;
-	
-  if(nbjets == 0) {++nbj0;}
-  if(nbjets == 1) {++nbj1;}
-  if(nbjets >= 2) {++nbj2;}
+  pttauh  = tauh.pt();
+  etatauh = tauh.eta();
+  phitauh = tauh.phi();
 
-  //  cout <<"    ---> n b-jets   counters nbj0, nbj1, nbj2 = " << nbj0 <<" " << nbj1 <<" "<< nbj2 << endl;
-  //  cout <<"    ---> n b-quarks counters nbq0, nbq1, nbq2 = " << nbq0 <<" " << nbq1 <<" "<< nbq2 << endl;
-
-  //  EtaRaw->clear();
   t1->Fill();
 }
 
