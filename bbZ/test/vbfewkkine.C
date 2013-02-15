@@ -196,8 +196,8 @@ void Draw()
 
   TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(hMjjQCDZ,"QCD Z+2jets","L");
-  leg->AddEntry(hMjjEWKZ,"EWK Z+2jets","L");
+  leg->AddEntry(hMjjQCDZ,"DY #mu#mujj","L");
+  leg->AddEntry(hMjjEWKZ,"EW #mu#mujj","L");
   leg->AddEntry(hMjjVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
@@ -227,7 +227,7 @@ void Draw()
   scale = 1./ hDetaJJVBFH->Integral();
   hDetaJJVBFH->Scale(scale);
   //  hDetaJJQCDZ->GetYaxis()->SetTitle("dp/#Delta#eta_{j1j2}");
-  hDetaJJQCDZ->GetXaxis()->SetTitle("#Delta#eta_{j1j2}");
+  hDetaJJQCDZ->GetXaxis()->SetTitle("#Delta#eta_{j_{1}j_{2}}");
   hDetaJJQCDZ->SetMaximum(0.2);
   hDetaJJQCDZ->SetLineStyle(1);
   hDetaJJQCDZ->SetLineWidth(2);
@@ -241,8 +241,8 @@ void Draw()
 
   TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(hDetaJJQCDZ,"QCD Z+2jets","L");
-  leg->AddEntry(hDetaJJEWKZ,"EWK Z+2jets","L");
+  leg->AddEntry(hDetaJJQCDZ,"DY #mu#mujj","L");
+  leg->AddEntry(hDetaJJEWKZ,"EW #mu#mujj","L");
   leg->AddEntry(hDetaJJVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
@@ -283,8 +283,8 @@ void Draw()
 
   TLegend *leg = new TLegend(0.15,0.75,0.55,0.95,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(hEtaJmaxQCDZ,"QCD Z+2jets","L");
-  leg->AddEntry(hEtaJmaxEWKZ,"EWK Z+2jets","L");
+  leg->AddEntry(hEtaJmaxQCDZ,"DY #mu#mujj","L");
+  leg->AddEntry(hEtaJmaxEWKZ,"EW #mu#mujj","L");
   leg->AddEntry(hEtaJmaxVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
@@ -311,7 +311,7 @@ void Draw()
   scale = 1./ hPtTagJVBFH->Integral();
   hPtTagJVBFH->Scale(scale);
   //  hPtTagJQCDZ->GetYaxis()->SetTitle("dp/p_{T,j}");
-  hPtTagJQCDZ->GetXaxis()->SetTitle("p_{T,j}, GeV");
+  hPtTagJQCDZ->GetXaxis()->SetTitle("p_{T}^{j}, GeV");
   //  hPtTagJQCDZ->SetMaximum(0.15);
   hPtTagJQCDZ->SetLineStyle(1);
   hPtTagJQCDZ->SetLineWidth(2);
@@ -325,8 +325,8 @@ void Draw()
 
   TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(hPtTagJQCDZ,"QCD Z+2jets","L");
-  leg->AddEntry(hPtTagJEWKZ,"EWK Z+2jets","L");
+  leg->AddEntry(hPtTagJQCDZ,"DY #mu#mujj","L");
+  leg->AddEntry(hPtTagJEWKZ,"EW #mu#mujj","L");
   leg->AddEntry(hPtTagJVBFH,"VBF H, m_{H}=120 GeV","L");
   leg->Draw();
   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
