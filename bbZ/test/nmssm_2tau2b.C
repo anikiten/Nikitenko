@@ -62,6 +62,9 @@ void nmssm_2tau2b::Loop()
    TH1F * hPtTauH   = new TH1F( "hPtTauH", "PtTauH", 20, 0., 100.);
    TH1F * hEtaTauH  = new TH1F( "hEtaTauH", "EtaTauH", 50, -5.0, 5.0);
 
+   TH1F * hDrMuTauH  = new TH1F( "hDrMuTauH", "DrMuTauH", 60, 0., 6.0);
+   TH1F * hDrBBbar   = new TH1F( "hDrBBbar", "DrBBbar", 60, 0., 6.0);
+
    if (fChain == 0) return;
 
    Long64_t nentries = fChain->GetEntriesFast();
@@ -82,6 +85,12 @@ void nmssm_2tau2b::Loop()
       hPtTauH->Fill(pttauh);
       hEtaTauH->Fill(etatauh);
 
+      double DrMuTauH = deltaR(etamu,phimu,etatauh,phitauh);
+      double DrBBbar  = deltaR(etab1,phib1,etab2,phib2);
+
+      hDrMuTauH->Fill(DrMuTauH);
+      hDrBBbar->Fill(DrBBbar);
+
    }
 
    TFile efile("nmssm_60_histos.root","recreate");
@@ -95,5 +104,8 @@ void nmssm_2tau2b::Loop()
    hPtTauH->Write();
    hEtaTauH->Write();
    
+   hDrMuTauH->Write();
+   hDrBBbar->Write();
+
    efile.Close();
 }
