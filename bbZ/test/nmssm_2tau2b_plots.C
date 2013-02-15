@@ -228,9 +228,8 @@ void Draw()
   //  t->DrawLatex(600.0,3000.0,"Z+2jets, Z#rightarrow l^{+}l^{-} MadGraph");
   c1->SaveAs("ptmu_nmssm_2tau2b.png");
 
-  /*
   // eta mu
-  setTDRStyle(0,1,0);
+  setTDRStyle(0,0,0);
   TCanvas* c2 = new TCanvas("X","Y",1);
   scale = 1./ hEtaMu20->Integral();
   hEtaMu20->Scale(scale);
@@ -239,9 +238,9 @@ void Draw()
   scale = 1./ hEtaMu60->Integral();
   hEtaMu60->Scale(scale);
 
-  hEtaMu20->GetXaxis()->SetTitle("p_{T}^{#mu}, GeV");
-  hEtaMu20->SetMaximum(1.0);
-  hEtaMu20->SetMinimum(0.001);
+  hEtaMu20->GetXaxis()->SetTitle("#eta^{#mu}");
+  hEtaMu20->SetMaximum(0.1);
+  //  hEtaMu20->SetMinimum(0.001);
   hEtaMu20->SetLineStyle(1);
   hEtaMu20->SetLineWidth(2);
   hEtaMu20->Draw("hist");
@@ -265,16 +264,202 @@ void Draw()
   tex->SetLineWidth(2);
   tex->Draw();
   tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
-  //  tex = new TLatex(0.1,0.96,"H2->H1H2, m_{H1}=125 GeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  //  TLatex *t = new TLatex();
-  //  t->SetTextSize(0.040);
-  //  t->DrawLatex(600.0,3000.0,"Z+2jets, Z#rightarrow l^{+}l^{-} MadGraph");
+
+  t->DrawLatex(-4.5, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+
   c2->SaveAs("etamu_nmssm_2tau2b.png");
-  */
+
+  // pT tau_h 
+  setTDRStyle(0,1,0);
+  TCanvas* c3 = new TCanvas("X","Y",1);
+  scale = 1./ hPtTauH20->Integral();
+  hPtTauH20->Scale(scale);
+  scale = 1./ hPtTauH40->Integral();
+  hPtTauH40->Scale(scale);
+  scale = 1./ hPtTauH60->Integral();
+  hPtTauH60->Scale(scale);
+
+  hPtTauH20->GetXaxis()->SetTitle("p_{T}^{#tau_{h}}, GeV");
+  hPtTauH20->SetMaximum(1.0);
+  hPtTauH20->SetMinimum(0.001);
+  hPtTauH20->SetLineStyle(1);
+  hPtTauH20->SetLineWidth(2);
+  hPtTauH20->Draw("hist");
+  hPtTauH40->SetLineStyle(2);
+  hPtTauH40->SetLineWidth(2);
+  hPtTauH40->Draw("same");
+  hPtTauH60->SetLineStyle(3);
+  hPtTauH60->SetLineWidth(2);
+  hPtTauH60->Draw("same");
+
+  TLegend *leg = new TLegend(0.5,0.55,0.9,0.75,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hPtTauH20,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hPtTauH40,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hPtTauH60,"m_{H2}=60 GeV","L");
+  leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  t->DrawLatex(5.0, 0.5,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+
+  c3->SaveAs("pttauh_nmssm_2tau2b.png");
+
+
+  // eta tauh
+  setTDRStyle(0,0,0);
+  TCanvas* c4 = new TCanvas("X","Y",1);
+  scale = 1./ hEtaTauH20->Integral();
+  hEtaTauH20->Scale(scale);
+  scale = 1./ hEtaTauH40->Integral();
+  hEtaTauH40->Scale(scale);
+  scale = 1./ hEtaTauH60->Integral();
+  hEtaTauH60->Scale(scale);
+
+  hEtaTauH20->GetXaxis()->SetTitle("#eta^{#tau_{h}}");
+  hEtaTauH20->SetMaximum(0.1);
+  //  hEtaTauH20->SetMinimum(0.001);
+  hEtaTauH20->SetLineStyle(1);
+  hEtaTauH20->SetLineWidth(2);
+  hEtaTauH20->Draw("hist");
+  hEtaTauH40->SetLineStyle(2);
+  hEtaTauH40->SetLineWidth(2);
+  hEtaTauH40->Draw("same");
+  hEtaTauH60->SetLineStyle(3);
+  hEtaTauH60->SetLineWidth(2);
+  hEtaTauH60->Draw("same");
+
+  TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hEtaTauH20,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hEtaTauH40,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hEtaTauH60,"m_{H2}=60 GeV","L");
+  leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  t->DrawLatex(-4.5, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+
+  c4->SaveAs("etatauh_nmssm_2tau2b.png");
+
+
+  // pT tau_h 
+  setTDRStyle(0,0,0);
+  TCanvas* c5 = new TCanvas("X","Y",1);
+  scale = 1./ hPtB20->Integral();
+  hPtB20->Scale(scale);
+  scale = 1./ hPtB40->Integral();
+  hPtB40->Scale(scale);
+  scale = 1./ hPtB60->Integral();
+  hPtB60->Scale(scale);
+
+  hPtB20->GetXaxis()->SetTitle("p_{T}^{b quark}, GeV");
+  hPtB20->SetMaximum(0.3);
+  //  hPtB20->SetMinimum(0.001);
+  hPtB20->SetLineStyle(1);
+  hPtB20->SetLineWidth(2);
+  hPtB20->Draw("hist");
+  hPtB40->SetLineStyle(2);
+  hPtB40->SetLineWidth(2);
+  hPtB40->Draw("same");
+  hPtB60->SetLineStyle(3);
+  hPtB60->SetLineWidth(2);
+  hPtB60->Draw("same");
+
+  TLegend *leg = new TLegend(0.5,0.55,0.9,0.75,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hPtB20,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hPtB40,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hPtB60,"m_{H2}=60 GeV","L");
+  leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  t->DrawLatex(5.0, 0.25,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+
+  c5->SaveAs("ptb_nmssm_2tau2b.png");
+
+
+  // eta b
+  setTDRStyle(0,0,0);
+  TCanvas* c6 = new TCanvas("X","Y",1);
+  scale = 1./ hEtaB20->Integral();
+  hEtaB20->Scale(scale);
+  scale = 1./ hEtaB40->Integral();
+  hEtaB40->Scale(scale);
+  scale = 1./ hEtaB60->Integral();
+  hEtaB60->Scale(scale);
+
+  hEtaB20->GetXaxis()->SetTitle("#eta^{b-quark}");
+  hEtaB20->SetMaximum(0.1);
+  //  hEtaB20->SetMinimum(0.001);
+  hEtaB20->SetLineStyle(1);
+  hEtaB20->SetLineWidth(2);
+  hEtaB20->Draw("hist");
+  hEtaB40->SetLineStyle(2);
+  hEtaB40->SetLineWidth(2);
+  hEtaB40->Draw("same");
+  hEtaB60->SetLineStyle(3);
+  hEtaB60->SetLineWidth(2);
+  hEtaB60->Draw("same");
+
+  TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hEtaB20,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hEtaB40,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hEtaB60,"m_{H2}=60 GeV","L");
+  leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  t->DrawLatex(-4.5, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+
+  c6->SaveAs("etab_nmssm_2tau2b.png");
+
 }
 
