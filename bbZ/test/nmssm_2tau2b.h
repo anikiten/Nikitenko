@@ -73,13 +73,10 @@ nmssm_2tau2b::nmssm_2tau2b(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-     //      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("nmssm_mh20.root");
-     //     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("nmssm_mh40.root");
-     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("nmssm_mh60.root");
+     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("nmssm_mh20.root");
       if (!f || !f->IsOpen()) {
 	//         f = new TFile("nmssm_mh20.root");
-	//	f = new TFile("nmssm_mh40.root");
-	f = new TFile("nmssm_mh60.root");
+	f = new TFile("nmssm_mh20.root");
       }
       f->GetObject("t1",tree);
 

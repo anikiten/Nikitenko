@@ -62,8 +62,16 @@ void nmssm_2tau2b::Loop()
    TH1F * hPtTauH   = new TH1F( "hPtTauH", "PtTauH", 20, 0., 100.);
    TH1F * hEtaTauH  = new TH1F( "hEtaTauH", "EtaTauH", 50, -5.0, 5.0);
 
-   TH1F * hDrMuTauH  = new TH1F( "hDrMuTauH", "DrMuTauH", 60, 0., 6.0);
-   TH1F * hDrBBbar   = new TH1F( "hDrBBbar", "DrBBbar", 60, 0., 6.0);
+   TH1F * hDrMuTauH  = new TH1F( "hDrMuTauH", "DrMuTauH", 25, 0., 5.0);
+   TH1F * hDrBBbar   = new TH1F( "hDrBBbar", "DrBBbar", 25, 0., 5.0);
+
+   TH1F * hDrMuTauHS  = new TH1F( "hDrMuTauHS", "DrMuTauHS", 25, 0., 5.0);
+   TH1F * hDrBBbarS   = new TH1F( "hDrBBbarS", "DrBBbarS", 25, 0., 5.0);
+
+   Int_t ntot      = 0;
+   Int_t nsel_mu   = 0;
+   Int_t nsel_tauh = 0;
+   Int_t nsel_b    = 0;
 
    if (fChain == 0) return;
 
@@ -76,11 +84,16 @@ void nmssm_2tau2b::Loop()
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
 
+      ntot += 1;
+
       hPtMu->Fill(ptmu);
       hEtaMu->Fill(etamu);
       
       hPtB->Fill(ptb1);
       hEtaB->Fill(etab1);
+
+      //      hPtB->Fill(ptb2);
+      //      hEtaB->Fill(etab2);
 
       hPtTauH->Fill(pttauh);
       hEtaTauH->Fill(etatauh);
@@ -91,9 +104,30 @@ void nmssm_2tau2b::Loop()
       hDrMuTauH->Fill(DrMuTauH);
       hDrBBbar->Fill(DrBBbar);
 
+      if(ptmu < 20. || fabs(etamu) > 2.1) {continue;}
+      nsel_mu += 1;
+      if(pttauh < 20. || fabs(etatauh) > 2.3) {continue;}
+      nsel_tauh += 1;
+      if(ptb1 < 25 || fabs(etab1) > 2.4 || ptb2 < 25 || fabs(etab2) > 2.4) {continue;}
+      nsel_b += 1;
+
+      hDrMuTauHS->Fill(DrMuTauH);
+      hDrBBbarS->Fill(DrBBbar);
+
    }
 
-   TFile efile("nmssm_60_histos.root","recreate");
+   cout <<" ====== Selections and efficiency ============" << endl;
+   cout <<"  ntot = " << ntot << endl;
+   cout <<"  nsel_mu = " << nsel_mu << endl;
+   cout <<"  nsel_tauh = " << nsel_tauh << endl;
+   cout <<"  nsel_b = " << nsel_b << endl;
+   
+   double eff = 1.*nsel_b/ntot;
+
+   cout <<" eff = " << eff << endl;
+
+
+   TFile efile("nmssm_20_histos.root","recreate");
 
    hPtMu->Write();
    hEtaMu->Write();
@@ -106,6 +140,9 @@ void nmssm_2tau2b::Loop()
    
    hDrMuTauH->Write();
    hDrBBbar->Write();
+
+   hDrMuTauHS->Write();
+   hDrBBbarS->Write();
 
    efile.Close();
 }
