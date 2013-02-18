@@ -39,7 +39,7 @@ from GeneratorInterface.ExternalDecays.TauolaSettings_cff import *
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(100000)
 )
 
 # Input source
@@ -51,7 +51,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('QCD_Pt_80_120_7TeV.cfi nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -89,14 +89,14 @@ process.ak5PartonJets  =  process.ak5GenJets.clone()
 process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 
 process.nmssmanalysis = cms.EDAnalyzer("nmssm",
-    HistOutFile = cms.untracked.string('nmssm_mh50.root'),
+    HistOutFile = cms.untracked.string('nmssm_4tau_mh8.root'),
     parton_jets = cms.InputTag("ak5PartonJets")
 )
 
 process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     pythiaHepMCVerbosity = cms.untracked.bool(False),
     maxEventsToPrint = cms.untracked.int32(0),
-    pythiaPylistVerbosity = cms.untracked.int32(1),
+    pythiaPylistVerbosity = cms.untracked.int32(2),
     filterEfficiency = cms.untracked.double(1.0),
     comEnergy = cms.double(7000.0),
     crossSection = cms.untracked.double(1.1),
@@ -107,7 +107,7 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
 	     InputCards = cms.PSet(
                pjak1 = cms.int32(0),
                pjak2 = cms.int32(0),
-               mdtau = cms.int32(116)
+               mdtau = cms.int32(126)
              )
         ),
         parameterSets = cms.vstring('Tauola')
@@ -138,7 +138,7 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
             'RMSS(16)= 2000.  ! At',
             'RMSS(17)= 2000.  ! Atau',
             # Higgs masses
-            'PMAS(25,1)=50.   ! mh',
+            'PMAS(25,1)=8.    ! mh',
             'PMAS(35,1)=125.  ! mH',
             # Switch off / on desirable channels for H->hh
             'MDME(334,1)=0  ! Higgs(H) decay into d              dbar', 
@@ -232,13 +232,13 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
             'MDME(211,1)=0  ! Higgs(h) decay                            ',
             'MDME(212,1)=0  ! Higgs(h) decay                            ',
             'MDME(213,1)=0  ! Higgs(h) decay                            ',
-            'MDME(214,1)=4  ! Higgs(h) decay   b b_bar                  ',
+            'MDME(214,1)=0  ! Higgs(h) decay   b b_bar                  ',
             'MDME(215,1)=0  ! Higgs(h) decay                            ',
             'MDME(216,1)=0  ! Higgs(h) decay                            ',
             'MDME(217,1)=0  ! Higgs(h) decay                            ',
             'MDME(218,1)=0  ! Higgs(h) decay                            ',
             'MDME(219,1)=0  ! Higgs(h) decay                            ',
-            'MDME(220,1)=5  ! Higgs(h) decay   tau tau                  ',
+            'MDME(220,1)=1  ! Higgs(h) decay   tau tau                  ',
             'MDME(221,1)=0  ! Higgs(h) decay                            ',
             'MDME(222,1)=0  ! Higgs(h) decay                            ',
             'MDME(223,1)=0  ! Higgs(h) decay                            ',

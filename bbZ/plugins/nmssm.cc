@@ -67,10 +67,8 @@ private:
   // names of modules, producing object collections
   edm::InputTag partonjetsSrc; 
   // variables to store in ntpl
-  double ptb1, etab1, phib1;
-  double ptb2, etab2, phib2;
-  double ptmu, etamu, phimu;
-  double pttauh, etatauh, phitauh;
+  double ptmu1, etamu1, phimu1;
+  double ptmu2, etamu2, phimu2;
   //
   TFile*      hOutputFile ;
   TTree*      t1;
@@ -91,41 +89,21 @@ nmssm::beginJob()
 {
   using namespace edm;
 
-  ptb1    = 0.; 
-  etab1   = 0.; 
-  phib1   = 0.;
-  ptb2    = 0.; 
-  etab2   = 0.; 
-  phib2   = 0.;
-  ptmu    = 0.; 
-  etamu   = 0.; 
-  phimu   = 0.;
-  pttauh  = 0.; 
-  etatauh = 0.; 
-  phitauh = 0.;
-
   // creating a simple tree
 
   hOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
 
   t1 = new TTree("t1","analysis tree");
 
-  t1->Branch("ptb1",&ptb1,"ptb1/D");
-  t1->Branch("etab1",&etab1,"etab1/D");
-  t1->Branch("phib1",&phib1,"phib1/D");
   //
-  t1->Branch("pt2",&ptb2,"ptb2/D");
-  t1->Branch("etab2",&etab2,"etab2/D");
-  t1->Branch("phib2",&phib2,"phib2/D");
+  t1->Branch("ptmu1",&ptmu1,"ptmu1/D");
+  t1->Branch("etamu1",&etamu1,"etamu1/D");
+  t1->Branch("phimu1",&phimu1,"phimu1/D");
   //
-  t1->Branch("ptmu",&ptmu,"ptmu/D");
-  t1->Branch("etamu",&etamu,"etamu/D");
-  t1->Branch("phimu",&phimu,"phimu/D");
+  t1->Branch("ptmu2",&ptmu2,"ptmu2/D");
+  t1->Branch("etamu2",&etamu2,"etamu2/D");
+  t1->Branch("phimu2",&phimu2,"phimu2/D");
   //
-  t1->Branch("pttauh",&pttauh,"pttauh/D");
-  t1->Branch("etatauh",&etatauh,"etatauh/D");
-  t1->Branch("phitauh",&phitauh,"phitauh/D");
-  //  t1->Branch("EtaRaw","vector<double>",&EtaRaw);
 
   return ;
 }
@@ -176,6 +154,14 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
+  ptmu1    = 0.; 
+  etamu1   = 0.; 
+  phimu1   = 0.;
+
+  ptmu2    = 0.; 
+  etamu2   = 0.; 
+  phimu2   = 0.;
+
   edm::Handle<GenEventInfoProduct> genEvt;;
   iEvent.getByLabel("generator",genEvt);
 
@@ -203,6 +189,8 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("genParticles", genparticles);
 
   math::XYZTLorentzVector  tauh(0.,0.,0.,0.);
+
+  int imu = 0;
 
   for( size_t i = 0; i < genparticles->size(); i++)
     {
@@ -239,6 +227,7 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       cout <<" i " << i 
 	   <<" ID " << p.pdgId() 
 	   <<" status " << p.status() 
+	   <<" mass " << p.mass() 
 	   <<" motherID " << motherID 
 	   <<" motherST " << motherSt
 	   <<" grmotherID " << grmotherID 
@@ -253,18 +242,33 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 abs(motherID) == 15 && motherSt == 2 &&
 	 abs(grmotherID) == 15 && grmotherSt == 3 &&
 	 grgrmotherID == 25) {
-	ptmu  = p.pt();
-	etamu = p.eta();
-	phimu = p.phi();
+	imu += 1;
+	if(imu == 1) {
+	  ptmu1  = p.pt();
+	  etamu1 = p.eta();
+	  phimu1 = p.phi();
+	}
+	if(imu == 2) {
+	  ptmu2  = p.pt();
+	  etamu2 = p.eta();
+	  phimu2 = p.phi();
+	}
+	/*
+	cout <<" ===> imu = " << imu 
+	     <<" ptmu1 = " << ptmu1 
+	     <<" ptmu2 = " << ptmu2 
+	     <<" charge = " << p.charge() << endl;
+	*/
       }
 
+      /*
       // select tau_h decay products from h->2tau
       if(abs(p.pdgId()) != 13 && abs(p.pdgId()) != 16 & 
 	 abs(p.pdgId()) != 14 && abs(p.pdgId()) != 24 &
 	 abs(motherID) == 15 && motherSt == 2 &&
 	 abs(grmotherID) == 15 && grmotherSt == 3 &&
 	 grgrmotherID == 25) {
-	math::XYZTLorentzVector tauh_c(p.px(),p.py(), p.pz(), p.p());
+	math::XYZTLorentzVector tauh_c(p.px(),p.py(),p.pz(),p.p());
 	tauh += tauh_c;
       }
 
@@ -275,29 +279,16 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 abs(grmotherID)   == 15 && grmotherSt   == 2 &&
 	 abs(grgrmotherID) == 15 && grgrmotherSt == 3) 
 	{
-	  math::XYZTLorentzVector tauh_c(p.px(),p.py(), p.pz(), p.p());
+	  math::XYZTLorentzVector tauh_c(p.px(),p.py(),p.pz(),p.p());
 	  tauh += tauh_c;
 	}
-
-      // select b quarks
-      if(p.pdgId() == 5 && motherID == 25 && motherSt == 3) {
-	ptb1  = p.pt();
-	etab1 = p.eta();
-	phib1 = p.phi();
-      }
-
-      // select b_bar quarks
-      if(p.pdgId() == -5 && motherID == 25 && motherSt == 3) {
-	ptb2  = p.pt();
-	etab2 = p.eta();
-	phib2 = p.phi();
-      }
+      */
     }
-
+  /*
   pttauh  = tauh.pt();
   etatauh = tauh.eta();
   phitauh = tauh.phi();
-
+  */
   t1->Fill();
 }
 

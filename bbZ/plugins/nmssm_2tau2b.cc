@@ -91,19 +91,6 @@ nmssm_2tau2b::beginJob()
 {
   using namespace edm;
 
-  ptb1    = 0.; 
-  etab1   = 0.; 
-  phib1   = 0.;
-  ptb2    = 0.; 
-  etab2   = 0.; 
-  phib2   = 0.;
-  ptmu    = 0.; 
-  etamu   = 0.; 
-  phimu   = 0.;
-  pttauh  = 0.; 
-  etatauh = 0.; 
-  phitauh = 0.;
-
   // creating a simple tree
 
   hOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
@@ -175,6 +162,19 @@ void
 nmssm_2tau2b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
+
+  ptb1    = 0.; 
+  etab1   = 0.; 
+  phib1   = 0.;
+  ptb2    = 0.; 
+  etab2   = 0.; 
+  phib2   = 0.;
+  ptmu    = 0.; 
+  etamu   = 0.; 
+  phimu   = 0.;
+  pttauh  = 0.; 
+  etatauh = 0.; 
+  phitauh = 0.;
 
   edm::Handle<GenEventInfoProduct> genEvt;;
   iEvent.getByLabel("generator",genEvt);
