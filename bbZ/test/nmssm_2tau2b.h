@@ -12,6 +12,8 @@
 #include <TChain.h>
 #include <TFile.h>
 
+#include <iostream>
+
 // Header file for the classes stored in the TTree if any.
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -73,10 +75,10 @@ nmssm_2tau2b::nmssm_2tau2b(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("nmssm_mh20.root");
+     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("nmssm_2tau2b_mh60.root");
       if (!f || !f->IsOpen()) {
 	//         f = new TFile("nmssm_mh20.root");
-	f = new TFile("nmssm_mh20.root");
+	f = new TFile("nmssm_2tau2b_mh60.root");
       }
       f->GetObject("t1",tree);
 

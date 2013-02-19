@@ -127,7 +127,7 @@ void nmssm_2tau2b::Loop()
    cout <<" eff = " << eff << endl;
 
 
-   TFile efile("nmssm_20_histos.root","recreate");
+   TFile efile("nmssm_2tau2b_60_histos.root","recreate");
 
    hPtMu->Write();
    hEtaMu->Write();
