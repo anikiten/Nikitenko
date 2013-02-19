@@ -609,9 +609,16 @@ void Draw()
   tex->Draw();
 
   t->DrawLatex(0.5,0.38,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+  t->DrawLatex(3.5, 0.30,"p_{T}^{#mu}>20 GeV");
+  t->DrawLatex(3.5, 0.25,"|#eta^{#mu}|<2.1");
+  t->DrawLatex(3.5, 0.20,"p_{T}^{#tau_{h}}>20 GeV");
+  t->DrawLatex(3.5, 0.15,"|#eta^{#tau_{h}}|<2.4");
+  t->DrawLatex(3.5, 0.10,"p_{T}^{b}>25 GeV");
+  t->DrawLatex(3.5, 0.05,"|#eta^{b}|<2.4");
 
   c9->SaveAs("drmutauhs_nmssm_2tau2b.png");
 
+  /*
   // dr b-b_bar S
   setTDRStyle(0,0,0);
   TCanvas* c10 = new TCanvas("X","Y",1);
@@ -656,6 +663,14 @@ void Draw()
 
   t->DrawLatex(1.0, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb");
   t->DrawLatex(1.0, 0.22,"m_{H1}=125 GeV");
+  //
+  t->DrawLatex(3.5, 0.22,"p_{T}^{#mu}>20 GeV");
+  t->DrawLatex(3.5, 0.19,"|#eta^{#mu}|<2.1");
+  t->DrawLatex(3.5, 0.16,"p_{T}^{#tau_{h}}>20 GeV");
+  t->DrawLatex(3.5, 0.13,"|#eta^{#tau_{h}}|<2.4");
+  t->DrawLatex(3.5, 0.10,"p_{T}^{b}>25 GeV");
+  t->DrawLatex(3.5, 0.07,"|#eta^{b}|<2.4");
 
   c10->SaveAs("drbbbars_nmssm_2tau2b.png");
+  */
 }
