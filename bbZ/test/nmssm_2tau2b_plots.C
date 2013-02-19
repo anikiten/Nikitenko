@@ -618,7 +618,6 @@ void Draw()
 
   c9->SaveAs("drmutauhs_nmssm_2tau2b.png");
 
-  /*
   // dr b-b_bar S
   setTDRStyle(0,0,0);
   TCanvas* c10 = new TCanvas("X","Y",1);
@@ -672,5 +671,4 @@ void Draw()
   t->DrawLatex(3.5, 0.07,"|#eta^{b}|<2.4");
 
   c10->SaveAs("drbbbars_nmssm_2tau2b.png");
-  */
 }
