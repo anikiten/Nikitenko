@@ -150,37 +150,43 @@ void setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
 void Draw()
 {
   // mh = 20 GeV
-  TFile* file = new TFile("nmssm_20_histos.root");
-  TH1F *hPtMu20     = (TH1F*)hPtMu->Clone();
-  TH1F *hEtaMu20    = (TH1F*)hEtaMu->Clone();
-  TH1F *hPtB20      = (TH1F*)hPtB->Clone();
-  TH1F *hEtaB20     = (TH1F*)hEtaB->Clone();
-  TH1F *hPtTauH20   = (TH1F*)hPtTauH->Clone();
-  TH1F *hEtaTauH20  = (TH1F*)hEtaTauH->Clone();
-  TH1F *hDrMuTauH20 = (TH1F*)hDrMuTauH->Clone();
-  TH1F *hDrBBbar20  = (TH1F*)hDrBBbar->Clone();
+  TFile* file = new TFile("nmssm_2tau2b_20_histos.root");
+  TH1F *hPtMu20      = (TH1F*)hPtMu->Clone();
+  TH1F *hEtaMu20     = (TH1F*)hEtaMu->Clone();
+  TH1F *hPtB20       = (TH1F*)hPtB->Clone();
+  TH1F *hEtaB20      = (TH1F*)hEtaB->Clone();
+  TH1F *hPtTauH20    = (TH1F*)hPtTauH->Clone();
+  TH1F *hEtaTauH20   = (TH1F*)hEtaTauH->Clone();
+  TH1F *hDrMuTauH20  = (TH1F*)hDrMuTauH->Clone();
+  TH1F *hDrBBbar20   = (TH1F*)hDrBBbar->Clone();
+  TH1F *hDrMuTauH20S = (TH1F*)hDrMuTauHS->Clone();
+  TH1F *hDrBBbar20S  = (TH1F*)hDrBBbarS->Clone();
 
   // mh = 40 GeV
-  TFile* file = new TFile("nmssm_40_histos.root");
-  TH1F *hPtMu40     = (TH1F*)hPtMu->Clone();
-  TH1F *hEtaMu40    = (TH1F*)hEtaMu->Clone();
-  TH1F *hPtB40      = (TH1F*)hPtB->Clone();
-  TH1F *hEtaB40     = (TH1F*)hEtaB->Clone();
-  TH1F *hPtTauH40   = (TH1F*)hPtTauH->Clone();
-  TH1F *hEtaTauH40  = (TH1F*)hEtaTauH->Clone();
-  TH1F *hDrMuTauH40 = (TH1F*)hDrMuTauH->Clone();
-  TH1F *hDrBBbar40  = (TH1F*)hDrBBbar->Clone();
+  TFile* file = new TFile("nmssm_2tau2b_40_histos.root");
+  TH1F *hPtMu40      = (TH1F*)hPtMu->Clone();
+  TH1F *hEtaMu40     = (TH1F*)hEtaMu->Clone();
+  TH1F *hPtB40       = (TH1F*)hPtB->Clone();
+  TH1F *hEtaB40      = (TH1F*)hEtaB->Clone();
+  TH1F *hPtTauH40    = (TH1F*)hPtTauH->Clone();
+  TH1F *hEtaTauH40   = (TH1F*)hEtaTauH->Clone();
+  TH1F *hDrMuTauH40  = (TH1F*)hDrMuTauH->Clone();
+  TH1F *hDrBBbar40   = (TH1F*)hDrBBbar->Clone();
+  TH1F *hDrMuTauH40S = (TH1F*)hDrMuTauHS->Clone();
+  TH1F *hDrBBbar40S  = (TH1F*)hDrBBbarS->Clone();
 
   // mh = 60 GeV
-  TFile* file = new TFile("nmssm_60_histos.root");
-  TH1F *hPtMu60     = (TH1F*)hPtMu->Clone();
-  TH1F *hEtaMu60    = (TH1F*)hEtaMu->Clone();
-  TH1F *hPtB60      = (TH1F*)hPtB->Clone();
-  TH1F *hEtaB60     = (TH1F*)hEtaB->Clone();
-  TH1F *hPtTauH60   = (TH1F*)hPtTauH->Clone();
-  TH1F *hEtaTauH60  = (TH1F*)hEtaTauH->Clone();
-  TH1F *hDrMuTauH60 = (TH1F*)hDrMuTauH->Clone();
-  TH1F *hDrBBbar60  = (TH1F*)hDrBBbar->Clone();
+  TFile* file = new TFile("nmssm_2tau2b_60_histos.root");
+  TH1F *hPtMu60      = (TH1F*)hPtMu->Clone();
+  TH1F *hEtaMu60     = (TH1F*)hEtaMu->Clone();
+  TH1F *hPtB60       = (TH1F*)hPtB->Clone();
+  TH1F *hEtaB60      = (TH1F*)hEtaB->Clone();
+  TH1F *hPtTauH60    = (TH1F*)hPtTauH->Clone();
+  TH1F *hEtaTauH60   = (TH1F*)hEtaTauH->Clone();
+  TH1F *hDrMuTauH60  = (TH1F*)hDrMuTauH->Clone();
+  TH1F *hDrBBbar60   = (TH1F*)hDrBBbar->Clone();
+  TH1F *hDrMuTauH60S = (TH1F*)hDrMuTauHS->Clone();
+  TH1F *hDrBBbar60S  = (TH1F*)hDrBBbarS->Clone();
 
   // pT mu
   setTDRStyle(0,1,0);
@@ -213,7 +219,7 @@ void Draw()
   leg->Draw();
 
   TLatex *t = new TLatex();
-  t->SetTextSize(0.05);
+  t->SetTextSize(0.045);
   t->DrawLatex(30, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb");
   t->DrawLatex(50, 0.03,"m_{H1}=125 GeV");
 
@@ -374,7 +380,7 @@ void Draw()
   c4->SaveAs("etatauh_nmssm_2tau2b.png");
 
 
-  // pT tau_h 
+  // pT b
   setTDRStyle(0,0,0);
   TCanvas* c5 = new TCanvas("X","Y",1);
   scale = 1./ hPtB20->Integral();
@@ -478,7 +484,7 @@ void Draw()
   hDrMuTauH60->Scale(scale);
 
   hDrMuTauH20->GetXaxis()->SetTitle("#DeltaR(#mu-#tau_{h})");
-  hDrMuTauH20->SetMaximum(0.2);
+  hDrMuTauH20->SetMaximum(0.4);
   //  hDrMuTauH20->SetMinimum(0.001);
   hDrMuTauH20->SetLineStyle(1);
   hDrMuTauH20->SetLineWidth(2);
@@ -509,12 +515,11 @@ void Draw()
   tex->SetLineWidth(2);
   tex->Draw();
 
-  t->DrawLatex(0.2, 0.13,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+  t->DrawLatex(0.2, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
   c7->SaveAs("drmutauh_nmssm_2tau2b.png");
 
-
-  // dr mu tauh
+  // dr b-b_bar
   setTDRStyle(0,0,0);
   TCanvas* c8 = new TCanvas("X","Y",1);
   scale = 1./ hDrBBbar20->Integral();
@@ -525,7 +530,7 @@ void Draw()
   hDrBBbar60->Scale(scale);
 
   hDrBBbar20->GetXaxis()->SetTitle("#DeltaR(b-b)");
-  hDrBBbar20->SetMaximum(0.2);
+  hDrBBbar20->SetMaximum(0.4);
   //  hDrBBbar20->SetMinimum(0.001);
   hDrBBbar20->SetLineStyle(1);
   hDrBBbar20->SetLineWidth(2);
@@ -556,8 +561,101 @@ void Draw()
   tex->SetLineWidth(2);
   tex->Draw();
 
-  t->DrawLatex(0.2, 0.13,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+  t->DrawLatex(1.0, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb");
+  t->DrawLatex(1.0, 0.22,"m_{H1}=125 GeV");
 
   c8->SaveAs("drbbbar_nmssm_2tau2b.png");
-}
 
+  // dr mu tauh
+  setTDRStyle(0,0,0);
+  TCanvas* c9 = new TCanvas("X","Y",1);
+  scale = 1./ hDrMuTauH20S->Integral();
+  hDrMuTauH20S->Scale(scale);
+  scale = 1./ hDrMuTauH40S->Integral();
+  hDrMuTauH40S->Scale(scale);
+  scale = 1./ hDrMuTauH60S->Integral();
+  hDrMuTauH60S->Scale(scale);
+
+  hDrMuTauH20S->GetXaxis()->SetTitle("#DeltaR(#mu-#tau_{h})");
+  hDrMuTauH20S->SetMaximum(0.6);
+  hDrMuTauH20S->SetMinimum(0.0);
+  hDrMuTauH20S->SetLineStyle(1);
+  hDrMuTauH20S->SetLineWidth(2);
+  hDrMuTauH20S->Draw("hist");
+  hDrMuTauH40S->SetLineStyle(2);
+  hDrMuTauH40S->SetLineWidth(2);
+  hDrMuTauH40S->Draw("same");
+  hDrMuTauH60S->SetLineStyle(3);
+  hDrMuTauH60S->SetLineWidth(2);
+  hDrMuTauH60S->Draw("same");
+
+  TLegend *leg = new TLegend(0.5,0.75,0.9,0.9,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hDrMuTauH20S,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hDrMuTauH40S,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hDrMuTauH60S,"m_{H2}=60 GeV","L");
+  leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  t->DrawLatex(0.5,0.38,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+
+  c9->SaveAs("drmutauhs_nmssm_2tau2b.png");
+
+  // dr b-b_bar S
+  setTDRStyle(0,0,0);
+  TCanvas* c10 = new TCanvas("X","Y",1);
+  scale = 1./ hDrBBbar20->Integral();
+  hDrBBbar20->Scale(scale);
+  scale = 1./ hDrBBbar40->Integral();
+  hDrBBbar40->Scale(scale);
+  scale = 1./ hDrBBbar60->Integral();
+  hDrBBbar60->Scale(scale);
+
+  hDrBBbar20->GetXaxis()->SetTitle("#DeltaR(b-b)");
+  hDrBBbar20->SetMaximum(0.4);
+  //  hDrBBbar20->SetMinimum(0.001);
+  hDrBBbar20->SetLineStyle(1);
+  hDrBBbar20->SetLineWidth(2);
+  hDrBBbar20->Draw("hist");
+  hDrBBbar40->SetLineStyle(2);
+  hDrBBbar40->SetLineWidth(2);
+  hDrBBbar40->Draw("same");
+  hDrBBbar60->SetLineStyle(3);
+  hDrBBbar60->SetLineWidth(2);
+  hDrBBbar60->Draw("same");
+
+  TLegend *leg = new TLegend(0.5,0.75,0.9,0.9,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hDrBBbar20,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hDrBBbar40,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hDrBBbar60,"m_{H2}=60 GeV","L");
+  leg->Draw();
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  t->DrawLatex(1.0, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb");
+  t->DrawLatex(1.0, 0.22,"m_{H1}=125 GeV");
+
+  c10->SaveAs("drbbbars_nmssm_2tau2b.png");
+}
