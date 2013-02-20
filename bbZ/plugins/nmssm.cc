@@ -69,6 +69,10 @@ private:
   // variables to store in ntpl
   double ptmu1, etamu1, phimu1;
   double ptmu2, etamu2, phimu2;
+
+  double pttauh1, etatauh1, phitauh1;
+  double pttauh2, etatauh2, phitauh2;
+
   //
   TFile*      hOutputFile ;
   TTree*      t1;
@@ -104,7 +108,14 @@ nmssm::beginJob()
   t1->Branch("etamu2",&etamu2,"etamu2/D");
   t1->Branch("phimu2",&phimu2,"phimu2/D");
   //
-
+  t1->Branch("pttauh1",&pttauh1,"pttauh1/D");
+  t1->Branch("etatauh1",&etatauh1,"etatauh1/D");
+  t1->Branch("phitauh1",&phitauh1,"phitauh1/D");
+  //
+  t1->Branch("pttauh2",&pttauh2,"pttauh2/D");
+  t1->Branch("etatauh2",&etatauh2,"etatauh2/D");
+  t1->Branch("phitauh2",&phitauh2,"phitauh2/D");
+  //
   return ;
 }
 
@@ -162,6 +173,14 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   etamu2   = 0.; 
   phimu2   = 0.;
 
+  pttauh1  = 0.;
+  etatauh1 = 0.;
+  phitauh1 = 0.;
+
+  pttauh2  = 0.;
+  etatauh2 = 0.;
+  phitauh2 = 0.;
+
   edm::Handle<GenEventInfoProduct> genEvt;;
   iEvent.getByLabel("generator",genEvt);
 
@@ -188,9 +207,12 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::GenParticleCollection> genparticles;
   iEvent.getByLabel("genParticles", genparticles);
 
-  math::XYZTLorentzVector  tauh(0.,0.,0.,0.);
+  math::XYZTLorentzVector  tauh1(0.,0.,0.,0.);
+  math::XYZTLorentzVector  tauh2(0.,0.,0.,0.);
 
   int imu = 0;
+  int tau = 0;
+  double pt1sttau = 0;
 
   for( size_t i = 0; i < genparticles->size(); i++)
     {
@@ -201,6 +223,7 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       int grmotherID = 0;
       int grmotherSt = 0;
+      int grmotherPt = 0;
 
       int grgrmotherID = 0;
       int grgrmotherSt = 0;
@@ -214,6 +237,7 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if(grmoth) {
 	  grmotherID = grmoth->pdgId();
 	  grmotherSt = grmoth->status();
+	  grmotherPt = grmoth->pt();
 	  const Candidate * grgrmoth = grmoth->mother();
 	  if(grgrmoth) {
 	    grgrmotherID = grgrmoth->pdgId();
@@ -261,15 +285,37 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	*/
       }
 
-      /*
       // select tau_h decay products from h->2tau
+
       if(abs(p.pdgId()) != 13 && abs(p.pdgId()) != 16 & 
 	 abs(p.pdgId()) != 14 && abs(p.pdgId()) != 24 &
 	 abs(motherID) == 15 && motherSt == 2 &&
 	 abs(grmotherID) == 15 && grmotherSt == 3 &&
 	 grgrmotherID == 25) {
+	if(tau == 0) {
+	  pt1sttau = grmotherPt;
+	  tau = 1;
+	}
 	math::XYZTLorentzVector tauh_c(p.px(),p.py(),p.pz(),p.p());
-	tauh += tauh_c;
+	if(grmotherPt == pt1sttau) {
+	  tauh1 += tauh_c;
+	} else {
+	  tauh2 += tauh_c;
+	}
+
+	cout <<" i " << i <<" tau = " << tau 
+	     <<" ID " << p.pdgId() 
+	     <<" status " << p.status() 
+	     <<" mass " << p.mass() 
+	     <<" motherID " << motherID 
+	     <<" motherST " << motherSt
+	     <<" grmotherID " << grmotherID 
+	     <<" grmotherST " << grmotherSt 
+	     <<" grmotherPt " << grmotherPt
+	     <<" grgrmotherID " << grgrmotherID 
+	     <<" grgrmotherST " << grgrmotherSt
+	     <<" grgrmotherpx " << grgrmotherpx << endl;
+
       }
 
       // select tau_h decay products from h->2tau
@@ -279,16 +325,40 @@ nmssm::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 abs(grmotherID)   == 15 && grmotherSt   == 2 &&
 	 abs(grgrmotherID) == 15 && grgrmotherSt == 3) 
 	{
+	  if(tau == 0) {
+	    pt1sttau = grmotherPt;
+	    tau = 1;
+	  }
 	  math::XYZTLorentzVector tauh_c(p.px(),p.py(),p.pz(),p.p());
-	  tauh += tauh_c;
+	  if(grmotherPt == pt1sttau) {
+	    tauh1 += tauh_c;
+	  } else {
+	    tauh2 += tauh_c;
+	  }
+
+	  cout <<" i " << i <<" tau = " << tau 
+	       <<" ID " << p.pdgId() 
+	       <<" status " << p.status() 
+	       <<" mass " << p.mass() 
+	       <<" motherID " << motherID 
+	       <<" motherST " << motherSt
+	       <<" grmotherID " << grmotherID 
+	       <<" grmotherST " << grmotherSt 
+	       <<" grmotherPt " << grmotherPt
+	       <<" grgrmotherID " << grgrmotherID 
+	       <<" grgrmotherST " << grgrmotherSt
+	       <<" grgrmotherpx " << grgrmotherpx << endl;
 	}
-      */
     }
-  /*
-  pttauh  = tauh.pt();
-  etatauh = tauh.eta();
-  phitauh = tauh.phi();
-  */
+  
+  pttauh1  = tauh1.pt();
+  etatauh1 = tauh1.eta();
+  phitauh1 = tauh1.phi();
+  
+  pttauh2  = tauh2.pt();
+  etatauh2 = tauh2.eta();
+  phitauh2 = tauh2.phi();
+
   t1->Fill();
 }
 
