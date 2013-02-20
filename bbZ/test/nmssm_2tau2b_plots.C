@@ -5,7 +5,7 @@ void setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
 // For the canvas:
   tdrStyle->SetCanvasBorderMode(0);
   tdrStyle->SetCanvasColor(kWhite);
-  tdrStyle->SetCanvasDefH(600); //Height of canvas
+  tdrStyle->SetCanvasDefH(500); //Height of canvas
   tdrStyle->SetCanvasDefW(600); //Width of canvas
   tdrStyle->SetCanvasDefX(0);   //POsition on screen
   tdrStyle->SetCanvasDefY(0);
@@ -99,8 +99,11 @@ void setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
   tdrStyle->SetTitleSize(0.06, "XYZ");
   // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
   // tdrStyle->SetTitleYSize(Float_t size = 0.02);
+
   tdrStyle->SetTitleXOffset(0.9);
   tdrStyle->SetTitleYOffset(1.05);
+
+
   // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
 // For the axis labels:
@@ -621,32 +624,34 @@ void Draw()
   // dr b-b_bar S
   setTDRStyle(0,0,0);
   TCanvas* c10 = new TCanvas("X","Y",1);
-  scale = 1./ hDrBBbar20->Integral();
-  hDrBBbar20->Scale(scale);
-  scale = 1./ hDrBBbar40->Integral();
-  hDrBBbar40->Scale(scale);
-  scale = 1./ hDrBBbar60->Integral();
-  hDrBBbar60->Scale(scale);
+  scale = 1./ hDrBBbar20S->Integral();
+  hDrBBbar20S->Scale(scale);
+  scale = 1./ hDrBBbar40S->Integral();
+  hDrBBbar40S->Scale(scale);
+  scale = 1./ hDrBBbar60S->Integral();
+  hDrBBbar60S->Scale(scale);
 
-  hDrBBbar20->GetXaxis()->SetTitle("#DeltaR(b-b)");
-  hDrBBbar20->SetMaximum(0.4);
-  //  hDrBBbar20->SetMinimum(0.001);
-  hDrBBbar20->SetLineStyle(1);
-  hDrBBbar20->SetLineWidth(2);
-  hDrBBbar20->Draw("hist");
-  hDrBBbar40->SetLineStyle(2);
-  hDrBBbar40->SetLineWidth(2);
-  hDrBBbar40->Draw("same");
-  hDrBBbar60->SetLineStyle(3);
-  hDrBBbar60->SetLineWidth(2);
-  hDrBBbar60->Draw("same");
+  hDrBBbar20S->GetXaxis()->SetTitle("#DeltaR(b-b)");
+  hDrBBbar20S->SetMaximum(0.6);
+  //  hDrBBbar20S->SetMinimum(0.001);
+  hDrBBbar20S->SetLineStyle(1);
+  hDrBBbar20S->SetLineWidth(2);
+  hDrBBbar20S->Draw("hist");
+
+  hDrBBbar40S->SetLineStyle(2);
+  hDrBBbar40S->SetLineWidth(2);
+  hDrBBbar40S->Draw("same");
+  hDrBBbar60S->SetLineStyle(3);
+  hDrBBbar60S->SetLineWidth(2);
+  hDrBBbar60S->Draw("same");
 
   TLegend *leg = new TLegend(0.5,0.75,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(hDrBBbar20,"m_{H2}=20 GeV","L");
-  leg->AddEntry(hDrBBbar40,"m_{H2}=40 GeV","L");
-  leg->AddEntry(hDrBBbar60,"m_{H2}=60 GeV","L");
+  leg->AddEntry(hDrBBbar20S,"m_{H2}=20 GeV","L");
+  leg->AddEntry(hDrBBbar40S,"m_{H2}=40 GeV","L");
+  leg->AddEntry(hDrBBbar60S,"m_{H2}=60 GeV","L");
   leg->Draw();
+
   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
   tex->SetNDC();
   tex->SetTextFont(43);
@@ -660,15 +665,12 @@ void Draw()
   tex->SetLineWidth(2);
   tex->Draw();
 
-  t->DrawLatex(1.0, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb");
-  t->DrawLatex(1.0, 0.22,"m_{H1}=125 GeV");
-  //
-  t->DrawLatex(3.5, 0.22,"p_{T}^{#mu}>20 GeV");
-  t->DrawLatex(3.5, 0.19,"|#eta^{#mu}|<2.1");
-  t->DrawLatex(3.5, 0.16,"p_{T}^{#tau_{h}}>20 GeV");
-  t->DrawLatex(3.5, 0.13,"|#eta^{#tau_{h}}|<2.4");
+  t->DrawLatex(0.7,0.38,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
+  t->DrawLatex(3.5, 0.30,"p_{T}^{#mu}>20 GeV");
+  t->DrawLatex(3.5, 0.25,"|#eta^{#mu}|<2.1");
+  t->DrawLatex(3.5, 0.20,"p_{T}^{#tau_{h}}>20 GeV");
+  t->DrawLatex(3.5, 0.15,"|#eta^{#tau_{h}}|<2.4");
   t->DrawLatex(3.5, 0.10,"p_{T}^{b}>25 GeV");
-  t->DrawLatex(3.5, 0.07,"|#eta^{b}|<2.4");
-
+  t->DrawLatex(3.5, 0.05,"|#eta^{b}|<2.4");
   c10->SaveAs("drbbbars_nmssm_2tau2b.png");
 }
