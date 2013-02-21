@@ -35,6 +35,12 @@ public :
    Double_t        ptmu2;
    Double_t        etamu2;
    Double_t        phimu2;
+   Double_t        pttauh1;
+   Double_t        etatauh1;
+   Double_t        phitauh1;
+   Double_t        pttauh2;
+   Double_t        etatauh2;
+   Double_t        phitauh2;
 
    // List of branches
    TBranch        *b_ptmu1;   //!
@@ -43,6 +49,12 @@ public :
    TBranch        *b_ptmu2;   //!
    TBranch        *b_etamu2;   //!
    TBranch        *b_phimu2;   //!
+   TBranch        *b_pttauh1;   //!
+   TBranch        *b_etatauh1;   //!
+   TBranch        *b_phitauh1;   //!
+   TBranch        *b_pttauh2;   //!
+   TBranch        *b_etatauh2;   //!
+   TBranch        *b_phitauh2;   //!
 
    nmssm_4tau(TTree *tree=0);
    virtual ~nmssm_4tau();
@@ -120,6 +132,12 @@ void nmssm_4tau::Init(TTree *tree)
    fChain->SetBranchAddress("ptmu2", &ptmu2, &b_ptmu2);
    fChain->SetBranchAddress("etamu2", &etamu2, &b_etamu2);
    fChain->SetBranchAddress("phimu2", &phimu2, &b_phimu2);
+   fChain->SetBranchAddress("pttauh1", &pttauh1, &b_pttauh1);
+   fChain->SetBranchAddress("etatauh1", &etatauh1, &b_etatauh1);
+   fChain->SetBranchAddress("phitauh1", &phitauh1, &b_phitauh1);
+   fChain->SetBranchAddress("pttauh2", &pttauh2, &b_pttauh2);
+   fChain->SetBranchAddress("etatauh2", &etatauh2, &b_etatauh2);
+   fChain->SetBranchAddress("phitauh2", &phitauh2, &b_phitauh2);
    Notify();
 }
 

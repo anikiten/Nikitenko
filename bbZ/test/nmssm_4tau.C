@@ -62,9 +62,9 @@ void nmssm_4tau::Loop()
    TH1F * hEtaTauH = new TH1F( "hEtaTauH", "EtaTauH", 50, -5.0, 5.0);
 
    TH2F * hDrMuMuTauHTauH = new TH2F( "hDrMuMuTauHTauH", "DrMuMuTauHTauH",
-				      50, 0., 5.0, 50, 0.,5.0);
+				      25, 0., 5.0, 25, 0.,5.0);
    TH2F * hDrMuTauHMuTauH = new TH2F( "hDrMuTauHMuTauH", "DrMuTauHMuTauH",
-				      50, 0., 5.0, 50, 0.,5.0);
+				      25, 0., 5.0, 25, 0.,5.0);
 
    TH1F * hDrMuTau1st  = new TH1F( "hDrMuTau1st", "DrMuTau1st", 50, 0., 5.0);
    TH1F * hDrMuTau2nd  = new TH1F( "hDrMuTau2nd", "DrMuTau2nd", 50, 0., 5.0);
@@ -148,6 +148,12 @@ void nmssm_4tau::Loop()
 
       if(DrMu1Mu2 < 1.0) {continue;}
       nsel_drmumu += 1;
+
+      /*
+      cout <<" DrMuTauH1st = " << DrMuTauH1st
+	   <<" DrMuTauH2nd = " << DrMuTauH2nd << endl;
+      cout <<" " << endl;
+      */
 
       hDrMuTau1st->Fill(DrMuTauH1st);
       hDrMuTau2nd->Fill(DrMuTauH2nd);
