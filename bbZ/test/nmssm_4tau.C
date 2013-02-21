@@ -54,15 +54,24 @@ void nmssm_4tau::Loop()
 //by  b_branchname->GetEntry(ientry); //read only this branch
    if (fChain == 0) return;
 
-   TH1F * hPtMu1  = new TH1F( "hPtMu1", "PtMu1", 50, 0., 100.);
-   TH1F * hEtaMu1 = new TH1F( "hEtaMu1", "EtaMu1", 50, -5.0, 5.0);
-   TH1F * hPtMu2  = new TH1F( "hPtMu2", "PtMu2", 50, 0., 100.);
-   TH1F * hEtaMu2 = new TH1F( "hEtaMu2", "EtaMu2", 50, -5.0, 5.0);
+   TH1F * hPtMu1   = new TH1F( "hPtMu1", "PtMu1", 50, 0., 100.);
+   TH1F * hEtaMu1  = new TH1F( "hEtaMu1", "EtaMu1", 50, -5.0, 5.0);
+   TH1F * hPtMu2   = new TH1F( "hPtMu2", "PtMu2", 50, 0., 100.);
+   TH1F * hEtaMu2  = new TH1F( "hEtaMu2", "EtaMu2", 50, -5.0, 5.0);
+   TH1F * hPtTauH  = new TH1F( "hPtTauH", "PtTauH", 50, 0., 100.);
+   TH1F * hEtaTauH = new TH1F( "hEtaTauH", "EtaTauH", 50, -5.0, 5.0);
 
-   TH1F * hDrMu1Mu2  = new TH1F( "hDrMu1Mu2", "DrMu1Mu2", 50, 0., 5.0);
+   TH2F * hDrMuMuTauHTauH = new TH2F( "hDrMuMuTauHTauH", "DrMuMuTauHTauH",
+				      50, 0., 5.0, 50, 0.,5.0);
+   TH2F * hDrMuTauHMuTauH = new TH2F( "hDrMuTauHMuTauH", "DrMuTauHMuTauH",
+				      50, 0., 5.0, 50, 0.,5.0);
+
+   TH1F * hDrMuTau1st  = new TH1F( "hDrMuTau1st", "DrMuTau1st", 50, 0., 5.0);
+   TH1F * hDrMuTau2nd  = new TH1F( "hDrMuTau2nd", "DrMuTau2nd", 50, 0., 5.0);
 
    int ntot        = 0;
    int nsel_mu     = 0;
+   int nsel_tau    = 0;
    int nsel_drmumu = 0;
 
    Long64_t nentries = fChain->GetEntriesFast();
@@ -108,16 +117,40 @@ void nmssm_4tau::Loop()
       hPtMu2->Fill(pt2);
       hEtaMu2->Fill(eta2);
 
+      hPtTauH->Fill(pttauh1);
+      hEtaTauH->Fill(etatauh1);
+      hPtTauH->Fill(pttauh2);
+      hEtaTauH->Fill(etatauh2);
+
       double DrMu1Mu2 = deltaR(etamu1,phimu1,etamu2,phimu2);
+      double DrTauH1TauH2 = deltaR(etatauh1,phitauh1,etatauh2,phitauh2);
+
+      double DrMu1TauH1  = deltaR(etamu1,phimu1,etatauh1,phitauh1);
+      double DrMu1TauH2  = deltaR(etamu1,phimu1,etatauh2,phitauh2);
+      double DrMuTauH1st = 0;
+      double DrMuTauH2nd = 0;
+      if(DrMu1TauH1 < DrMu1TauH2) {
+	DrMuTauH1st = DrMu1TauH1;
+	DrMuTauH2nd = deltaR(etamu2,phimu2,etatauh2,phitauh2);
+      } else {
+	DrMuTauH1st = DrMu1TauH2;
+	DrMuTauH2nd = deltaR(etamu2,phimu2,etatauh1,phitauh1);
+      }
 
       if(pt1 < 17 || fabs(eta1) > 2.1 || pt2 < 10 || fabs(eta2) > 2.4) {continue;}
       //      if(pt1 < 8 || fabs(eta1) > 2.1 || pt2 < 8 || fabs(eta2) > 2.4) {continue;}
       nsel_mu += 1;
+      if(pttauh1 < 10 || fabs(etatauh1) > 2.4 || pttauh2 < 10 || fabs(etatauh2) > 2.4) {continue;}
+      nsel_tau += 1;
 
-      hDrMu1Mu2->Fill(DrMu1Mu2);
+      hDrMuMuTauHTauH->Fill(DrMu1Mu2,DrTauH1TauH2);
+      hDrMuTauHMuTauH->Fill(DrMuTauH1st,DrMuTauH2nd);
 
-      if(DrMu1Mu2 > 1.) {continue;}
+      if(DrMu1Mu2 < 1.0) {continue;}
       nsel_drmumu += 1;
+
+      hDrMuTau1st->Fill(DrMuTauH1st);
+      hDrMuTau2nd->Fill(DrMuTauH2nd);
 
    }
 
@@ -125,6 +158,7 @@ void nmssm_4tau::Loop()
 
    cout <<" ntot = " << ntot << endl;
    cout <<" nsel_mu = " << nsel_mu << endl;
+   cout <<" nsel_tau = " << nsel_tau << endl;
    cout <<" nsel_drmumu = " << nsel_drmumu << endl;
    cout <<" ===> eff = " << eff << endl;
 
@@ -134,7 +168,14 @@ void nmssm_4tau::Loop()
    hEtaMu1->Write();
    hPtMu2->Write();
    hEtaMu2->Write();
-   hDrMu1Mu2->Write();
+   hPtTauH->Write();
+   hEtaTauH->Write();
+   
+   hDrMuMuTauHTauH->Write();
+   hDrMuTauHMuTauH->Write();
+
+   hDrMuTau1st->Write();
+   hDrMuTau2nd->Write();
 
    efile.Close();
 
