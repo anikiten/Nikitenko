@@ -51,7 +51,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.4 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('QCD_Pt_80_120_7TeV.cfi nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -95,7 +95,7 @@ process.nmssmanalysis = cms.EDAnalyzer("nmssm_4b",
 
 process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     pythiaHepMCVerbosity = cms.untracked.bool(False),
-    maxEventsToPrint = cms.untracked.int32(0),
+    maxEventsToPrint = cms.untracked.int32(1),
     pythiaPylistVerbosity = cms.untracked.int32(2),
     filterEfficiency = cms.untracked.double(1.0),
     comEnergy = cms.double(7000.0),
@@ -116,7 +116,7 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     PythiaParameters = cms.PSet(
         pythiaUESettingsBlock,
         processParameters = cms.vstring('MSEL=0         ! User defined processes',
-            'MSUB(152)= 1   ! 
+            'MSUB(152)= 1   ! gg->H',
             # MSSM settings
             'IMSS(4)= 2     ! masses fixed by user',
             'RMSS(5)= 30.   ! tan beta', 
