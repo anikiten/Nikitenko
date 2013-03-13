@@ -12,8 +12,18 @@ process.load("RecoJets.Configuration.RecoJPTJets_cff")
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
-# process.load('JetMETCorrections.Type1MET.MetType1Corrections_cff')
 process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
+#
+## next line is needed only for data
+process.pfJetMETcorr.jetCorrLabel = cms.string('ak5PFL1FastL2L3Residual')
+#
+## next lines are needed only for Type0+1
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+    cms.InputTag('pfMETcorrType0'),
+    cms.InputTag('pfJetMETcorr', 'type1')        
+)
 
 # 1.    Run2012A-13Jul2012 Re-reco....................GT: FT_53_V6_AN3
 # process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
@@ -28,13 +38,13 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 # process.GlobalTag.globaltag = cms.string('FT_53_V10_AN3::All') 
 #
 # 5.    Run2012C-PromptReco-v2 ...................... GT: GR_P_V42_AN3 
-# process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
+process.GlobalTag.globaltag = cms.string('GR_P_V41_AN3::All') 
 #
 # 6.    Run2012C-EcalRecover_11Dec2012................GT: FT_P_V42C_AN3
 # process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
 #
 # 7.    Run2012D-PromptReco-v1........................GT: GR_P_V42_AN3 
-process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
+# process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
 #
 # ############# electrons #################################################################
 # rho value for isolation
@@ -208,6 +218,8 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p1 = cms.Path(process.filtersSeq*
+# next line is needed only for Type0+1 corrected MET
+                      process.type0PFMEtCorrection*
                       process.producePFMETCorrections*
                       process.ak5PFJetsL1L2L3Residual*
                       process.recoPuJetId*
