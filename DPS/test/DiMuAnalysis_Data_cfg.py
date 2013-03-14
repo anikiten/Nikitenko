@@ -180,7 +180,7 @@ process.filtersSeq = cms.Sequence(
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(2)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
@@ -218,7 +218,6 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p1 = cms.Path(process.filtersSeq*
-# next line is needed only for Type0+1 corrected MET
                       process.type0PFMEtCorrection*
                       process.producePFMETCorrections*
                       process.ak5PFJetsL1L2L3Residual*
@@ -229,6 +228,6 @@ process.p1 = cms.Path(process.filtersSeq*
                       process.ak5JPTJetsL1L2L3Residual*
 	              process.kt6PFJetsForIsolation* 
 	              process.pfiso*
-                      process.myjetplustrack)
-#                      process.dump)
+                      process.myjetplustrack*
+                      process.dump)
 

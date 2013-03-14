@@ -842,7 +842,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if(medium) {electronID = 3;}
       if(tight)  {electronID = 4;}
       
-      if(electronID >= 2) {
+      if(electronID >= 1) {
 	// fill electron variables into ntpl	  
 	iel++;
 	math::XYZTLorentzVector elc(ele->px(),ele->py(),ele->pz(),ele->p()); 
@@ -1174,6 +1174,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     */
     // THE HAPPY END OF MVA PU ID story for JPT
     
+    // JES uncertainy pre jet
+
     //     jecUnc->setJetEta(jptjet->eta());
     //     jecUnc->setJetPt (jptjet->pt() ); 
     //     double unc = jecUnc->getUncertainty(true);
