@@ -940,7 +940,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if(imu >= 2) { DRmu2 = deltaR(muon2.Eta(), muon2.Phi(), jptjet->eta(), jptjet->phi());}
 	  if(iel >= 1) { DRel1 = deltaR(el1.Eta(),   el1.Phi(),   jptjet->eta(), jptjet->phi());}
 	  if(iel >= 2) { DRel2 = deltaR(el2.Eta(),   el2.Phi(),   jptjet->eta(), jptjet->phi());}
-	  if( (DRmu1 > 0.6) && (DRmu2 > 0.6) && (DRel1 > 0.6) && (DRel2 > 0.6) ) {
+	  if( (DRmu1 > 0.5) && (DRmu2 > 0.5) && (DRel1 > 0.5) && (DRel2 > 0.5) ) {
 	    pTjptIndex[jptjet->pt()] = &(*jptjet);
 	  }
 	}
@@ -960,7 +960,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if(imu >= 2) { DRmu2 = deltaR(muon2.Eta(), muon2.Phi(), pfjet->eta(), pfjet->phi());}
 	if(iel >= 1) { DRel1 = deltaR(el1.Eta(),   el1.Phi(),   pfjet->eta(), pfjet->phi());}
 	if(iel >= 2) { DRel2 = deltaR(el2.Eta(),   el2.Phi(),   pfjet->eta(), pfjet->phi());}
-	if( (DRmu1 > 0.6) && (DRmu2 > 0.6) && (DRel1 > 0.6) && (DRel2 > 0.6) ) {
+	if( (DRmu1 > 0.5) && (DRmu2 > 0.5) && (DRel1 > 0.5) && (DRel2 > 0.5) ) {
 	  float mva  = (*puJetIdMVA)[pfjetref->refAt(ipfjet)];
 	  int idflag = (*puJetIdFlag)[pfjetref->refAt(ipfjet)];
 	  pTpfIndex[pfjet->pt()]    = pfjet;
