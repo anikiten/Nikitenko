@@ -790,7 +790,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       reco::GsfElectronRef ele(els_h, i);
       bool isEB = ele->isEB();
       bool isEE = ele->isEE();
-      bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
+      //      bool inAcceptance = (isEB || isEE) && (ele->ecalDrivenSeed()==1);
+      bool inAcceptance = (isEB || isEE);
       if(inAcceptance && ele->pt() > 10.) {
 	pTElectronIndex[ele->pt()] = i;
       }
