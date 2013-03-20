@@ -38,7 +38,7 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
 # process.GlobalTag.globaltag = cms.string('FT_53_V10_AN3::All') 
 #
 # 5.    Run2012C-PromptReco-v2 ...................... GT: GR_P_V42_AN3 
-process.GlobalTag.globaltag = cms.string('GR_P_V41_AN3::All') 
+# process.GlobalTag.globaltag = cms.string('GR_P_V41_AN3::All') 
 #
 # 6.    Run2012C-EcalRecover_11Dec2012................GT: FT_P_V42C_AN3
 # process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
@@ -228,6 +228,6 @@ process.p1 = cms.Path(process.filtersSeq*
                       process.ak5JPTJetsL1L2L3Residual*
 	              process.kt6PFJetsForIsolation* 
 	              process.pfiso*
-                      process.myjetplustrack*
-                      process.dump)
+                      process.myjetplustrack)
+#                      process.dump)
 
