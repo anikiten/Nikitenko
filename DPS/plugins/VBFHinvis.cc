@@ -962,7 +962,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     rfirstPF++;
     
     // pfjet id
-    if(  (*pfjet).neutralHadronEnergyFraction() > 0.99 )  continue;
+    if(((*pfjet).neutralHadronEnergy()+(*pfjet).HFHadronEnergy())/(*pfjet).energy() > 0.99) {continue;}
+    //    if(  (*pfjet).neutralHadronEnergyFraction() > 0.99 )  continue;
     if(  (*pfjet).neutralEmEnergyFraction() > 0.99 )  continue;
     if(( (*pfjet).neutralMultiplicity() + (*pfjet).chargedMultiplicity() ) < 1 )  continue;
     if( fabs((*pfjet).eta()) < 2.4) {
