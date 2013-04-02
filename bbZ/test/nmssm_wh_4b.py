@@ -51,7 +51,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('QCD_Pt_80_120_7TeV.cfi nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -88,7 +88,7 @@ process.load("RecoJets.JetProducers.ak5GenJets_cfi")
 process.ak5PartonJets  =  process.ak5GenJets.clone()
 process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 
-process.nmssmanalysis = cms.EDAnalyzer("nmssm_4b",
+process.nmssmanalysis = cms.EDAnalyzer("nmssm_wh_4b",
     HistOutFile = cms.untracked.string('nmssm_wh_4b_mh60.root'),
     parton_jets = cms.InputTag("ak5PartonJets")
 )
