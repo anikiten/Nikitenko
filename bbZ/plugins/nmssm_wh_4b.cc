@@ -305,9 +305,8 @@ nmssm_wh_4b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	       <<" p = " << p.px() << endl;
 	  */
 	}
- 
-	    //  t1->Fill();
     }
+  t1->Fill();
 }
 
 //define this as a plug-in
