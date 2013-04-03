@@ -65,14 +65,14 @@ private:
   // output root file
   string fOutputFileName ;
   // names of modules, producing object collections
-  edm::InputTag partonjetsSrc; 
   // variables to store in ntpl
-  double ptmu1, etamu1, phimu1;
-  double ptmu2, etamu2, phimu2;
-
-  double pttauh1, etatauh1, phitauh1;
-  double pttauh2, etatauh2, phitauh2;
-
+  double ptel, etael, phiel;
+  double ptmu, etamu, phimu;
+  
+  std::vector<double> *ptb;
+  std::vector<double> *etab;
+  std::vector<double> *phib;
+  
   //
   TFile*      hOutputFile ;
   TTree*      t1;
@@ -99,22 +99,23 @@ nmssm_wh_4b::beginJob()
 
   t1 = new TTree("t1","analysis tree");
 
+  ptb  = new std::vector<double>();
+  etab = new std::vector<double>();
+  phib = new std::vector<double>();
+
+
   //
-  t1->Branch("ptmu1",&ptmu1,"ptmu1/D");
-  t1->Branch("etamu1",&etamu1,"etamu1/D");
-  t1->Branch("phimu1",&phimu1,"phimu1/D");
+  t1->Branch("ptel",&ptel,"ptel/D");
+  t1->Branch("etael",&etael,"etael/D");
+  t1->Branch("phiel",&phiel,"phiel/D");
   //
-  t1->Branch("ptmu2",&ptmu2,"ptmu2/D");
-  t1->Branch("etamu2",&etamu2,"etamu2/D");
-  t1->Branch("phimu2",&phimu2,"phimu2/D");
+  t1->Branch("ptmu",&ptmu,"ptmu/D");
+  t1->Branch("etamu",&etamu,"etamu/D");
+  t1->Branch("phimu",&phimu,"phimu/D");
   //
-  t1->Branch("pttauh1",&pttauh1,"pttauh1/D");
-  t1->Branch("etatauh1",&etatauh1,"etatauh1/D");
-  t1->Branch("phitauh1",&phitauh1,"phitauh1/D");
-  //
-  t1->Branch("pttauh2",&pttauh2,"pttauh2/D");
-  t1->Branch("etatauh2",&etatauh2,"etatauh2/D");
-  t1->Branch("phitauh2",&phitauh2,"phitauh2/D");
+  t1->Branch("ptb","vector<double>",&ptb);
+  t1->Branch("etab","vector<double>",&etab);
+  t1->Branch("phib","vector<double>",&phib);
   //
   return ;
 }
@@ -141,8 +142,6 @@ nmssm_wh_4b::nmssm_wh_4b(const edm::ParameterSet& iConfig)
   // get name of output file with histogramms
   fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
   //
-  // get parton jets
-  partonjetsSrc      = iConfig.getParameter<edm::InputTag>("parton_jets");
 }
 
 
@@ -165,21 +164,17 @@ nmssm_wh_4b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
-  ptmu1    = 0.; 
-  etamu1   = 0.; 
-  phimu1   = 0.;
+  ptel    = 0.; 
+  etael   = 0.; 
+  phiel   = 0.;
 
-  ptmu2    = 0.; 
-  etamu2   = 0.; 
-  phimu2   = 0.;
+  ptmu    = 0.; 
+  etamu   = 0.; 
+  phimu   = 0.;
 
-  pttauh1  = 0.;
-  etatauh1 = 0.;
-  phitauh1 = 0.;
-
-  pttauh2  = 0.;
-  etatauh2 = 0.;
-  phitauh2 = 0.;
+  ptb->clear();
+  etab->clear();
+  phib->clear();
 
   edm::Handle<GenEventInfoProduct> genEvt;;
   iEvent.getByLabel("generator",genEvt);
@@ -247,27 +242,71 @@ nmssm_wh_4b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
       }
 
-      cout <<" i " << i 
-	   <<" ID " << p.pdgId() 
-	   <<" status " << p.status() 
-	   <<" mass " << p.mass() 
-	   <<" pt " << p.pt() 
-	   <<" motherID " << motherID 
-	   <<" motherST " << motherSt
-	   <<" grmotherID " << grmotherID 
-	   <<" grmotherST " << grmotherSt 
-	   <<" grmotherPt " << grmotherPt 
-	   <<" grgrmotherID " << grgrmotherID 
-	   <<" grgrmotherST " << grgrmotherSt
-	   <<" grgrmotherpx " << grgrmotherpx << endl;
-     
+      /*
+      if(p.status() == 3 && 
+	 (fabs(p.pdgId()) == 5 || fabs(p.pdgId()) == 11 || fabs(p.pdgId()) == 13)) {
+	   cout <<" i " << i 
+		<<" ID " << p.pdgId() 
+		<<" status " << p.status() 
+		<<" mass " << p.mass() 
+		<<" pt " << p.pt() 
+		<<" motherID " << motherID 
+		<<" motherST " << motherSt
+		<<" grmotherID " << grmotherID 
+		<<" grmotherST " << grmotherSt 
+		<<" grmotherPt " << grmotherPt 
+		<<" grgrmotherID " << grgrmotherID 
+		<<" grgrmotherST " << grgrmotherSt
+		<<" grgrmotherpx " << grgrmotherpx << endl;
+	 }
+      */
+      // select W->enu
+      if(fabs(p.pdgId()) == 11 && fabs(motherID) == 24 && motherSt == 3)
+	{
+	  /*
+	  cout <<" electron ID = " << p.pdgId()
+	       <<" pt = " << p.pt()
+	       <<" eta = " << p.eta()
+	       <<" phi = " << p.phi() 
+	       <<" p = " << p.px() << endl;
+	  */
+	  ptel  = p.pt();
+	  etael = p.eta();
+	  phiel = p.phi();
+	}
+
+      // select W->enu
+      if(fabs(p.pdgId()) == 13 && fabs(motherID) == 24 && motherSt == 3)
+	{
+	  /*
+	  cout <<" muon ID = " << p.pdgId()
+	       <<" pt = " << p.pt()
+	       <<" eta = " << p.eta()
+	       <<" phi = " << p.phi()
+	       <<" p = " << p.px() << endl;
+	  */
+	  ptmu  = p.pt();
+	  etamu = p.eta();
+	  phimu = p.phi();
+	}
+
       // select b quarks
       if(fabs(p.pdgId()) == 5 && motherID == 25 && motherSt == 3) 
 	{
-	  cout <<" b -quark ! + " << endl;
+	  ptb->push_back(p.pt());
+	  etab->push_back(p.eta());
+	  phib->push_back(p.phi());
+	  /*
+	  cout <<" b -quark ! + " 
+	       <<" id = " << p.pdgId()
+	       <<" pt = " << p.pt()
+	       <<" eta = " << p.eta()
+	       <<" phi = " << p.phi()
+	       <<" p = " << p.px() << endl;
+	  */
 	}
  
-      //  t1->Fill();
+	    //  t1->Fill();
     }
 }
 
