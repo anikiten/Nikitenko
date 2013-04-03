@@ -66,8 +66,8 @@ private:
   string fOutputFileName ;
   // names of modules, producing object collections
   // variables to store in ntpl
-  double ptel, etael, phiel;
-  double ptmu, etamu, phimu;
+  int idl;
+  double ptl, etal, phil;
   
   std::vector<double> *ptb;
   std::vector<double> *etab;
@@ -105,13 +105,10 @@ nmssm_wh_4b::beginJob()
 
 
   //
-  t1->Branch("ptel",&ptel,"ptel/D");
-  t1->Branch("etael",&etael,"etael/D");
-  t1->Branch("phiel",&phiel,"phiel/D");
-  //
-  t1->Branch("ptmu",&ptmu,"ptmu/D");
-  t1->Branch("etamu",&etamu,"etamu/D");
-  t1->Branch("phimu",&phimu,"phimu/D");
+  t1->Branch("idl",&idl,"idl/I");
+  t1->Branch("ptl",&ptl,"ptl/D");
+  t1->Branch("etal",&etal,"etal/D");
+  t1->Branch("phil",&phil,"phil/D");
   //
   t1->Branch("ptb","vector<double>",&ptb);
   t1->Branch("etab","vector<double>",&etab);
@@ -164,13 +161,10 @@ nmssm_wh_4b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
-  ptel    = 0.; 
-  etael   = 0.; 
-  phiel   = 0.;
-
-  ptmu    = 0.; 
-  etamu   = 0.; 
-  phimu   = 0.;
+  idl    = 0;
+  ptl    = 0.; 
+  etal   = 0.; 
+  phil   = 0.;
 
   ptb->clear();
   etab->clear();
@@ -260,8 +254,8 @@ nmssm_wh_4b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		<<" grgrmotherpx " << grgrmotherpx << endl;
 	 }
       */
-      // select W->enu
-      if(fabs(p.pdgId()) == 11 && fabs(motherID) == 24 && motherSt == 3)
+      // select W->e/mu nu
+      if((fabs(p.pdgId()) == 11 || fabs(p.pdgId()) == 13) && fabs(motherID) == 24 && motherSt == 3)
 	{
 	  /*
 	  cout <<" electron ID = " << p.pdgId()
@@ -270,24 +264,10 @@ nmssm_wh_4b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	       <<" phi = " << p.phi() 
 	       <<" p = " << p.px() << endl;
 	  */
-	  ptel  = p.pt();
-	  etael = p.eta();
-	  phiel = p.phi();
-	}
-
-      // select W->enu
-      if(fabs(p.pdgId()) == 13 && fabs(motherID) == 24 && motherSt == 3)
-	{
-	  /*
-	  cout <<" muon ID = " << p.pdgId()
-	       <<" pt = " << p.pt()
-	       <<" eta = " << p.eta()
-	       <<" phi = " << p.phi()
-	       <<" p = " << p.px() << endl;
-	  */
-	  ptmu  = p.pt();
-	  etamu = p.eta();
-	  phimu = p.phi();
+	  idl  = p.pdgId();
+	  ptl  = p.pt();
+	  etal = p.eta();
+	  phil = p.phi();
 	}
 
       // select b quarks
