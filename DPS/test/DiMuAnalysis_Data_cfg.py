@@ -18,12 +18,12 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 process.pfJetMETcorr.jetCorrLabel = cms.string('ak5PFL1FastL2L3Residual')
 #
 ## next lines are needed only for Type0+1
-process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-    cms.InputTag('pfMETcorrType0'),
-    cms.InputTag('pfJetMETcorr', 'type1')        
-)
+#process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+#process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+#process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+#    cms.InputTag('pfMETcorrType0'),
+#    cms.InputTag('pfJetMETcorr', 'type1')        
+#)
 
 # 1.    Run2012A-13Jul2012 Re-reco....................GT: FT_53_V6_AN3
 # process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
@@ -41,7 +41,7 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
 # process.GlobalTag.globaltag = cms.string('GR_P_V41_AN3::All') 
 #
 # 6.    Run2012C-EcalRecover_11Dec2012................GT: FT_P_V42C_AN3
-# process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
+process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
 #
 # 7.    Run2012D-PromptReco-v1........................GT: GR_P_V42_AN3 
 # process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
@@ -180,15 +180,16 @@ process.filtersSeq = cms.Sequence(
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2)
+    input = cms.untracked.int32(40)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
+skipEvents = cms.untracked.uint32(11200),
 fileNames = cms.untracked.vstring(
-# '/store/data/Run2011A/Jet/AOD/PromptReco-v1/000/161/312/F2A79C25-0A58-E011-BE69-003048F024C2.root')
+ '/store/data/Run2012D/MET/AOD/PromptReco-v1/000/203/894/7A023A24-E90C-E211-BE74-0019B9F70468.root')
 #  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_1_1_ggY.root')
 #  'file:/localscratch/dimu2012file/DiMuons2012_1_1_9jG.root')
-  'file:/localscratch/MET_PD_test/MET_PD_test_1_1_JAH.root')
+#  'file:/localscratch/MET_PD_test/MET_PD_test_1_1_JAH.root')
 )
 
 
@@ -218,7 +219,7 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p1 = cms.Path(process.filtersSeq*
-                      process.type0PFMEtCorrection*
+#                      process.type0PFMEtCorrection*
                       process.producePFMETCorrections*
                       process.ak5PFJetsL1L2L3Residual*
                       process.recoPuJetId*
