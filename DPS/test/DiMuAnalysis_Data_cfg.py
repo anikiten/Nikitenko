@@ -18,12 +18,12 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 process.pfJetMETcorr.jetCorrLabel = cms.string('ak5PFL1FastL2L3Residual')
 #
 ## next lines are needed only for Type0+1
-#process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
-#process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-#process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-#    cms.InputTag('pfMETcorrType0'),
-#    cms.InputTag('pfJetMETcorr', 'type1')        
-#)
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+    cms.InputTag('pfMETcorrType0'),
+    cms.InputTag('pfJetMETcorr', 'type1')        
+)
 
 # 1.    Run2012A-13Jul2012 Re-reco....................GT: FT_53_V6_AN3
 # process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
@@ -41,10 +41,10 @@ process.pfJetMETcorr.jetCorrLabel = cms.string('ak5PFL1FastL2L3Residual')
 # process.GlobalTag.globaltag = cms.string('GR_P_V41_AN3::All') 
 #
 # 6.    Run2012C-EcalRecover_11Dec2012................GT: FT_P_V42C_AN3
-process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
+# process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
 #
 # 7.    Run2012D-PromptReco-v1........................GT: GR_P_V42_AN3 
-# process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
+process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
 #
 # ############# electrons #################################################################
 # rho value for isolation
@@ -65,14 +65,14 @@ process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIs
 process.load("CMGTools.External.pujetidsequence_cff")
 from CMGTools.External.pujetidsequence_cff import puJetId
 process.recoPuJetId = puJetId.clone(
-   jets = cms.InputTag("ak5PFJetsL1L2L3Residual"),
+   jets = cms.InputTag("ak5PFJetsL1FastL2L3Residual"),
    applyJec = cms.bool(False),
    inputIsCorrected = cms.bool(True)                
 )
 
 from CMGTools.External.pujetidsequence_cff import puJetMva
 process.recoPuJetMva = puJetMva.clone(
-   jets = cms.InputTag("ak5PFJetsL1L2L3Residual"),
+   jets = cms.InputTag("ak5PFJetsL1FastL2L3Residual"),
    jetids = cms.InputTag("recoPuJetId"),
    applyJec = cms.bool(False),
    inputIsCorrected = cms.bool(True)                
@@ -207,7 +207,7 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
     jetsID              = cms.InputTag("ak5JetID"),
     JPTjets             = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
     JPTjetsL1L2L3       = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
-    PFjetsL1L2L3        = cms.InputTag("ak5PFJetsL1L2L3Residual"),
+    PFjetsL1L2L3        = cms.InputTag("ak5PFJetsL1FastL2L3Residual"),
     TriggerResults      = cms.InputTag("TriggerResults","","HLT")	
 )
 
@@ -219,9 +219,9 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p1 = cms.Path(process.filtersSeq*
-#                      process.type0PFMEtCorrection*
+                      process.type0PFMEtCorrection*
                       process.producePFMETCorrections*
-                      process.ak5PFJetsL1L2L3Residual*
+	              process.ak5PFJetsL1FastL2L3Residual*
                       process.recoPuJetId*
                       process.recoPuJetMva*
                       process.ak5JTA*
