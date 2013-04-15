@@ -164,7 +164,7 @@ void Draw()
   TH1F *hEtaJmaxEWKZ = (TH1F*)hEtaJmax->Clone();
   TH1F *hPtTagJEWKZ  = (TH1F*)hPtTagJ->Clone();
 
-  TFile* file = new TFile("VBFH_histos.root");
+  TFile* file = new TFile("VBFH120_histos.root");
   TH1F *hMjjVBFH     = (TH1F*)hMjj->Clone();
   TH1F *hDetaJJVBFH  = (TH1F*)hDetaJJ->Clone();
   TH1F *hEtaJminVBFH = (TH1F*)hEtaJmin->Clone();
@@ -180,7 +180,7 @@ void Draw()
   hMjjEWKZ->Scale(scale);
   scale = 1./ hMjjVBFH->Integral();
   hMjjVBFH->Scale(scale);
-  //  hMjjQCDZ->GetYaxis()->SetTitle("dp/dM_{j1j2}");
+  hMjjQCDZ->GetYaxis()->SetTitle("arbitrary units");
   hMjjQCDZ->GetXaxis()->SetTitle("M_{j1j2}, GeV");
   hMjjQCDZ->SetMaximum(1.0);
   hMjjQCDZ->SetMinimum(0.0001);
@@ -215,7 +215,7 @@ void Draw()
   //  TLatex *t = new TLatex();
   //  t->SetTextSize(0.040);
   //  t->DrawLatex(600.0,3000.0,"Z+2jets, Z#rightarrow l^{+}l^{-} MadGraph");
-  c1->SaveAs("mjj.eps");
+  c1->SaveAs("mjj.pdf");
 
   // DetaJJ
   setTDRStyle(0,0,0);
@@ -226,8 +226,9 @@ void Draw()
   hDetaJJEWKZ->Scale(scale);
   scale = 1./ hDetaJJVBFH->Integral();
   hDetaJJVBFH->Scale(scale);
-  //  hDetaJJQCDZ->GetYaxis()->SetTitle("dp/#Delta#eta_{j1j2}");
+  hDetaJJQCDZ->GetYaxis()->SetTitle("arbitrary units");
   hDetaJJQCDZ->GetXaxis()->SetTitle("#Delta#eta_{j_{1}j_{2}}");
+  hDetaJJQCDZ->SetTitleOffset(1.3, "Y");
   hDetaJJQCDZ->SetMaximum(0.2);
   hDetaJJQCDZ->SetLineStyle(1);
   hDetaJJQCDZ->SetLineWidth(2);
@@ -257,7 +258,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c2->SaveAs("detajj.eps");
+  c2->SaveAs("detajj.pdf");
 
   // Eta J1, j2
   setTDRStyle(0,0,0);
@@ -268,7 +269,7 @@ void Draw()
   hEtaJmaxEWKZ->Scale(scale);
   scale = 1./ hEtaJmaxVBFH->Integral();
   hEtaJmaxVBFH->Scale(scale);
-  //  hEtaJmaxQCDZ->GetYaxis()->SetTitle("dp/#eta_{j} max");
+  hEtaJmaxQCDZ->GetYaxis()->SetTitle("arbitrary units");
   hEtaJmaxQCDZ->GetXaxis()->SetTitle("#eta_{j} max");
   hEtaJmaxQCDZ->SetMaximum(0.15);
   hEtaJmaxQCDZ->SetLineStyle(1);
@@ -299,7 +300,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c3->SaveAs("etaj.eps");
+  c3->SaveAs("etaj.pdf");
 
   // pT jet
   setTDRStyle(0,0,0);
@@ -310,9 +311,9 @@ void Draw()
   hPtTagJEWKZ->Scale(scale);
   scale = 1./ hPtTagJVBFH->Integral();
   hPtTagJVBFH->Scale(scale);
-  //  hPtTagJQCDZ->GetYaxis()->SetTitle("dp/p_{T,j}");
+  hPtTagJQCDZ->GetYaxis()->SetTitle("arbitrary units");
   hPtTagJQCDZ->GetXaxis()->SetTitle("p_{T}^{j}, GeV");
-  //  hPtTagJQCDZ->SetMaximum(0.15);
+  hPtTagJQCDZ->SetTitleOffset(1.3, "Y");
   hPtTagJQCDZ->SetLineStyle(1);
   hPtTagJQCDZ->SetLineWidth(2);
   hPtTagJQCDZ->Draw("hist");
@@ -341,6 +342,6 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c4->SaveAs("ptj.eps");
+  c4->SaveAs("ptj.pdf");
 }
 
