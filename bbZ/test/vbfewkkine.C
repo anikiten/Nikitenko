@@ -228,7 +228,7 @@ void Draw()
   hDetaJJVBFH->Scale(scale);
   hDetaJJQCDZ->GetYaxis()->SetTitle("arbitrary units");
   hDetaJJQCDZ->GetXaxis()->SetTitle("#Delta#eta_{j_{1}j_{2}}");
-  hDetaJJQCDZ->SetTitleOffset(1.3, "Y");
+  hDetaJJQCDZ->SetTitleOffset(1.5, "Y");
   hDetaJJQCDZ->SetMaximum(0.2);
   hDetaJJQCDZ->SetLineStyle(1);
   hDetaJJQCDZ->SetLineWidth(2);
@@ -313,7 +313,7 @@ void Draw()
   hPtTagJVBFH->Scale(scale);
   hPtTagJQCDZ->GetYaxis()->SetTitle("arbitrary units");
   hPtTagJQCDZ->GetXaxis()->SetTitle("p_{T}^{j}, GeV");
-  hPtTagJQCDZ->SetTitleOffset(1.3, "Y");
+  hPtTagJQCDZ->SetTitleOffset(1.5, "Y");
   hPtTagJQCDZ->SetLineStyle(1);
   hPtTagJQCDZ->SetLineWidth(2);
   hPtTagJQCDZ->Draw("hist");
