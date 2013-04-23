@@ -227,6 +227,7 @@ private:
   std::vector<double> *EtaPF;
   std::vector<double> *PhiPF;
   std::vector<double> *EtPF;
+  std::vector<double> *EnPF;
   std::vector<float>  *MVAPF;
   std::vector<int>    *IDPF;
   std::vector<int>    *JTypePF;
@@ -289,6 +290,7 @@ VBFHinvis::beginJob()
   EtaPF        = new std::vector<double>();
   PhiPF        = new std::vector<double>();
   EtPF         = new std::vector<double>();
+  EnPF         = new std::vector<double>();
   MVAPF        = new std::vector<float>();
   IDPF         = new std::vector<int>();
   JTypePF      = new std::vector<int>();
@@ -362,6 +364,7 @@ VBFHinvis::beginJob()
   t1->Branch("EtaPF","vector<double>",&EtaPF);
   t1->Branch("PhiPF","vector<double>",&PhiPF);
   t1->Branch("EtPF" ,"vector<double>",&EtPF);
+  t1->Branch("EnPF" ,"vector<double>",&EnPF);
   t1->Branch("MVAPF" ,"vector<float>",&MVAPF);
   t1->Branch("IDPF","vector<int>",&IDPF);
   t1->Branch("JTypePF","vector<int>",&JTypePF);
@@ -538,6 +541,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   EtaPF->clear();
   PhiPF->clear();
   EtPF->clear(); 
+  EnPF->clear(); 
   MVAPF->clear();
   IDPF->clear(); 
   JTypePF->clear();
@@ -916,7 +920,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       const MuonPFIsolation pfisol = muon->pfIsolationR04();
       double muon_sumPFPt = pfisol.sumChargedHadronPt +
 	max(0.,pfisol.sumNeutralHadronEt+pfisol.sumPhotonEt-0.5*pfisol.sumPUPt);
-      mupfisol->push_back(muon_sumPFPt);
+      mupfisol->push_back(muon_sumPFPt); 
       if (imu == 1) muon1 = muonc; 
       if (imu == 2) muon2 = muonc; 
       rmfirst++;
@@ -957,12 +961,30 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // fill pf jet variables
   map<double,const PFJet*>::reverse_iterator rfirstPF(pTpfIndex.end());
   map<double,const PFJet*>::reverse_iterator rlastPF(pTpfIndex.begin());
+
+  math::XYZTLorentzVector  pfjet1(0.,0.,0.,0.);
+  math::XYZTLorentzVector  pfjet2(0.,0.,0.,0.);
+  int npfjet = 0;
+
   while (rfirstPF != rlastPF) {
     const PFJet* pfjet = (*rfirstPF).second;
     rfirstPF++;
     
     // pfjet id
-    if(((*pfjet).neutralHadronEnergy()+(*pfjet).HFHadronEnergy())/(*pfjet).energy() > 0.99) {continue;}
+
+    double jetEnergyUncorrected = (*pfjet).chargedHadronEnergy()+
+                                  (*pfjet).neutralHadronEnergy()+
+                                  (*pfjet).photonEnergy()+
+                                  (*pfjet).electronEnergy()+
+                                  (*pfjet).muonEnergy()+
+                                  (*pfjet).HFHadronEnergy()+
+                                  (*pfjet).HFEMEnergy();
+
+    double NHEHF = ( (*pfjet).neutralHadronEnergy()+(*pfjet).HFHadronEnergy() )/jetEnergyUncorrected;
+    double NEmF  = (*pfjet).neutralEmEnergyFraction();
+    double NCHMult = (*pfjet).neutralMultiplicity() + (*pfjet).chargedMultiplicity();
+
+    if(((*pfjet).neutralHadronEnergy()+(*pfjet).HFHadronEnergy())/jetEnergyUncorrected>0.99) {continue;}
     //    if(  (*pfjet).neutralHadronEnergyFraction() > 0.99 )  continue;
     if(  (*pfjet).neutralEmEnergyFraction() > 0.99 )  continue;
     if(( (*pfjet).neutralMultiplicity() + (*pfjet).chargedMultiplicity() ) < 1 )  continue;
@@ -971,6 +993,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if( (*pfjet).chargedMultiplicity() < 0. )  continue;
       if( (*pfjet).chargedEmEnergyFraction() > 0.99 )  continue;
     }
+
     float mva  = (*PuMVApfIndex.find((*pfjet).pt())).second;
     int idflag = (*PuIDpfIndex.find((*pfjet).pt())).second;
     
@@ -981,14 +1004,38 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {pfjidtype = 2;}
     if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )) 
       {pfjidtype = 3;}
-    
+
+    /*
+    if(run == 203894 && event == 1003932495) {
+      cout <<" ptj = " << pfjet->pt()
+	   <<" eta = " << pfjet->eta()
+	   <<" phi = " << pfjet->phi() 
+	   <<" NHEHF = " << NHEHF 
+	   <<" NEmF = " << NEmF
+	   <<" NCHMult = " << NCHMult <<endl;
+    }
+    */
+
+    npfjet += 1;
+    math::XYZTLorentzVector pfjetc(pfjet->px(),pfjet->py(),pfjet->pz(),pfjet->energy());
+    if (npfjet == 1) pfjet1 = pfjetc; 
+    if (npfjet == 2) pfjet2 = pfjetc; 
+
     EtaPF->push_back(pfjet->eta());
     PhiPF->push_back(pfjet->phi());
     EtPF->push_back(pfjet->pt());
+    EnPF->push_back(pfjet->energy());
     MVAPF->push_back(mva);
     IDPF->push_back(idflag);
     JTypePF->push_back(pfjidtype);
   }
+
+  double mass_twopfjets;
+  if(npfjet >= 2) {
+    math::XYZTLorentzVector twopfjets = pfjet1 + pfjet2;
+    mass_twopfjets = twopfjets.M();
+  }
+
 
   // fill jpt jet variables
   int jc = 0;
@@ -1222,11 +1269,61 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
   }
+  
   // fill tree
   //   if( mass_mumu >= 40. ) t1->Fill();
 
   if( (nvtx >= 1) & (L1ETM40 > 0 || VBF_AllJets > 0 
-		     || mass_mumu >= 40. || mass_ee >= 40.) ) t1->Fill();
-}
+		     || mass_mumu >= 40. || mass_ee >= 40.) ) 
+		      
+  {
+    t1->Fill();
+    /*
+    if ( (run == 205826 && event == 409091748) ||
+	 (run == 206484 && event == 543753786) ||
+	 (run == 207487 && event == 260097190) ||
+	 (run == 207488 && event == 317126730) ||
+	 (run == 208686 && event == 250155539) ||
+	 (run == 204541 && event == 348899425) ) {
+      cout <<" V10 MET =< 130; run = " << run <<" event = " << event <<" MET= " << pfmetType1 << endl;
+    }
+
+    if ( (run == 205683 && event == 339464679) ||
+	 (run == 203987 && event == 26316846) ||
+	 (run == 208391 && event == 300769978) ||
+	 (run == 204544 && event == 74768388) ) {
+      cout <<" V10 MET >= 130; run = " << run <<" event = " << event <<" MET= " << pfmetType1 << endl;
+    }
+
+    if ( (run ==  205193 && event == 192024878) ||
+	 (run ==  207492 && event == 153309740) ||
+	 (run ==  205666 && event == 61762276)  ||
+	 (run ==  206208 && event == 375087728) ||
+	 (run ==  206940 && event == 233232689) ||
+	 (run ==  207214 && event == 388384248) ) {
+      int nmu = PtMu->size();
+      int nel = PtEl->size();
+      cout <<" V10 MET > 130 with and no leptons; run = " << run <<" event = " << event 
+	   <<" MET= " << pfmetType1 
+	   <<" nmu = " << nmu
+	   <<" nel = " << nel 
+	   <<" mass JJ + " << mass_twopfjets << endl;
+      for (int j = 0; j < nmu; j++) {
+	cout <<"     -> mu n = " << j
+	     <<" id = " << (*muid)[j]
+	     <<" pt = " << (*PtMu)[j]
+	     <<" eta = " << (*EtaMu)[j]
+	     <<" pf isol = " << (*mupfisol)[j]/(*PtMu)[j] << endl; 
+      }
+      for (int j = 0; j < nel; j++) {
+	cout <<"     --> el n = " << j
+	     <<" id = " << (*elid)[j]
+	     <<" pt = " << (*PtEl)[j]
+	     <<" eta = " << (*EtaEl)[j] << endl;
+      }
+    }
+    */
+  }
+}		          
 //define this as a plug-in
 DEFINE_FWK_MODULE(VBFHinvis);

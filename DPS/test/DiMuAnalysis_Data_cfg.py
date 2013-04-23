@@ -180,16 +180,17 @@ process.filtersSeq = cms.Sequence(
 ########################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(40)
+    input = cms.untracked.int32(-1)
 )
 ### For 219, file from RelVal
 process.source = cms.Source("PoolSource",
-skipEvents = cms.untracked.uint32(11200),
+# skipEvents = cms.untracked.uint32(11200),
 fileNames = cms.untracked.vstring(
- '/store/data/Run2012D/MET/AOD/PromptReco-v1/000/203/894/7A023A24-E90C-E211-BE74-0019B9F70468.root')
+# '/store/data/Run2012D/MET/AOD/PromptReco-v1/000/203/894/7A023A24-E90C-E211-BE74-0019B9F70468.root')
 #  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_1_1_ggY.root')
 #  'file:/localscratch/dimu2012file/DiMuons2012_1_1_9jG.root')
 #  'file:/localscratch/MET_PD_test/MET_PD_test_1_1_JAH.root')
+   'file:skimForQCDStudy_v1.root')
 )
 
 
