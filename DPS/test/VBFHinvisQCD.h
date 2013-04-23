@@ -177,6 +177,8 @@ VBFHinvisQCD::VBFHinvisQCD(TTree *tree) : fChain(0)
 */
   if (tree == 0) {
     TChain * chain = new TChain("t1","");
+
+    /*
     chain->Add("/vols/cms02/anikiten/MET_Run2012A-13Jul2012/VBFHinvis_*.root");
     chain->Add("/vols/cms02/anikiten/MET_Run2012A-06Aug2012/VBFHinvis_*.root");
     chain->Add("/vols/cms02/anikiten/MET_Run2012B-13Jul2012/VBFHinvis_*.root");
@@ -184,6 +186,20 @@ VBFHinvisQCD::VBFHinvisQCD(TTree *tree) : fChain(0)
     chain->Add("/vols/cms02/anikiten/MET_Run2012C-PromptReco-v2/VBFHinvis_*.root");
     chain->Add("/vols/cms02/anikiten/MET_Run2012C-11Dec2012/VBFHinvis_*.root");
     chain->Add("/vols/cms02/anikiten/MET_Run2012D-PromptReco-v1/VBFHinvis_*.root");
+    */
+
+    chain->Add("/vols/cms02/anikiten/MET_Run2012A-13Jul2012_Type1/VBFHinvis_*.root");
+    chain->Add("/vols/cms02/anikiten/MET_Run2012A-06Aug2012_Type1/VBFHinvis_*.root");
+    chain->Add("/vols/cms02/anikiten/MET_Run2012B-13Jul2012_Type1/VBFHinvis_*.root");
+    chain->Add("/vols/cms02/anikiten/MET_Run2012C-24Aug2012_Type1/VBFHinvis_*.root");
+    chain->Add("/vols/cms02/anikiten/MET_Run2012C-PromptReco-v2_Type1/VBFHinvis_*.root");
+    chain->Add("/vols/cms02/anikiten/MET_Run2012C-11Dec2012_Type1/VBFHinvis_*.root");
+    chain->Add("/vols/cms02/anikiten/MET_Run2012D-PromptReco-v1_Type1/VBFHinvis_*.root");
+
+    //    chain->Add("/vols/cms02/anikiten/MET_Run2012D-PromptReco-v1_MCMET/VBFHinvis_*.root");
+
+    //    chain->Add("/vols/cms02/anikiten/MET_Run2012D-PromptReco-v1_Synch/VBFHinvis_*.root");
+
     tree = chain;
   }
 
