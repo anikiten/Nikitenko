@@ -617,8 +617,10 @@ void VBFHinvisQCD::Loop()
    hDphiJJmJJ1200DetaJJ42->Write();
    hDphiJJmJJ1200DetaJJ42MET70j3->Write();
    hDphiJJmJJ1200DetaJJ42MET70jveto->Write();
+   hDphiJJmJJ1200DetaJJ42MET70jveto24->Write();
    hDphiJJmJJ1200DetaJJ42j3->Write();
    hDphiJJmJJ1200DetaJJ42jveto->Write();
+   hDphiJJmJJ1200DetaJJ42jveto24->Write();
   
    hDphiJJmJJ1200DetaJJ42MET020->Write();
    hDphiJJmJJ1200DetaJJ42MET2030->Write();
