@@ -57,9 +57,34 @@ void VBFHinvisQCD::Loop()
    TH1F * hEtaJPU   = new TH1F( "hEtaJPU", "EtaJPU", 50, -5.0, 5.0);
    TH1F * hDphiJJPU = new TH1F( "hDphiJJPU", "DphiJJPU", 17, 0., 3.4);
 
-   TH1F * hPtJ1   = new TH1F( "hPtJ1", "PtJ1", 60, 0., 300.);
-   TH1F * hPtJ2   = new TH1F( "hPtJ2", "PtJ2", 60, 0., 300.);
-   TH1F * hEtaJ   = new TH1F( "hEtaJ", "EtaJ", 50, -5.0, 5.0);
+   // QCD study
+   // jets in QCD signal and bkg regions
+   TH1F * hPtJ1S   = new TH1F( "hPtJ1S", "PtJ1S", 60, 0., 300.);
+   TH1F * hPtJ2S   = new TH1F( "hPtJ2S", "PtJ2S", 60, 0., 300.);
+   TH1F * hPtJ3S   = new TH1F( "hPtJ3S", "PtJ3S", 60, 0., 300.);
+   TH1F * hEtaJ1S   = new TH1F( "hEtaJ1S", "EtaJ1S", 50, -5.0, 5.0);
+   TH1F * hEtaJ2S   = new TH1F( "hEtaJ2S", "EtaJ2S", 50, -5.0, 5.0);
+   TH1F * hEtaJ3S   = new TH1F( "hEtaJ3S", "EtaJ3S", 50, -5.0, 5.0);
+
+   TH1F * hPtJ1B   = new TH1F( "hPtJ1B", "PtJ1B", 60, 0., 300.);
+   TH1F * hPtJ2B   = new TH1F( "hPtJ2B", "PtJ2B", 60, 0., 300.);
+   TH1F * hPtJ3B   = new TH1F( "hPtJ3B", "PtJ3B", 60, 0., 300.);
+   TH1F * hEtaJ1B   = new TH1F( "hEtaJ1B", "EtaJ1B", 50, -5.0, 5.0);
+   TH1F * hEtaJ2B   = new TH1F( "hEtaJ2B", "EtaJ2B", 50, -5.0, 5.0);
+   TH1F * hEtaJ3B   = new TH1F( "hEtaJ3B", "EtaJ3B", 50, -5.0, 5.0);
+   //
+   // MET in QCD signal and bkg region
+   Float_t xbins[11]={0.,10.,20.,30.,40.,50.,60.,70.,80.,100.,120};
+   TH1F * hPfMetDphiJJSData = new TH1F("hPfMetDphiJJSData","PfMetDphiJJSData",10,xbins); 
+   TH1F * hPfMetDphiJJBData = new TH1F("hPfMetDphiJJBData","PfMetDphiJJBData",10,xbins);
+   TH1F * hPFMET1mJJ1200DetaJJ42S = new TH1F( "hPFMET1mJJ1200DetaJJ42S", 
+					       "PFMET1mJJ1200DetaJJ42S", 60, 0., 300.);
+
+   TH1F * hPFMET1mJJ1200DetaJJ42B = new TH1F( "hPFMET1mJJ1200DetaJJ42B", 
+					       "PFMET1mJJ1200DetaJJ42B", 60, 0., 300.);
+
+   //
+
 
    TH2F * hDetaJJmJJ = new TH2F( "hDetaJJmJJ", "DetaJJmJJ", 50, 0., 10.,40,0.,2000.);
    TH1F * hmJJ    = new TH1F( "hmJJ", "mJJ", 40, 0., 2000.);
@@ -84,9 +109,19 @@ void VBFHinvisQCD::Loop()
    TH1F * hDphiJJmJJ1200DetaJJ42 = new TH1F( "hDphiJJmJJ1200DetaJJ42", 
                                              "DphiJJmJJ1200DetaJJ42", 17, 0., 3.4);
 
-   Float_t xbins[11]={0.,10.,20.,30.,40.,50.,60.,70.,80.,100.,120};
-   TH1F * hPfMetDphiJJSData = new TH1F("hPfMetDphiJJSData","PfMetDphiJJSData",10,xbins); 
-   TH1F * hPfMetDphiJJBData = new TH1F("hPfMetDphiJJBData","PfMetDphiJJBData",10,xbins);
+   TH1F * hDphiJJmJJ1200DetaJJ42MET70j3 = new TH1F( "hDphiJJmJJ1200DetaJJ42MET70j3", 
+                                             "DphiJJmJJ1200DetaJJ42MET70j3", 17, 0., 3.4);
+   TH1F * hDphiJJmJJ1200DetaJJ42MET70jveto = new TH1F( "hDphiJJmJJ1200DetaJJ42MET70jveto", 
+                                             "DphiJJmJJ1200DetaJJ42MET70jveto", 17, 0., 3.4);
+   TH1F * hDphiJJmJJ1200DetaJJ42MET70jveto24 = new TH1F( "hDphiJJmJJ1200DetaJJ42MET70jveto24", 
+					"DphiJJmJJ1200DetaJJ42MET70jveto24", 17, 0., 3.4);
+
+   TH1F * hDphiJJmJJ1200DetaJJ42j3 = new TH1F( "hDphiJJmJJ1200DetaJJ42j3", 
+                                             "DphiJJmJJ1200DetaJJ42j3", 17, 0., 3.4);
+   TH1F * hDphiJJmJJ1200DetaJJ42jveto = new TH1F( "hDphiJJmJJ1200DetaJJ42jveto", 
+                                             "DphiJJmJJ1200DetaJJ42jveto", 17, 0., 3.4);
+   TH1F * hDphiJJmJJ1200DetaJJ42jveto24 = new TH1F( "hDphiJJmJJ1200DetaJJ42jveto24", 
+                                             "DphiJJmJJ1200DetaJJ42jveto24", 17, 0., 3.4);
 
    TH1F * hDphiJJmJJ1200DetaJJ42MET020 = new TH1F( "hDphiJJmJJ1200DetaJJ42MET020", 
                                              "DphiJJmJJ1200DetaJJ42MET020", 17, 0., 3.4);
@@ -120,7 +155,7 @@ void VBFHinvisQCD::Loop()
                                              "DphiJJmJJ1200DetaJJ42MET70", 17, 0., 3.4);
 
    TH1F * hDphiJJmJJ900DetaJJ42 = new TH1F( "hDphiJJmJJ900DetaJJ42", 
-                                             "DphiJJmJJ900DetaJJ42", 17, 0., 3.4);
+                                            "DphiJJmJJ900DetaJJ42", 17, 0., 3.4);
    TH1F * hDphiJJmJJ900DetaJJ42MET70 = new TH1F( "hDphiJJmJJ900DetaJJ42MET70", 
                                              "DphiJJmJJ900DetaJJ42MET70", 17, 0., 3.4);
 
@@ -131,8 +166,10 @@ void VBFHinvisQCD::Loop()
 					       "PFMET1mJJ300DetaJJ2", 60, 0., 300.);
    TH1F * hPFMET1mJJ800DetaJJ4   = new TH1F( "hPFMET1mJJ800DetaJJ4", 
 						 "PFMET1mJJ800DetaJJ4", 60, 0., 300.);
+
    TH1F * hPFMET1mJJ1200DetaJJ42 = new TH1F( "hPFMET1mJJ1200DetaJJ42", 
 						 "PFMET1mJJ1200DetaJJ42", 60, 0., 300.);
+
    TH1F * hPFMET1mJJ900DetaJJ42 = new TH1F( "hPFMET1mJJ900DetaJJ42", 
 						 "PFMET1mJJ900DetaJJ42", 60, 0., 300.);
    Long64_t nentries = fChain->GetEntriesFast();
@@ -251,12 +288,12 @@ void VBFHinvisQCD::Loop()
 	    Double_t DR = deltaR((*EtaPF)[j],(*PhiPF)[j],(*EtaEl)[l],(*PhiEl)[l]);
 	    if (DR < 0.5) {jetlept_match = 1;}
 	  }
-	  if(jetlept_match == 0) {
-	    ptjet.push_back((*EtPF)[j]);
-	    etajet.push_back((*EtaPF)[j]);
-	    phijet.push_back((*PhiPF)[j]);
-	    jetpuid.push_back((*JTypePF)[j]);
-	  }
+	  //	  if(jetlept_match == 0) {
+	  ptjet.push_back((*EtPF)[j]);
+	  etajet.push_back((*EtaPF)[j]);
+	  phijet.push_back((*PhiPF)[j]);
+	  jetpuid.push_back((*JTypePF)[j]);
+	  //	  }
 	}
       }
 
@@ -342,10 +379,6 @@ void VBFHinvisQCD::Loop()
                            - (PJ1x+PJ2x)*(PJ1x+PJ2x) 
                            - (PJ1y+PJ2y)*(PJ1y+PJ2y) 
 			   - (PJ1z+PJ2z)*(PJ1z+PJ2z) ); 
-      hPtJ1->Fill(ptjet[0]);
-      hPtJ2->Fill(ptjet[1]);
-      hEtaJ->Fill(etajet[0]); 
-      hEtaJ->Fill(etajet[1]); 
       
       hDetaJJmJJ->Fill(DetaJJ,mJJ);
 
@@ -365,17 +398,62 @@ void VBFHinvisQCD::Loop()
 	hDphiJJmJJ800DetaJJ4->Fill(DphiJJ);
 	hPFMET1mJJ800DetaJJ4->Fill(pfmetType1);
       }
+      // main selection
       if( (mJJ > 1200.) && (DetaJJ > 4.2) && etajet[0]*etajet[1] < 0 ) {
    
 	if(DphiJJ < 1.0) {
 	  hPfMetDphiJJSData->Fill(pfmetType1);
+	  hPFMET1mJJ1200DetaJJ42S->Fill(pfmetType1);
+	  hPtJ1S->Fill(ptjet[0]);
+	  hPtJ2S->Fill(ptjet[1]);
+	  hEtaJ1S->Fill(etajet[0]); 
+	  hEtaJ2S->Fill(etajet[1]); 
+	  if(njets > 2 && ptjet[2] > 20.) {
+	    hPtJ3S->Fill(ptjet[2]);
+	    hEtaJ3S->Fill(etajet[2]); 
+	  }
 	}
 
 	if(DphiJJ > 2.6) {
 	  hPfMetDphiJJBData->Fill(pfmetType1);
+	  hPFMET1mJJ1200DetaJJ42B->Fill(pfmetType1);
+	  hPtJ1B->Fill(ptjet[0]);
+	  hPtJ2B->Fill(ptjet[1]);
+	  hEtaJ1B->Fill(etajet[0]); 
+	  hEtaJ2B->Fill(etajet[1]); 
+	  if(njets > 2 && ptjet[2] > 20.) {
+	    hPtJ3B->Fill(ptjet[2]);
+	    hEtaJ3B->Fill(etajet[2]); 
+	  }
 	}
 
 	hDphiJJmJJ1200DetaJJ42->Fill(DphiJJ);
+
+	if(njets > 2 && ptjet[2] > 20. && fabs(etajet[2]) < 2.4) {
+	} else {
+	  hDphiJJmJJ1200DetaJJ42jveto24->Fill(DphiJJ);
+	}
+
+	if(njets > 2 && ptjet[2] > 20.) {
+	  hDphiJJmJJ1200DetaJJ42j3->Fill(DphiJJ);
+	} else {
+	  hDphiJJmJJ1200DetaJJ42jveto->Fill(DphiJJ);
+	}
+
+
+	if(pfmetType1 > 70.) {
+
+	  if(njets > 2 && ptjet[2] > 20. && fabs(etajet[2]) < 2.4) {
+	  } else {
+	    hDphiJJmJJ1200DetaJJ42MET70jveto24->Fill(DphiJJ);
+	  }
+
+	  if(njets > 2 && ptjet[2] > 20.) {
+	    hDphiJJmJJ1200DetaJJ42MET70j3->Fill(DphiJJ);
+	  } else {
+	    hDphiJJmJJ1200DetaJJ42MET70jveto->Fill(DphiJJ);
+	  }
+	}
 	hPFMET1mJJ1200DetaJJ42->Fill(pfmetType1);
 
 	if(pfmetType1 >  0. && pfmetType1 <= 20.) {hDphiJJmJJ1200DetaJJ42MET020->Fill(DphiJJ);}
@@ -496,9 +574,28 @@ void VBFHinvisQCD::Loop()
    hEtaJPU->Write();
    hDphiJJPU->Write();
 
-   hPtJ1->Write();
-   hPtJ2->Write();
-   hEtaJ->Write();
+   // for QCD analysis
+   hPtJ1B->Write();
+   hPtJ2B->Write();
+   hPtJ3B->Write();
+   hEtaJ1B->Write();
+   hEtaJ2B->Write();
+   hEtaJ3B->Write();
+
+   hPtJ1S->Write();
+   hPtJ2S->Write();
+   hPtJ3S->Write();
+   hEtaJ1S->Write();
+   hEtaJ2S->Write();
+   hEtaJ3S->Write();
+
+   hPFMET1mJJ1200DetaJJ42S->Write();
+   hPFMET1mJJ1200DetaJJ42B->Write();
+
+   hPfMetDphiJJSData->Write();
+   hPfMetDphiJJBData->Write();
+
+   //
 
    hmJJ->Write();
    hDetaJJ->Write();
@@ -518,10 +615,11 @@ void VBFHinvisQCD::Loop()
    hDphiJJmJJ300DetaJJ2->Write();
    hDphiJJmJJ800DetaJJ4->Write();  
    hDphiJJmJJ1200DetaJJ42->Write();
-
-   hPfMetDphiJJSData->Write();
-   hPfMetDphiJJBData->Write();
-
+   hDphiJJmJJ1200DetaJJ42MET70j3->Write();
+   hDphiJJmJJ1200DetaJJ42MET70jveto->Write();
+   hDphiJJmJJ1200DetaJJ42j3->Write();
+   hDphiJJmJJ1200DetaJJ42jveto->Write();
+  
    hDphiJJmJJ1200DetaJJ42MET020->Write();
    hDphiJJmJJ1200DetaJJ42MET2030->Write();
    hDphiJJmJJ1200DetaJJ42MET3040->Write();
