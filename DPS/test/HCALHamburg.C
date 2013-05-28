@@ -182,6 +182,8 @@ void Draw()
   graph_st->SetMaximum(0.40);
   graph_st->SetMarkerStyle(20);
   graph_st->GetXaxis()->SetRangeUser(0.,60.);
+  graph_st->GetYaxis()->SetTitleSize(0.05);
+  graph_st->GetYaxis()->SetLabelSize(0.04);
   graph_st->Draw("AP");
 
   graph_up->SetMarkerStyle(24);
@@ -215,6 +217,8 @@ void Draw()
   graph_st->SetMaximum(0.40);
   graph_st->SetMarkerStyle(20);
   graph_st->GetXaxis()->SetRangeUser(0.,60.);
+  graph_st->GetYaxis()->SetTitleSize(0.05);
+  graph_st->GetYaxis()->SetLabelSize(0.04);
   graph_st->Draw("AP");
 
   graph_up->SetMarkerStyle(24);
