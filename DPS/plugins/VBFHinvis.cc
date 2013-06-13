@@ -595,10 +595,10 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   // MVA PU PF jet discriminator
   edm::Handle<edm::ValueMap<float> > puJetIdMVA;
-  iEvent.getByLabel("recoPuJetMva","fullDiscriminant",puJetIdMVA);
+  iEvent.getByLabel("recoPuJetMva","full53xDiscriminant",puJetIdMVA);
   //
   edm::Handle<edm::ValueMap<int> > puJetIdFlag;
-  iEvent.getByLabel("recoPuJetMva","fullId",puJetIdFlag);
+  iEvent.getByLabel("recoPuJetMva","full53xId",puJetIdFlag);
   
   // JPT jets raw
   edm::Handle<reco::JPTJetCollection> jptjets;
