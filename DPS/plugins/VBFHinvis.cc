@@ -61,7 +61,7 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
-#include "EGamma/EGammaAnalysisTools/interface/EGammaCutBasedEleId.h"
+#include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"
 // isolation
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 //jets
