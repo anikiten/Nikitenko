@@ -189,7 +189,7 @@ process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
     calojets            = cms.InputTag("ak5CaloJets"),
     jetsID              = cms.InputTag("ak5JetID"),
     JPTjets             = cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
-    JPTjetsL1L2L3       = cms.InputTag("ak5JPTJetsL1L2L3Residual"),
+    JPTjetsL1L2L3       = cms.InputTag("ak5JPTJetsL1FastL2L3Residual"),
     PFjetsL1L2L3        = cms.InputTag("ak5PFJetsL1FastL2L3Residual"),
     TriggerResults      = cms.InputTag("TriggerResults","","HLT")	
 )
@@ -209,7 +209,7 @@ process.p1 = cms.Path(process.filtersSeq*
                       process.recoPuJetMva*
                       process.ak5JTA*
                       process.jetPlusTrackZSPCorJetAntiKt5*
-                      process.ak5JPTJetsL1L2L3Residual*
+                      process.ak5JPTJetsL1FastL2L3Residual*
 	              process.kt6PFJetsForIsolation* 
 	              process.pfiso*
                       process.myjetplustrack)
