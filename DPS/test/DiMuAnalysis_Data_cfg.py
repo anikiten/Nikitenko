@@ -24,27 +24,8 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
     cms.InputTag('pfMETcorrType0'),
     cms.InputTag('pfJetMETcorr', 'type1')        
 )
-
-# 1.    Run2012A-13Jul2012 Re-reco....................GT: FT_53_V6_AN3
-# process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
 #
-# 2.    Run2012A-recover-06Aug2012  Re-reco ..........GT: FT_53_V6C_AN3
-# process.GlobalTag.globaltag = cms.string('FT_53_V6C_AN3::All') 
-#
-# 3.    Run2012B-13Jul2012 Re-reco ...................GT: FT_53_V6_AN3
-# process.GlobalTag.globaltag = cms.string('FT_53_V6_AN3::All') 
-#
-# 4.    Run2012C-ReReco 24Aug.........................GT: FT_53_V10_AN3
-# process.GlobalTag.globaltag = cms.string('FT_53_V10_AN3::All') 
-#
-# 5.    Run2012C-PromptReco-v2 ...................... GT: GR_P_V42_AN3 
-# process.GlobalTag.globaltag = cms.string('GR_P_V41_AN3::All') 
-#
-# 6.    Run2012C-EcalRecover_11Dec2012................GT: FT_P_V42C_AN3
-# process.GlobalTag.globaltag = cms.string('FT_P_V42C_AN3::All') 
-#
-# 7.    Run2012D-PromptReco-v1........................GT: GR_P_V42_AN3 
-process.GlobalTag.globaltag = cms.string('GR_P_V42_AN3::All') 
+process.GlobalTag.globaltag = cms.string('FT_53_V21_AN4::All') 
 #
 # ############# electrons #################################################################
 # rho value for isolation
@@ -186,11 +167,12 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
 # skipEvents = cms.untracked.uint32(11200),
 fileNames = cms.untracked.vstring(
-# '/store/data/Run2012D/MET/AOD/PromptReco-v1/000/203/894/7A023A24-E90C-E211-BE74-0019B9F70468.root')
+'/store/user/srimanob/invHiggs/22Jan13/0008F234-739C-E211-A836-002590832A48.root')
 #  'rfio:/castor/cern.ch/user/a/anikiten/DiMuonData2011/DiMuons_May10ReReco_1_1_ggY.root')
 #  'file:/localscratch/dimu2012file/DiMuons2012_1_1_9jG.root')
 #  'file:/localscratch/MET_PD_test/MET_PD_test_1_1_JAH.root')
-   'file:skimForQCDStudy_v1.root')
+#
+#   'file:skimForQCDStudy_v1.root')
 )
 
 
