@@ -164,10 +164,11 @@ void setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
 void Draw()
 {
 
-  TFile* file = new TFile("EW_AM_withTrgWeights.root");
+  //  TFile* file = new TFile("EW_AM_withTrgWeights.root");
   //  TFile* file = new TFile("BkgForQCDEstimation_new_cjv.root");
-  TH1F * hEWS = (TH1F*)metRangeTotal_DPhiSIGNAL->Clone();
-  TH1F * hEWB = (TH1F*)metRangeTotal_DPhiQCD->Clone();
+  TFile* file = new TFile("BkgForQCDEstimation_method2.root");
+  TH1F * hEWS = (TH1F*)metRangeTotal_DPhiSIGNAL_noCJV->Clone();
+  TH1F * hEWB = (TH1F*)metRangeTotal_DPhiQCD_noCJV->Clone();
 
   TFile* file = new TFile("VBFHinvisQCDAnalysisV10_Type01MET.root");
   TH1F * hDphiJJMET70RatioToCJV = (TH1F*)hDphiJJmJJ1200DetaJJ42MET70->Clone();
