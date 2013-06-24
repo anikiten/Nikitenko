@@ -188,7 +188,6 @@ void Draw()
   TCanvas* c1 = new TCanvas("X","Y",1);
   TLegend *leg = new TLegend(0.2,0.80,0.50,0.90,NULL,"brNDC");
 
-  /*
   // data in signal region
   hDphiJJmJJ1200DetaJJ42MET70->Sumw2(); 
   hDphiJJmJJ1200DetaJJ42MET70->GetXaxis()->SetTitle("#Delta#phi_{jj}, rad");
@@ -236,7 +235,6 @@ void Draw()
   t->DrawLatex(2.0,30.,"no E_{T}^{miss} cut");
   c11->SaveAs("dphi_jj.gif");
   c11->SaveAs("dphi_jj.pdf");
-*/
 
   setTDRStyle(0,1,0);
   TCanvas* c2 = new TCanvas("X","Y",1);
@@ -286,35 +284,7 @@ void Draw()
   c2->SaveAs("cjv_eff_vs_dphi.gif");
   c2->SaveAs("cjv_eff_vs_dphi.pdf");
 
-  /*
-  setTDRStyle(0,0,0);
-  TCanvas* c200 = new TCanvas("X","Y",1);
-  TLegend *leg = new TLegend(0.45,0.75,0.65,0.90,NULL,"brNDC");
-  hDphiJJRatioToCJVM24->GetXaxis()->SetTitle("#Delta#phi_{jj}, rad");
-  hDphiJJRatioToCJVM24->GetYaxis()->SetTitle("veto efficiency");
-  hDphiJJRatioToCJVM24->Divide(hDphiJJmJJ1200DetaJJ42jveto24,
-			      hDphiJJmJJ1200DetaJJ42,1.,1.,"");
 
-  hDphiJJRatioToCJVM24->SetMinimum(0.0);
-  hDphiJJRatioToCJVM24->SetMaximum(0.6);
-  hDphiJJRatioToCJVM24->SetMarkerStyle(20);
-  hDphiJJRatioToCJVM24->SetTitleOffset(1.5, "Y");
-  hDphiJJRatioToCJVM24->Draw("E1P");
-
-  hDphiJJRatioToCJV24->Divide(hDphiJJmJJ1200DetaJJ42cjveto24,
-			    hDphiJJmJJ1200DetaJJ42,1.,1.,"");
-  hDphiJJRatioToCJV24->SetMarkerStyle(24);
-  hDphiJJRatioToCJV24->Draw("sameE1P");
-
-  leg->SetFillColor(10);
-  leg->AddEntry(hDphiJJRatioToCJVM24,"data, CJVM","PL");
-  leg->AddEntry(hDphiJJRatioToCJV24,"data, CJV","PL");
-  leg->Draw();
-
-  c200->SaveAs("cjvm_cjv_eff_vs_dphi.gif");
-  */
-
-  /*
   setTDRStyle(0,0,0);
   TCanvas* c1000 = new TCanvas("X","Y",1);
   c1000->Divide(1,2);
@@ -338,33 +308,14 @@ void Draw()
   hDphiJ3JTmJJ1200DetaJJ42S->Draw("hist");
 
   c1000->SaveAs("dphi_j3jtag_min.gif");
-  */
-
-  /*
-  setTDRStyle(0,1,0);
-  TCanvas* c22 = new TCanvas("X","Y",1);
-  TLegend *leg = new TLegend(0.20,0.80,0.70,0.90,NULL,"brNDC");
-  hDphiJJmJJ1200DetaJJ42->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
-  hDphiJJmJJ1200DetaJJ42->GetYaxis()->SetTitle("Nev");
-  hDphiJJmJJ1200DetaJJ42->SetMinimum(100.);
-  hDphiJJmJJ1200DetaJJ42->SetMaximum(200000.);
-  hDphiJJmJJ1200DetaJJ42->SetMarkerStyle(20);
-  hDphiJJmJJ1200DetaJJ42->Draw("E1P");
-
-  leg->SetFillColor(10);
-  leg->AddEntry(hDphiJJmJJ1200DetaJJ42,"data, no cut on E_{T}^{miss}","PL");
-  leg->Draw();
-
-  c22->SaveAs("dphi_example.gif");
-  */
-
+  c1000->SaveAs("dphi_j3jtag_min.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c5 = new TCanvas("X","Y",1);
   c5->SetGrid();
   TLegend *leg = new TLegend(0.60,0.80,0.80,0.90,NULL,"brNDC");
-  TH1F * hCJVS   = new TH1F( "hCJVS", "CJVS", 25, 0.0, 5.0);
-  TH1F * hCJVB   = new TH1F( "hCJVB", "CJVB", 25, 0.0, 5.0);
+  TH1F * hCJVS = new TH1F( "hCJVS", "CJVS", 25, 0.0, 5.0);
+  TH1F * hCJVB = new TH1F( "hCJVB", "CJVB", 25, 0.0, 5.0);
 
   Double_t sum_s = 0;
   Double_t sum_b = 0;
@@ -394,8 +345,8 @@ void Draw()
        <<" normb = " << normb
        <<" sum_b = " << sum_b <<" eff cjv = " << (normb-sum_b)/normb << endl; 
 
-  hCJVB->GetXaxis()->SetTitle("|#eta^{j3}| coverage for CJV");
-  hCJVB->GetYaxis()->SetTitle("efficiency of jet veto, p_{T}^{j3}>30 GeV");
+  hCJVB->GetXaxis()->SetTitle("|#eta^{j3}| coverage for j3");
+  hCJVB->GetYaxis()->SetTitle("efficiency of CJV, p_{T}^{j3}>30 GeV");
   hCJVB->SetMinimum(0.05);
   hCJVB->SetMaximum(2.00);
   hCJVB->SetMarkerStyle(20);
@@ -416,7 +367,6 @@ void Draw()
   c5->SaveAs("cjv_eff_vs_eta.pdf");
 
 
-  /*
   setTDRStyle(0,0,0);
   TCanvas* c6 = new TCanvas("X","Y",1);
   TLegend *leg = new TLegend(0.30,0.75,0.80,0.90,NULL,"brNDC");
@@ -548,9 +498,7 @@ void Draw()
 
   c9->SaveAs("etajs.gif");
   c9->SaveAs("etajs.pdf");
-  */
 
-  /*
   setTDRStyle(0,0,0);
   TCanvas* c100 = new TCanvas("X","Y",1);
   c100->Divide(1,2);
@@ -579,31 +527,7 @@ void Draw()
 
   c100->SaveAs("n_add_jets.gif");
   c100->SaveAs("n_add_jets.pdf");
-  */
 
-  /*
-  setTDRStyle(0,0,0);
-  TCanvas* c10 = new TCanvas("X","Y",1);
-  TLegend *leg = new TLegend(0.30,0.75,0.80,0.90,NULL,"brNDC");
-
-  hEtaJ3S->Sumw2();
-  hEtaJ3B->Sumw2();
-
-  hEtaJ3RatioSovB->Divide(hEtaJ3S, hEtaJ3B, 1., 1.,"");
-  hEtaJ3RatioSovB->GetXaxis()->SetTitle("#eta^{j3}");
-  hEtaJ3RatioSovB->GetYaxis()->SetTitle("Nev(#Delta#phi_{jj}<1.0)/Nev(#Delta#phi_{jj}>2.6)");
-  hEtaJ3RatioSovB->SetMinimum(0.00);
-  hEtaJ3RatioSovB->SetMaximum(0.06);
-  hEtaJ3RatioSovB->SetMarkerStyle(24);
-  hEtaJ3RatioSovB->SetTitleOffset(1.5, "Y");
-  //  hEtaJ3RatioSovB->SetTitleSize(0.05, "X");
-  //  hEtaJ3RatioSovB->SetTitleSize(0.05, "Y");
-  hEtaJ3RatioSovB->Draw("E1P");
-
-  c10->SaveAs("etaj3s_ov_j3b.gif");
-  */
-
-  /*
   // all about QCD method 2
   setTDRStyle(0,1,0);
   TCanvas* c3 = new TCanvas("X","Y",1);
@@ -792,5 +716,64 @@ void Draw()
   ln->Draw();
   c55->SaveAs("mets_ov_metb_shifted.gif");
   c55->SaveAs("mets_ov_metb_shifted.pdf");
-  */
+
+
+  setTDRStyle(0,1,0);
+  TCanvas* c3001 = new TCanvas("X","Y",1);
+
+  hNmuonsInsTagJetsS->GetXaxis()->SetTitle("N muons p_{T}>10 GeV inside tagging jets");
+  hNmuonsInsTagJetsS->GetYaxis()->SetTitle("probability");
+  Double_t scale=1./hNmuonsInsTagJetsS->Integral();
+  hNmuonsInsTagJetsS->Scale(scale);
+  hNmuonsInsTagJetsS->SetMinimum(0.001);
+  hNmuonsInsTagJetsS->SetMaximum(2.000);
+  hNmuonsInsTagJetsS->SetLineStyle(1);
+  hNmuonsInsTagJetsS->SetLineWidth(3);
+  //  hNmuonsInsTagJetsS->SetTitleSize(0.055, "X");
+  hNmuonsInsTagJetsS->Draw("hist");
+
+  scale=1./hNmuonsInsTagJetsB->Integral();
+  hNmuonsInsTagJetsB->Scale(scale);
+  hNmuonsInsTagJetsB->SetLineStyle(2);
+  hNmuonsInsTagJetsB->SetLineWidth(3);
+  hNmuonsInsTagJetsB->Draw("same");
+
+  TLegend *leg = new TLegend(0.50,0.80,0.80,0.90,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hNmuonsInsTagJetsS,"#Delta#phi_{jj}<1.0","PL");
+  leg->AddEntry(hNmuonsInsTagJetsB,"#Delta#phi_{jj}>2.6","PL");
+  leg->Draw();
+
+  c3001->SaveAs("nmuons_injet.gif");
+  c3001->SaveAs("nmuons_injet.pdf");
+
+
+  setTDRStyle(0,1,0);
+  TCanvas* c3002 = new TCanvas("X","Y",1);
+
+  hNmuonsOutTagJetsS->GetXaxis()->SetTitle("N muons p_{T}>10 GeV outside tagging jets");
+  hNmuonsOutTagJetsS->GetYaxis()->SetTitle("probability");
+  Double_t scale=1./hNmuonsOutTagJetsS->Integral();
+  hNmuonsOutTagJetsS->Scale(scale);
+  hNmuonsOutTagJetsS->SetMinimum(0.001);
+  hNmuonsOutTagJetsS->SetMaximum(2.000);
+  hNmuonsOutTagJetsS->SetLineStyle(1);
+  hNmuonsOutTagJetsS->SetLineWidth(3);
+  //  hNmuonsOutTagJetsS->SetTitleSize(0.055, "X");
+  hNmuonsOutTagJetsS->Draw("hist");
+
+  scale=1./hNmuonsOutTagJetsB->Integral();
+  hNmuonsOutTagJetsB->Scale(scale);
+  hNmuonsOutTagJetsB->SetLineStyle(2);
+  hNmuonsOutTagJetsB->SetLineWidth(3);
+  hNmuonsOutTagJetsB->Draw("same");
+
+  TLegend *leg = new TLegend(0.50,0.80,0.80,0.90,NULL,"brNDC");
+  leg->SetFillColor(10);
+  leg->AddEntry(hNmuonsOutTagJetsS,"#Delta#phi_{jj}<1.0","PL");
+  leg->AddEntry(hNmuonsOutTagJetsB,"#Delta#phi_{jj}>2.6","PL");
+  leg->Draw();
+
+  c3002->SaveAs("nmuons_outjet.gif");
+  c3002->SaveAs("nmuons_outjet.pdf");
 }
