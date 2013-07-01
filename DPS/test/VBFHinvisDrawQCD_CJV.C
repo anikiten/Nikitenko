@@ -170,6 +170,10 @@ void Draw()
   TH1F * hEWS = (TH1F*)metRangeTotal_DPhiSIGNAL_noCJV->Clone();
   TH1F * hEWB = (TH1F*)metRangeTotal_DPhiQCD_noCJV->Clone();
 
+  TH1F * hEWSPhi = (TH1F*)metRangeTotal_DPhiSIGNAL_noCJV->Clone();
+  TH1F * hEWBPhi = (TH1F*)metRangeTotal_DPhiQCD_noCJV->Clone();
+
+
   TFile* file = new TFile("VBFHinvisQCDAnalysisV10_Type01MET.root");
   TH1F * hDphiJJMET70RatioToCJV = (TH1F*)hDphiJJmJJ1200DetaJJ42MET70->Clone();
   TH1F * hDphiJJMET70RatioToCJV24 = (TH1F*)hDphiJJmJJ1200DetaJJ42MET70->Clone();
@@ -271,11 +275,13 @@ void Draw()
       sum_phisa += sa;
     }
   }
-
-  cout <<" sum_phisb = " << sum_phisb
-       <<" sum_phisa = " << sum_phisa
-       <<" ev with jet3 = " << sum_phisb-sum_phisa
-       <<" eff cjv = " << sum_phisa/sum_phisb << endl;
+  
+  cout <<" "<< endl;
+  cout <<" ====> Efficiency of CJV from data in Signal region with no MET cut " << endl;
+  cout <<"       Nev before CJV = " << sum_phisb << endl;
+  cout <<"       Nev after  CJV = " << sum_phisa << endl;
+  cout <<"       Eff CJV = " << sum_phisa/sum_phisb << endl;
+  cout <<" " << endl;
 
   leg->SetFillColor(10);
   leg->AddEntry(hDphiJJMET70RatioToCJV,"E_{T}^{miss}>70 GeV, CJV p_{T}^{j3}>30 GeV","PL");
@@ -569,7 +575,6 @@ void Draw()
   c3->SaveAs("met_in_s_and_b.gif");
   c3->SaveAs("met_in_s_and_b.pdf");
 
-
   setTDRStyle(0,1,0);
   TCanvas* c33 = new TCanvas("X","Y",1);
   TLegend *leg = new TLegend(0.50,0.80,0.80,0.90,NULL,"brNDC");
@@ -593,6 +598,62 @@ void Draw()
   leg->AddEntry(hPFMET1mJJ1200DetaJJ42QCDS,"data-EW: #Delta#phi_{jj}<1.0","PL");
   leg->Draw();
 
+  Double_t data_c_metle120 = 0.;
+  Double_t ew_c_metle120 = 0.;
+  Double_t qcd_c_metle120 = 0.;
+
+  Double_t data_c_metge120 = 0.;
+  Double_t ew_c_metge120 = 0.;
+  Double_t qcd_c_metge120 = 0.;
+
+  Double_t data_s_metle130 = 0.;
+  Double_t ew_s_metle130 = 0.;
+  Double_t qcd_s_metle130 = 0.;
+
+  for (Int_t im = 1; im <= 60; im++) {
+
+    if( im <= 23) {
+      Float_t data_c_metle120_im = hPFMET1mJJ1200DetaJJ42B->GetBinContent(im);
+      data_c_metle120 += data_c_metle120_im;
+      Float_t ew_c_metle120_im = hEWB->GetBinContent(im);
+      ew_c_metle120 += ew_c_metle120_im;
+    }
+
+    if( im > 23) {
+      Float_t data_c_metge120_im = hPFMET1mJJ1200DetaJJ42B->GetBinContent(im);
+      data_c_metge120 += data_c_metge120_im;
+      Float_t ew_c_metge120_im = hEWB->GetBinContent(im);
+      ew_c_metge120 += ew_c_metge120_im;
+    }
+    
+    if( im <= 25) {
+      Float_t data_s_metle130_im = hPFMET1mJJ1200DetaJJ42S->GetBinContent(im);
+      data_s_metle130 += data_s_metle130_im;
+      Float_t ew_s_metle130_im = hEWS->GetBinContent(im);
+      ew_s_metle130 += ew_s_metle130_im;
+    }
+  }
+
+  qcd_c_metle120 = data_c_metle120 - ew_c_metle120;
+  qcd_c_metge120 = data_c_metge120 - ew_c_metge120;
+  qcd_s_metle130 = data_s_metle130 - ew_s_metle130;
+
+  cout <<"  =====>  Method 2 for QCD measurement ==== " << endl;
+  cout <<"               Control region  MET < 120 GeV" << endl;
+  cout <<"    data " << data_c_metle120 
+       <<" ew = " << ew_c_metle120 
+       <<" QCD = " << qcd_c_metle120 << endl;
+  cout <<"               Control region  MET > 120 GeV" << endl;
+  cout <<"    data " << data_c_metge120 
+       <<" ew = " << ew_c_metge120 
+       <<" QCD = " << qcd_c_metge120 << endl;
+  cout <<"               Signal region  MET < 130 GeV" << endl;
+  cout <<"    data " << data_s_metle130 
+       <<" ew = " << ew_s_metle130 
+       <<" QCD = " << qcd_s_metle130 << endl;
+  cout <<"               Predicted QCD in signal region MET > 130 GeV " << endl;
+  cout <<"                 " << qcd_s_metle130*(qcd_c_metge120/qcd_c_metle120) << endl;
+
   c33->SaveAs("qcdmet_in_s_and_b.gif");
   c33->SaveAs("qcdmet_in_s_and_b.pdf");
 
@@ -607,8 +668,11 @@ void Draw()
     sums += s;
     if(im <= 23) {sumb += b;}
   }
-  cout <<" s = " << sums <<" sumb = " << sumb 
-       <<" total b = " << hPFMET1mJJ1200DetaJJ42QCDB->Integral() << endl;
+  Double_t qcd_total = hPFMET1mJJ1200DetaJJ42QCDB->Integral();
+  cout <<" QCD in signal region MET < 130 GeV = " << sums 
+       <<" QCD in background region MET < 120 GeV = " << sumb 
+       <<" QCD in background region MET > 120 GeV = " << qcd_total-sumb  
+       <<" total b = " << qcd_total << endl;
   Double_t scale = sums/sumb;
 
   hPFMET1mJJ1200DetaJJ42QCDB->Scale(scale);
@@ -777,4 +841,105 @@ void Draw()
 
   c3002->SaveAs("nmuons_outjet.gif");
   c3002->SaveAs("nmuons_outjet.pdf");
+
+  setTDRStyle(0,0,0);
+  TCanvas* c320 = new TCanvas("X","Y",1);
+  TLegend *leg = new TLegend(0.20,0.70,0.50,0.90,NULL,"brNDC");
+
+  hPFMET1XmJJ1200DetaJJ42S->GetXaxis()->SetTitle("E_{T,x}^{miss}, GeV");
+  hPFMET1XmJJ1200DetaJJ42S->GetYaxis()->SetTitle("Nev");
+  hPFMET1XmJJ1200DetaJJ42S->SetMarkerStyle(20);
+  //  hPFMET1XmJJ1200DetaJJ42S->SetMinimum(1.);
+  hPFMET1XmJJ1200DetaJJ42S->SetMaximum(500.);
+  //  hPFMET1XmJJ1200DetaJJ42S->SetAxisRange(-100.,100.,"X");
+  hPFMET1XmJJ1200DetaJJ42S->Draw("E1P");
+  // normalize b
+  Double_t normalizationb=hPFMET1XmJJ1200DetaJJ42S->Integral()/hPFMET1XmJJ1200DetaJJ42B->Integral();
+  hPFMET1XmJJ1200DetaJJ42B ->Scale(normalizationb);  
+
+  hPFMET1XmJJ1200DetaJJ42B->SetMarkerStyle(24);
+  hPFMET1XmJJ1200DetaJJ42B->Draw("sameE1P");
+
+  leg->SetFillColor(10);
+  leg->AddEntry(hPFMET1XmJJ1200DetaJJ42B,"data: #Delta#phi_{jj}>2.6","PL");
+  leg->AddEntry(hPFMET1XmJJ1200DetaJJ42S,"data: #Delta#phi_{jj}<1.0","PL");
+  leg->Draw();
+
+  c320->SaveAs("metx_comparizon.gif");
+  c320->SaveAs("metx_comparizon.pdf");
+
+
+  setTDRStyle(0,0,0);
+  TCanvas* c444 = new TCanvas("X","Y",1);
+  TLegend *leg = new TLegend(0.40,0.70,0.90,0.90,NULL,"brNDC");
+  Float_t sums = 0;
+  Float_t sumb = 0;
+  for (Int_t im = 1; im <= 25; im++) {
+    Float_t s = hPFMET1mJJ1200DetaJJ42S->GetBinContent(im);
+    Float_t b = hPFMET1mJJ1200DetaJJ42B->GetBinContent(im);
+    sums += s;
+    if(im <= 23) {sumb += b;}
+  }
+  Double_t scale = sums/sumb;
+
+  hPFMET1mJJ1200DetaJJ42B->Scale(scale);
+
+  hPFMET1mJJ1200DetaJJ42B->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
+  hPFMET1mJJ1200DetaJJ42B->GetYaxis()->SetTitle("Nev");
+  hPFMET1mJJ1200DetaJJ42B->SetMinimum(1.);
+  hPFMET1mJJ1200DetaJJ42B->SetMaximum(1000.);
+  hPFMET1mJJ1200DetaJJ42B->SetMarkerStyle(20);
+  hPFMET1mJJ1200DetaJJ42B->Draw("E1P");
+
+  hPFMET1mJJ1200DetaJJ42S->SetMarkerStyle(24);
+  hPFMET1mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
+  hPFMET1mJJ1200DetaJJ42S->Draw("sameE1P");
+
+
+  hPFP4MET20mJJ1200DetaJJ42S->SetMarkerStyle(21);
+  hPFP4MET20mJJ1200DetaJJ42S->SetLineStyle(2);
+  hPFP4MET20mJJ1200DetaJJ42S->SetLineWidth(3);
+  hPFP4MET20mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
+  hPFP4MET20mJJ1200DetaJJ42S->Draw("same");
+
+  hPFP4MET30mJJ1200DetaJJ42S->SetLineStyle(1);
+  hPFP4MET30mJJ1200DetaJJ42S->SetLineWidth(3);
+  hPFP4MET30mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
+  hPFP4MET30mJJ1200DetaJJ42S->Draw("same");
+
+  leg->SetFillColor(10);
+  leg->AddEntry(hPFMET1mJJ1200DetaJJ42B,"QCD control region: #Delta#phi_{jj}>2.6","PL");
+  leg->AddEntry(hPFMET1mJJ1200DetaJJ42S,"Signal region: #Delta#phi_{jj}<1.0","PL");
+  leg->AddEntry(hPFP4MET20mJJ1200DetaJJ42S,"Signal region. E_{T}^{miss}=#Sigma p_{T}^{j}, p_{T}^{j}>20 GeV","L");
+  leg->AddEntry(hPFP4MET30mJJ1200DetaJJ42S,"Signal region. E_{T}^{miss}=#Sigma p_{T}^{j}, p_{T}^{j}>30 GeV","L");
+  leg->Draw();
+
+  c444->SaveAs("met_in_s_and_b_norm.gif");
+  c444->SaveAs("met_in_s_and_b_norm.pdf");
+
+  /*
+  setTDRStyle(0,0,0);
+  TCanvas* c555 = new TCanvas("X","Y",1);
+  TLegend *leg = new TLegend(0.45,0.80,0.95,0.95,NULL,"brNDC");
+
+  hPFMET1mJJ1200DetaJJ42B->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
+  hPFMET1mJJ1200DetaJJ42B->GetYaxis()->SetTitle("Nev");
+  hPFMET1mJJ1200DetaJJ42B->SetMinimum(1.);
+  hPFMET1mJJ1200DetaJJ42B->SetMaximum(1000.);
+  hPFMET1mJJ1200DetaJJ42B->SetMarkerStyle(20);
+  hPFMET1mJJ1200DetaJJ42B->Draw("E1P");
+
+  hPFP4MET30mJJ1200DetaJJ42B->Scale(scale);
+  hPFP4MET30mJJ1200DetaJJ42B->SetLineStyle(1);
+  hPFP4MET30mJJ1200DetaJJ42B->SetLineWidth(3);
+  hPFP4MET30mJJ1200DetaJJ42B->Draw("same");
+
+  leg->SetFillColor(10);
+  leg->AddEntry(hPFMET1mJJ1200DetaJJ42B,"#Delta#phi_{jj}>2.6","PL");
+  leg->AddEntry(hPFP4MET30mJJ1200DetaJJ42B,"#Delta#phi_{jj}>2.6. MET from jets","PL");
+  leg->Draw();
+
+  c555->SaveAs("met_in_b.gif");
+  c555->SaveAs("met_in_b.pdf");
+  */
 }
