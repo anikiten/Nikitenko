@@ -174,7 +174,7 @@ void Draw()
   TH1F * hEWBPhi = (TH1F*)metRangeTotal_DPhiQCD_noCJV->Clone();
 
 
-  TFile* file = new TFile("VBFHinvisQCDAnalysisV10_Type01MET.root");
+  TFile* file = new TFile("VBFHinvisQCDAnalysisV10_Type01MET_L140.root");
   TH1F * hDphiJJMET70RatioToCJV = (TH1F*)hDphiJJmJJ1200DetaJJ42MET70->Clone();
   TH1F * hDphiJJMET70RatioToCJV24 = (TH1F*)hDphiJJmJJ1200DetaJJ42MET70->Clone();
   TH1F * hDphiJJRatioToCJV = (TH1F*)hDphiJJmJJ1200DetaJJ42->Clone();
@@ -213,8 +213,8 @@ void Draw()
   TLatex *t = new TLatex();
   t->SetTextSize(0.042);
   t->DrawLatex(2.0,30.,"E_{T}^{miss}>70 GeV");
-  c1->SaveAs("dphi_jj_met70.gif");
-  c1->SaveAs("dphi_jj_met70.pdf");
+  c1->SaveAs("dphi_jj_met70_l140.gif");
+  c1->SaveAs("dphi_jj_met70_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c11 = new TCanvas("X","Y",1);
@@ -238,8 +238,8 @@ void Draw()
   TLatex *t = new TLatex();
   t->SetTextSize(0.042);
   t->DrawLatex(2.0,30.,"no E_{T}^{miss} cut");
-  c11->SaveAs("dphi_jj.gif");
-  c11->SaveAs("dphi_jj.pdf");
+  c11->SaveAs("dphi_jj_l140.gif");
+  c11->SaveAs("dphi_jj_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c2 = new TCanvas("X","Y",1);
@@ -288,8 +288,8 @@ void Draw()
   leg->AddEntry(hDphiJJRatioToCJV,"no E_{T}^{miss}, CJV p_{T}^{j3}>30 GeV","PL");
   leg->Draw();
 
-  c2->SaveAs("cjv_eff_vs_dphi.gif");
-  c2->SaveAs("cjv_eff_vs_dphi.pdf");
+  c2->SaveAs("cjv_eff_vs_dphi_l140.gif");
+  c2->SaveAs("cjv_eff_vs_dphi_l140.pdf");
 
 
   setTDRStyle(0,0,0);
@@ -314,8 +314,8 @@ void Draw()
   hDphiJ3JTmJJ1200DetaJJ42S->SetLabelSize(0.06, "X");
   hDphiJ3JTmJJ1200DetaJJ42S->Draw("hist");
 
-  c1000->SaveAs("dphi_j3jtag_min.gif");
-  c1000->SaveAs("dphi_j3jtag_min.pdf");
+  c1000->SaveAs("dphi_j3jtag_min_l140.gif");
+  c1000->SaveAs("dphi_j3jtag_min_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c5 = new TCanvas("X","Y",1);
@@ -370,8 +370,8 @@ void Draw()
   leg->AddEntry(hCJVS,"#Delta#phi_{jj}<1.0","PL");
   leg->Draw();
 
-  c5->SaveAs("cjv_eff_vs_eta.gif");
-  c5->SaveAs("cjv_eff_vs_eta.pdf");
+  c5->SaveAs("cjv_eff_vs_eta_l140.gif");
+  c5->SaveAs("cjv_eff_vs_eta_l140.pdf");
 
 
   setTDRStyle(0,0,0);
@@ -404,8 +404,8 @@ void Draw()
   leg->AddEntry(hPtJ3B,"leading p_{T} non tagging jet","L");
   leg->Draw();
 
-  c6->SaveAs("ptjb.gif");
-  c6->SaveAs("ptjb.pdf");
+  c6->SaveAs("ptjb_l140.gif");
+  c6->SaveAs("ptjb_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c7 = new TCanvas("X","Y",1);
@@ -437,8 +437,8 @@ void Draw()
   leg->AddEntry(hEtaJ3B,"leading p_{T} non tagging jet","L");
   leg->Draw();
 
-  c7->SaveAs("etajb.gif");
-  c7->SaveAs("etajb.pdf");
+  c7->SaveAs("etajb_l140.gif");
+  c7->SaveAs("etajb_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c8 = new TCanvas("X","Y",1);
@@ -470,8 +470,8 @@ void Draw()
   leg->AddEntry(hPtJ3S,"leading p_{T} non tagging jet","L");
   leg->Draw();
 
-  c8->SaveAs("ptjs.gif");
-  c8->SaveAs("ptjs.pdf");
+  c8->SaveAs("ptjs_l140.gif");
+  c8->SaveAs("ptjs_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c9 = new TCanvas("X","Y",1);
@@ -503,8 +503,8 @@ void Draw()
   leg->AddEntry(hEtaJ3S,"leading p_{T} non tagging jet","L");
   leg->Draw();
 
-  c9->SaveAs("etajs.gif");
-  c9->SaveAs("etajs.pdf");
+  c9->SaveAs("etajs_l140.gif");
+  c9->SaveAs("etajs_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c100 = new TCanvas("X","Y",1);
@@ -532,8 +532,8 @@ void Draw()
   hNAddJetsS->SetLabelSize(0.06, "X");
   hNAddJetsS->Draw("hist");
 
-  c100->SaveAs("n_add_jets.gif");
-  c100->SaveAs("n_add_jets.pdf");
+  c100->SaveAs("n_add_jets_l140.gif");
+  c100->SaveAs("n_add_jets_l140.pdf");
 
   // all about QCD method 2
   setTDRStyle(0,1,0);
@@ -572,8 +572,8 @@ void Draw()
        <<" B data = " << hPFMET1mJJ1200DetaJJ42B->Integral()
        <<" B EW = " << hEWB->Integral() << endl;
 
-  c3->SaveAs("met_in_s_and_b.gif");
-  c3->SaveAs("met_in_s_and_b.pdf");
+  c3->SaveAs("met_in_s_and_b_l140.gif");
+  c3->SaveAs("met_in_s_and_b_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c33 = new TCanvas("X","Y",1);
@@ -654,8 +654,8 @@ void Draw()
   cout <<"               Predicted QCD in signal region MET > 130 GeV " << endl;
   cout <<"                 " << qcd_s_metle130*(qcd_c_metge120/qcd_c_metle120) << endl;
 
-  c33->SaveAs("qcdmet_in_s_and_b.gif");
-  c33->SaveAs("qcdmet_in_s_and_b.pdf");
+  c33->SaveAs("qcdmet_in_s_and_b_l140.gif");
+  c33->SaveAs("qcdmet_in_s_and_b_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c4 = new TCanvas("X","Y",1);
@@ -713,8 +713,8 @@ void Draw()
   leg->AddEntry(hPFMET1mJJ1200DetaJJ42QCDS,"data-EW: #Delta#phi_{jj}<1.0","PL");
   leg->Draw();
 
-  c4->SaveAs("qcdmet_in_s_and_b_norm.gif");
-  c4->SaveAs("qcdmet_in_s_and_b_norm.pdf");
+  c4->SaveAs("qcdmet_in_s_and_b_norm_l140.gif");
+  c4->SaveAs("qcdmet_in_s_and_b_norm_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c44 = new TCanvas("X","Y",1);
@@ -737,8 +737,8 @@ void Draw()
   leg->AddEntry(hPFMET1mJJ1200DetaJJ42QCDS,"data-EW: #Delta#phi_{jj}<1.0","PL");
   leg->Draw();
 
-  c44->SaveAs("qcdmet_in_s_and_b_norm_shifted.gif");
-  c44->SaveAs("qcdmet_in_s_and_b_norm_shifted.pdf");
+  c44->SaveAs("qcdmet_in_s_and_b_norm_shifted_l140.gif");
+  c44->SaveAs("qcdmet_in_s_and_b_norm_shifted_l140.pdf");
 
   cout <<" =============> QCD calculations using MET shapes =========" << endl;
 
@@ -779,8 +779,8 @@ void Draw()
   ln = new TLine(20.,1.,130.,1.);
   ln->SetLineWidth(1);
   ln->Draw();
-  c55->SaveAs("mets_ov_metb_shifted.gif");
-  c55->SaveAs("mets_ov_metb_shifted.pdf");
+  c55->SaveAs("mets_ov_metb_shifted_l140.gif");
+  c55->SaveAs("mets_ov_metb_shifted_l140.pdf");
 
 
   setTDRStyle(0,1,0);
@@ -809,8 +809,8 @@ void Draw()
   leg->AddEntry(hNmuonsInsTagJetsB,"#Delta#phi_{jj}>2.6","PL");
   leg->Draw();
 
-  c3001->SaveAs("nmuons_injet.gif");
-  c3001->SaveAs("nmuons_injet.pdf");
+  c3001->SaveAs("nmuons_injet_l140.gif");
+  c3001->SaveAs("nmuons_injet_l140.pdf");
 
 
   setTDRStyle(0,1,0);
@@ -839,11 +839,11 @@ void Draw()
   leg->AddEntry(hNmuonsOutTagJetsB,"#Delta#phi_{jj}>2.6","PL");
   leg->Draw();
 
-  c3002->SaveAs("nmuons_outjet.gif");
-  c3002->SaveAs("nmuons_outjet.pdf");
+  c3002->SaveAs("nmuons_outjet_l140.gif");
+  c3002->SaveAs("nmuons_outjet_l140.pdf");
 
 
-  setTDRStyle(0,0,0);
+  setTDRStyle(0,1,0);
   TCanvas* c444 = new TCanvas("X","Y",1);
   TLegend *leg = new TLegend(0.40,0.70,0.90,0.90,NULL,"brNDC");
   Float_t sums = 0;
@@ -856,128 +856,95 @@ void Draw()
   }
   Double_t scale = sums/sumb;
 
+  hPFMET1mJJ1200DetaJJ42B->Sumw2();
   hPFMET1mJJ1200DetaJJ42B->Scale(scale);
 
-  hPFMET1mJJ1200DetaJJ42B->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
+  hPFMET1mJJ1200DetaJJ42B->GetXaxis()->SetTitle("E_{T}^{miss}, GeV. Events from L1ETM40 pre-scaled");
   hPFMET1mJJ1200DetaJJ42B->GetYaxis()->SetTitle("Nev");
-  hPFMET1mJJ1200DetaJJ42B->SetMinimum(1.);
-  hPFMET1mJJ1200DetaJJ42B->SetMaximum(1000.);
+  hPFMET1mJJ1200DetaJJ42B->SetMinimum(0.01);
+  //  hPFMET1mJJ1200DetaJJ42B->SetMaximum(1000.);
   hPFMET1mJJ1200DetaJJ42B->SetMarkerStyle(20);
   hPFMET1mJJ1200DetaJJ42B->Draw("E1P");
 
   hPFMET1mJJ1200DetaJJ42S->SetMarkerStyle(24);
   hPFMET1mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
   hPFMET1mJJ1200DetaJJ42S->Draw("sameE1P");
-
-
-  hPFP4MET20mJJ1200DetaJJ42S->SetMarkerStyle(21);
-  hPFP4MET20mJJ1200DetaJJ42S->SetLineStyle(2);
-  hPFP4MET20mJJ1200DetaJJ42S->SetLineWidth(3);
-  hPFP4MET20mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
-  hPFP4MET20mJJ1200DetaJJ42S->Draw("same");
-
-  hPFP4MET30mJJ1200DetaJJ42S->SetLineStyle(1);
-  hPFP4MET30mJJ1200DetaJJ42S->SetLineWidth(3);
-  hPFP4MET30mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
-  hPFP4MET30mJJ1200DetaJJ42S->Draw("same");
 
   leg->SetFillColor(10);
   leg->AddEntry(hPFMET1mJJ1200DetaJJ42B,"QCD control region: #Delta#phi_{jj}>2.6","PL");
   leg->AddEntry(hPFMET1mJJ1200DetaJJ42S,"Signal region: #Delta#phi_{jj}<1.0","PL");
-  leg->AddEntry(hPFP4MET20mJJ1200DetaJJ42S,"Signal region. E_{T}^{miss}=#Sigma p_{T}^{j}, p_{T}^{j}>20 GeV","L");
-  leg->AddEntry(hPFP4MET30mJJ1200DetaJJ42S,"Signal region. E_{T}^{miss}=#Sigma p_{T}^{j}, p_{T}^{j}>30 GeV","L");
   leg->Draw();
 
-  c444->SaveAs("met_in_s_and_b_norm.gif");
-  c444->SaveAs("met_in_s_and_b_norm.pdf");
-
-  setTDRStyle(0,0,0);
-  TCanvas* c555 = new TCanvas("X","Y",1);
-  TLegend *leg = new TLegend(0.45,0.80,0.95,0.95,NULL,"brNDC");
-
-  hPFMET1mJJ1200DetaJJ42B->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
-  hPFMET1mJJ1200DetaJJ42B->GetYaxis()->SetTitle("Nev");
-  hPFMET1mJJ1200DetaJJ42B->SetMinimum(1.);
-  hPFMET1mJJ1200DetaJJ42B->SetMaximum(1000.);
-  hPFMET1mJJ1200DetaJJ42B->SetMarkerStyle(20);
-  hPFMET1mJJ1200DetaJJ42B->Draw("E1P");
-
-  hPFMET1mJJ1200DetaJJ42S->SetMarkerStyle(24);
-  hPFMET1mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
-  hPFMET1mJJ1200DetaJJ42S->Draw("sameE1P");
-
-  hPFnewMET1mJJ1200DetaJJ42S->SetLineStyle(1);
-  hPFnewMET1mJJ1200DetaJJ42S->SetLineWidth(3);
-  hPFnewMET1mJJ1200DetaJJ42S->SetAxisRange(0.,125.,"X");
-  hPFnewMET1mJJ1200DetaJJ42S->Draw("same");
-
-  leg->SetFillColor(10);
-  leg->AddEntry(hPFMET1mJJ1200DetaJJ42B,"#Delta#phi_{jj}>2.6","PL");
-  leg->AddEntry(hPFMET1mJJ1200DetaJJ42S,"#Delta#phi_{jj}<1.0","PL");
-  leg->Draw();
-
-  c555->SaveAs("metnew.gif");
-  c555->SaveAs("metnew.pdf");
+  c444->SaveAs("met_in_s_and_b_norm_l140.gif");
+  c444->SaveAs("met_in_s_and_b_norm_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c320 = new TCanvas("X","Y",1);
-  TLegend *leg = new TLegend(0.20,0.80,0.50,0.90,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.20,0.80,0.60,0.90,NULL,"brNDC");
 
-  hPFMET1XmJJ1200DetaJJ42S->GetXaxis()->SetTitle("E_{T,x}^{miss}, GeV");
+  hPFMET1XmJJ1200DetaJJ42S->GetXaxis()->SetTitle("E_{T,x}^{miss}, GeV. Events from L1ETM40 pre-scaled");
   hPFMET1XmJJ1200DetaJJ42S->GetYaxis()->SetTitle("Nev");
   hPFMET1XmJJ1200DetaJJ42S->SetMarkerStyle(20);
   //  hPFMET1XmJJ1200DetaJJ42S->SetMinimum(1.);
-  hPFMET1XmJJ1200DetaJJ42S->SetMaximum(500.);
-  hPFMET1XmJJ1200DetaJJ42S->SetAxisRange(-60.,200.,"X");
+  hPFMET1XmJJ1200DetaJJ42S->SetMaximum(50.);
+  hPFMET1XmJJ1200DetaJJ42S->SetAxisRange(-100.,100.,"X");
+  hPFMET1XmJJ1200DetaJJ42S->Fit("gaus","R","",-30.,50.);
   hPFMET1XmJJ1200DetaJJ42S->Draw("E1P");
   hPFMET1XmJJ1200DetaJJ42B->Sumw2();
   hPFMET1XmJJ1200DetaJJ42B->Scale(scale);  
 
-  hPFMET1XmJJ1200DetaJJ42B->SetMarkerStyle(24);
-  hPFMET1XmJJ1200DetaJJ42B->Draw("sameE1P");
+  //  hPFMET1XmJJ1200DetaJJ42B->SetMarkerStyle(20);
+  hPFMET1XmJJ1200DetaJJ42B->SetLineStyle(1);
+  hPFMET1XmJJ1200DetaJJ42B->SetLineWidth(3);
+  hPFMET1XmJJ1200DetaJJ42B->Fit("gaus","R","same",-30.,50.);
+  hPFMET1XmJJ1200DetaJJ42B->Draw("samehist");
 
   leg->SetFillColor(10);
-  leg->AddEntry(hPFMET1XmJJ1200DetaJJ42B,"data norm: #Delta#phi_{jj}>2.6","PL");
   leg->AddEntry(hPFMET1XmJJ1200DetaJJ42S,"data: #Delta#phi_{jj}<1.0","PL");
+  leg->AddEntry(hPFMET1XmJJ1200DetaJJ42B,"data norm.: #Delta#phi_{jj}>2.6","L");
   leg->Draw();
 
-  c320->SaveAs("metx_comparizon.gif");
-  c320->SaveAs("metx_comparizon.pdf");
+  c320->SaveAs("metx_comparizon_l140.gif");
+  c320->SaveAs("metx_comparizon_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c321 = new TCanvas("X","Y",1);
-  TLegend *leg = new TLegend(0.20,0.80,0.50,0.90,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.20,0.80,0.60,0.90,NULL,"brNDC");
 
-  hPFMET1YmJJ1200DetaJJ42S->GetXaxis()->SetTitle("E_{T,y}^{miss}, GeV");
+  hPFMET1YmJJ1200DetaJJ42S->GetXaxis()->SetTitle("E_{T,y}^{miss}, GeV. Events from L1ETM40 pre-scaled");
   hPFMET1YmJJ1200DetaJJ42S->GetYaxis()->SetTitle("Nev");
   hPFMET1YmJJ1200DetaJJ42S->SetMarkerStyle(20);
   //  hPFMET1YmJJ1200DetaJJ42S->SetMinimum(1.);
-  hPFMET1YmJJ1200DetaJJ42S->SetMaximum(500.);
-  hPFMET1YmJJ1200DetaJJ42S->SetAxisRange(-200.,60.,"X");
+  hPFMET1YmJJ1200DetaJJ42S->SetMaximum(50.);
+  hPFMET1YmJJ1200DetaJJ42S->SetAxisRange(-100.,100.,"X");
+  hPFMET1YmJJ1200DetaJJ42S->Fit("gaus","R","",-50.,30.);
   hPFMET1YmJJ1200DetaJJ42S->Draw("E1P");
   hPFMET1YmJJ1200DetaJJ42B->Sumw2();
   hPFMET1YmJJ1200DetaJJ42B->Scale(scale);  
 
-  hPFMET1YmJJ1200DetaJJ42B->SetMarkerStyle(24);
-  hPFMET1YmJJ1200DetaJJ42B->Draw("sameE1P");
+  //  hPFMET1YmJJ1200DetaJJ42B->SetMarkerStyle(20);
+  hPFMET1YmJJ1200DetaJJ42B->SetLineStyle(1);
+  hPFMET1YmJJ1200DetaJJ42B->SetLineWidth(3);
+  hPFMET1YmJJ1200DetaJJ42B->Fit("gaus","R","same",-50.,30.);
+  hPFMET1YmJJ1200DetaJJ42B->Draw("samehist");
 
   leg->SetFillColor(10);
-  leg->AddEntry(hPFMET1YmJJ1200DetaJJ42B,"data norm.: #Delta#phi_{jj}>2.6","PL");
   leg->AddEntry(hPFMET1YmJJ1200DetaJJ42S,"data: #Delta#phi_{jj}<1.0","PL");
+  leg->AddEntry(hPFMET1YmJJ1200DetaJJ42B,"data norm.: #Delta#phi_{jj}>2.6","L");
   leg->Draw();
 
-  c321->SaveAs("mety_comparizon.gif");
-  c321->SaveAs("mety_comparizon.pdf");
+  c321->SaveAs("mety_comparizon_l140.gif");
+  c321->SaveAs("mety_comparizon_l140.pdf");
 
   setTDRStyle(0,0,0);
   TCanvas* c322 = new TCanvas("X","Y",1);
   TLegend *leg = new TLegend(0.20,0.80,0.60,0.90,NULL,"brNDC");
 
-  hPFHTmJJ1200DetaJJ42S->GetXaxis()->SetTitle("HT=#Sigma p_{T}^{j}, p_{T}^{j}>20 GeV [GeV]");
+  hPFHTmJJ1200DetaJJ42S->GetXaxis()->SetTitle("HT=#Sigma p_{T}^{j}, p_{T}^{j}>20 GeV [GeV]; Events from L1ETM40 pre-scaled");
   hPFHTmJJ1200DetaJJ42S->GetYaxis()->SetTitle("Nev");
   hPFHTmJJ1200DetaJJ42S->SetMarkerStyle(20);
   //  hPFHTmJJ1200DetaJJ42S->SetMinimum(1.);
-  hPFHTmJJ1200DetaJJ42S->SetMaximum(1000.);
+  hPFHTmJJ1200DetaJJ42S->SetMaximum(50.);
   hPFHTmJJ1200DetaJJ42S->Draw("E1P");
 
   hPFHTmJJ1200DetaJJ42B->Sumw2();
@@ -991,24 +958,24 @@ void Draw()
   leg->AddEntry(hPFHTmJJ1200DetaJJ42S,"data: #Delta#phi_{jj}<1.0","PL");
   leg->Draw();
 
-  c322->SaveAs("ht_comparizon.gif");
-  c322->SaveAs("ht_comparizon.pdf");
+  c322->SaveAs("ht_comparizon_l140.gif");
+  c322->SaveAs("ht_comparizon_l140.pdf");
 
   setTDRStyle(0,1,0);
   TCanvas* c323 = new TCanvas("X","Y",1);
   TLegend *leg = new TLegend(0.20,0.80,0.60,0.90,NULL,"brNDC");
 
-  hDphiMETJJ->GetXaxis()->SetTitle("#Delta#phi(E_{T}^{miss}-p_{T}^{j1+j2}), rad");
+  hDphiMETJJ->GetXaxis()->SetTitle("#Delta#phi(E_{T}^{miss}-p_{T}^{j1+j2}), rad; Events from L1ETM40 pre-scaled");
   hDphiMETJJ->GetYaxis()->SetTitle("Nev");
   hDphiMETJJ->SetMarkerStyle(20);
   hDphiMETJJ->SetMinimum(1.);
-  hDphiMETJJ->SetMaximum(10000.);
+  hDphiMETJJ->SetMaximum(100.);
   hDphiMETJJ->Draw("E1P");
 
   leg->SetFillColor(10);
   leg->AddEntry(hDphiMETJJ,"data: #Delta#phi_{jj}<1.0","PL");
   leg->Draw();
 
-  c323->SaveAs("dphi_metjj.gif");
-  c323->SaveAs("dphi_metjj.pdf");
+  c323->SaveAs("dphi_metjj_l140.gif");
+  c323->SaveAs("dphi_metjj_l140.pdf");
 }
