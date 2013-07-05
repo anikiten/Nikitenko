@@ -67,6 +67,7 @@ private:
   // names of modules, producing object collections
   edm::InputTag partonjetsSrc; 
   // variables to store in ntpl
+  double mhl, mhc;
   double ptb1, etab1, phib1;
   double ptb2, etab2, phib2;
   double ptmu, etamu, phimu;
@@ -97,6 +98,8 @@ mssm_2tau2b::beginJob()
 
   t1 = new TTree("t1","analysis tree");
 
+  t1->Branch("mhl",&mhl,"mhl/D");
+  t1->Branch("mhc",&mhc,"mhc/D");
   t1->Branch("ptb1",&ptb1,"ptb1/D");
   t1->Branch("etab1",&etab1,"etab1/D");
   t1->Branch("phib1",&phib1,"phib1/D");
@@ -163,6 +166,8 @@ mssm_2tau2b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
+  mhl     = 0.;
+  mhc     = 0.;
   ptb1    = 0.; 
   etab1   = 0.; 
   phib1   = 0.;
@@ -207,6 +212,9 @@ mssm_2tau2b::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( size_t i = 0; i < genparticles->size(); i++)
     {
       const reco::GenParticle & p = (*genparticles)[i];
+      
+      if(p.pdgId() == 35) {mhc = p.mass();}
+      if(p.pdgId() == 25) {mhl = p.mass();}
 
       int motherID = 0;
       int motherSt = 0;

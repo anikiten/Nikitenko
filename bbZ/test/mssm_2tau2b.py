@@ -39,7 +39,7 @@ from GeneratorInterface.ExternalDecays.TauolaSettings_cff import *
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100000)
+    input = cms.untracked.int32(1000)
 )
 
 # Input source
@@ -88,14 +88,14 @@ process.load("RecoJets.JetProducers.ak5GenJets_cfi")
 process.ak5PartonJets  =  process.ak5GenJets.clone()
 process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 
-process.nmssmanalysis = cms.EDAnalyzer("mssm_2tau2b",
+process.mssmanalysis = cms.EDAnalyzer("mssm_2tau2b",
     HistOutFile = cms.untracked.string('mssm_2tau2b_mH300.root'),
     parton_jets = cms.InputTag("ak5PartonJets")
 )
 
 process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     pythiaHepMCVerbosity = cms.untracked.bool(False),
-    maxEventsToPrint = cms.untracked.int32(0),
+    maxEventsToPrint = cms.untracked.int32(4),
     pythiaPylistVerbosity = cms.untracked.int32(1),
     filterEfficiency = cms.untracked.double(1.0),
     comEnergy = cms.double(7000.0),
@@ -103,12 +103,12 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     ExternalDecays = cms.PSet(
         Tauola = cms.untracked.PSet(
             TauolaPolar,
-#            TauolaDefaultInputCards
-	     InputCards = cms.PSet(
-               pjak1 = cms.int32(0),
-               pjak2 = cms.int32(0),
-               mdtau = cms.int32(116)
-             )
+	    TauolaDefaultInputCards
+#	      InputCards = cms.PSet(
+#                pjak1 = cms.int32(0),
+#                pjak2 = cms.int32(0),
+#                mdtau = cms.int32(116)
+#             )
         ),
         parameterSets = cms.vstring('Tauola')
     ),
@@ -116,7 +116,7 @@ process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     PythiaParameters = cms.PSet(
         pythiaUESettingsBlock,
         processParameters = cms.vstring('MSEL=0         ! User defined processes',
-            'MSUB(152)= 1   ! gg->QQbarH (MSSM)', 
+            'MSUB(152)= 1   ! gg->H (MSSM)', 
             # MSSM settings
             'IMSS(4)= 2     ! masses fixed by user',
             'RMSS(5)= 30.   ! tan beta', 
@@ -328,9 +328,9 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 # Schedule definition
 # process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step)
 
-#process.an = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.nmssmanalysis)
+#process.an = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.mssmanalysis)
 
-process.an = cms.Path(process.nmssmanalysis)
+process.an = cms.Path(process.mssmanalysis)
 
 process.schedule = cms.Schedule(process.generation_step,process.an)
 
