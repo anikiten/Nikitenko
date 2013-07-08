@@ -660,8 +660,7 @@ void Draw()
   c33->SaveAs("qcdmet_in_s_and_b.gif");
   c33->SaveAs("qcdmet_in_s_and_b.pdf");
 
-  /*
-  setTDRStyle(0,1,0);
+  setTDRStyle(0,0,0);
 
   TCanvas* c34 = new TCanvas("X","Y",1);
   hPFMET1mJJ1200DetaJJ42QCDB->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
@@ -678,9 +677,14 @@ void Draw()
   f1->SetParameter(0,10.);
   f1->Draw("");
 
+  TF1 *f2 = new TF1("f2","0.5*(TMath::Erf(0.05*(x-80))+1)*(1/([0]*[0]))*x*exp(-x*x/(2*[0]*[0]))",0.,150.);
+  //   f2->SetMinimum(0.00001);
+  //  f2->SetMaximum(1.0);
+  f2->SetParameter(0,10.);
+  f2->Draw("");
+
   //  hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
   c34->SaveAs("qcdmetfit_in_s_and_b.pdf");
-  */
 
   /*
   setTDRStyle(0,1,0);
