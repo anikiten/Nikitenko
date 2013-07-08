@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("RECO3")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
@@ -19,7 +19,7 @@ process.ak5PartonJets  =  process.ak5GenJets.clone()
 process.ak5PartonJets.src = cms.InputTag("genParticlesForPartonJets")
 
 
-process.GlobalTag.globaltag = cms.string('START44_V9B::All')
+process.GlobalTag.globaltag = cms.string('START53_V22::All')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
@@ -35,11 +35,11 @@ fileNames = cms.untracked.vstring(
 )
 
 
-process.bbhanalysis = cms.EDAnalyzer("DYjets",
-    HistOutFile = cms.untracked.string('dymadgraph.root'),
+process.dyjjanalysis = cms.EDAnalyzer("DYjets",
+    HistOutFile = cms.untracked.string('dymadgraph8tev.root'),
 #    HistOutFile = cms.untracked.string('dysherpa.root'),
-#    parton_jets = cms.InputTag("ak5PartonJets")
-    parton_jets = cms.InputTag("ak5GenJets")
+    parton_jets = cms.InputTag("ak5PartonJets")
+#    parton_jets = cms.InputTag("ak5GenJets")
 )
 
 # JPTjetsL2L3 = cms.InputTag("ak5JPTJetsL2L3"),
@@ -49,8 +49,8 @@ process.bbhanalysis = cms.EDAnalyzer("DYjets",
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")
 
-# process.p1 = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.bbhanalysis)
+process.p1 = cms.Path(process.genParticlesForPartonJets*process.ak5PartonJets*process.dyjjanalysis)
 
-process.p1 = cms.Path(process.bbhanalysis)
+# process.p1 = cms.Path(process.bbhanalysis)
 
 # process.p1 = cms.Path(process.dump)
