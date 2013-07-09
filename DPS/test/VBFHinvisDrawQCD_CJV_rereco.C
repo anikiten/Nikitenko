@@ -660,28 +660,41 @@ void Draw()
   c33->SaveAs("qcdmet_in_s_and_b.gif");
   c33->SaveAs("qcdmet_in_s_and_b.pdf");
 
-  setTDRStyle(0,0,0);
+  setTDRStyle(0,1,0);
 
   TCanvas* c34 = new TCanvas("X","Y",1);
   hPFMET1mJJ1200DetaJJ42QCDB->GetXaxis()->SetTitle("E_{T}^{miss}, GeV");
   hPFMET1mJJ1200DetaJJ42QCDB->GetYaxis()->SetTitle("Nev");
   Double_t scale = 1./hPFMET1mJJ1200DetaJJ42QCDB->Integral();
   hPFMET1mJJ1200DetaJJ42QCDB->Scale(scale);
-  hPFMET1mJJ1200DetaJJ42QCDB->SetMinimum(0.00001);
-  hPFMET1mJJ1200DetaJJ42QCDB->SetMaximum(1.0);
+  hPFMET1mJJ1200DetaJJ42QCDB->SetMinimum(0.0001);
+  hPFMET1mJJ1200DetaJJ42QCDB->SetMaximum(0.5);
   hPFMET1mJJ1200DetaJJ42QCDB->SetMarkerStyle(20);
+  //  hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
 
+  /*
   TF1 *f1 = new TF1("f1","(1/([0]*[0]))*x*exp(-x*x/(2*[0]*[0]))",0.,150.);
-  f1->SetMinimum(0.00001);
-  f1->SetMaximum(1.0);
-  f1->SetParameter(0,10.);
+  //  f1->SetMinimum(0.00001);
+  //  f1->SetMaximum(1.0);
+  f1->SetParameter(0,20.);
   f1->Draw("");
 
-  TF1 *f2 = new TF1("f2","0.5*(TMath::Erf(0.05*(x-80))+1)*(1/([0]*[0]))*x*exp(-x*x/(2*[0]*[0]))",0.,150.);
-  //   f2->SetMinimum(0.00001);
+  */
+
+  //  TF1 *f2 = new TF1("f2","0.5*(TMath::Erf(0.03*(x-80))+1)",0.,150.);
+
+  //  TF1 *f2 = new TF1("f2","[0]*0.5*(TMath::Erf([1]*(x-[2]))+1)*(1/([3]*[3]))*x*exp(-x*x/(2*[3]*[3]))",0.,150.);
+  TF1 *f2 = new TF1("f2","[0]*0.5*(TMath::Erf([1]*(x-[2]))+1)*(1/([3]*[3]))*x*exp(-x*x/(2*[3]*[3]))",0.,150.);
+  //f2->SetMinimum(0.00001);
   //  f2->SetMaximum(1.0);
-  f2->SetParameter(0,10.);
-  f2->Draw("");
+  f2->SetParameter(0,100);
+  f2->SetParameter(1,0.03);
+  f2->SetParameter(2,80);
+  f2->SetParameter(3,32);
+  //  f2->Draw("");
+
+  hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
+  hPFMET1mJJ1200DetaJJ42QCDB->Fit("f2","R","same",30.,120.);
 
   //  hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
   c34->SaveAs("qcdmetfit_in_s_and_b.pdf");
