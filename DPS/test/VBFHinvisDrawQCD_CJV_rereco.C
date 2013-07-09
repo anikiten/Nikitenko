@@ -667,7 +667,7 @@ void Draw()
   hPFMET1mJJ1200DetaJJ42QCDB->GetYaxis()->SetTitle("Nev");
   Double_t scale = 1./hPFMET1mJJ1200DetaJJ42QCDB->Integral();
   hPFMET1mJJ1200DetaJJ42QCDB->Scale(scale);
-  hPFMET1mJJ1200DetaJJ42QCDB->SetMinimum(0.0001);
+  hPFMET1mJJ1200DetaJJ42QCDB->SetMinimum(0.00001);
   hPFMET1mJJ1200DetaJJ42QCDB->SetMaximum(0.5);
   hPFMET1mJJ1200DetaJJ42QCDB->SetMarkerStyle(20);
   //  hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
@@ -685,16 +685,39 @@ void Draw()
 
   //  TF1 *f2 = new TF1("f2","[0]*0.5*(TMath::Erf([1]*(x-[2]))+1)*(1/([3]*[3]))*x*exp(-x*x/(2*[3]*[3]))",0.,150.);
   TF1 *f2 = new TF1("f2","[0]*0.5*(TMath::Erf([1]*(x-[2]))+1)*(1/([3]*[3]))*x*exp(-x*x/(2*[3]*[3]))",0.,150.);
-  //f2->SetMinimum(0.00001);
-  //  f2->SetMaximum(1.0);
+  Double_t par[4];
   f2->SetParameter(0,100);
   f2->SetParameter(1,0.03);
   f2->SetParameter(2,80);
   f2->SetParameter(3,32);
-  //  f2->Draw("");
-
   hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
-  hPFMET1mJJ1200DetaJJ42QCDB->Fit("f2","R","same",30.,120.);
+  f2->SetLineWidth(2);
+  f2->SetLineStyle(1);
+  hPFMET1mJJ1200DetaJJ42QCDB->Fit("f2","R","same",30.,130.);
+  f2->GetParameters(&par[0]);
+  cout <<" ===========> Parameters from Control Region Fit <============"<< endl;
+  cout <<" Parameters " << par[0] <<" "<< par[1] <<" "<< par[2] <<" " << par[3] << endl;
+
+  TF1 *f3 = new TF1("f3","[0]*0.5*(TMath::Erf([1]*(x-[2]-13))+1)*(1/([3]*[3]))*(x-13)*exp(-(x-13)*(x-13)/(2*[3]*[3]))",30.,130.);
+
+  f3->SetParameter(0,par[0]);
+  f3->SetParameter(1,par[1]);
+  f3->SetParameter(2,par[2]);
+  f3->SetParameter(3,par[3]);
+
+  f3->Draw("same");
+
+  hPFMET1mJJ1200DetaJJ42QCDS->Scale(1./qcd_s_metle130);
+  hPFMET1mJJ1200DetaJJ42QCDS->SetMarkerStyle(24);
+  hPFMET1mJJ1200DetaJJ42QCDS->SetAxisRange(0.,125.,"X");
+  hPFMET1mJJ1200DetaJJ42QCDS->Draw("sameE1P");
+  f2->SetLineStyle(1);
+  hPFMET1mJJ1200DetaJJ42QCDS->Fit("f2","R","same",30.,130.);
+
+  f2->GetParameters(&par[0]);
+
+  cout <<" ===========> Parameters from Signal Region Fit <============"<< endl;
+  cout <<" Parameters " << par[0] <<" "<< par[1] <<" "<< par[2] <<" " << par[3] << endl;
 
   //  hPFMET1mJJ1200DetaJJ42QCDB->Draw("E1P");
   c34->SaveAs("qcdmetfit_in_s_and_b.pdf");
