@@ -158,6 +158,8 @@ private:
   edm::InputTag muonsSrc;
   // raw calo jet ID map
   edm::InputTag jetsIDSrc;
+  // gen jets
+  edm::InputTag genjetsSrc; 
   // calo jets
   edm::InputTag calojetsSrc; 
   // JPT jets raw
@@ -206,6 +208,10 @@ private:
   std::vector<double> *eltrkisol;
   std::vector<int>    *elcharge;
   std::vector<int>    *elid;
+  // eta/phi/pt of genjet
+  std::vector<double> *EtaGenJet;
+  std::vector<double> *PhiGenJet;
+  std::vector<double> *EtGenJet;
   // eta/phi/pt of raw calo jet from JPT
   std::vector<double> *EtaRaw;
   std::vector<double> *PhiRaw;
@@ -276,6 +282,10 @@ VBFHinvis::beginJob()
   elcharge     = new std::vector<int>();
   elid         = new std::vector<int>();
 
+  EtaGenJet    = new std::vector<double>();  
+  PhiGenJet    = new std::vector<double>();
+  EtGenJet     = new std::vector<double>();
+
   EtaRaw       = new std::vector<double>();  
   PhiRaw       = new std::vector<double>();
   EtRaw        = new std::vector<double>();
@@ -345,6 +355,10 @@ VBFHinvis::beginJob()
   t1->Branch("eltrkisol" ,"vector<double>",&eltrkisol);
   t1->Branch("elcharge" ,"vector<int>",&elcharge);
   t1->Branch("elid" ,"vector<int>",&elid);
+
+  t1->Branch("EtaGenJet","vector<double>",&EtaGenJet);
+  t1->Branch("PhiGenJet","vector<double>",&PhiGenJet);
+  t1->Branch("EtGenJet" ,"vector<double>",&EtGenJet);
 
   t1->Branch("EtaRaw","vector<double>",&EtaRaw);
   t1->Branch("PhiRaw","vector<double>",&PhiRaw);
@@ -437,6 +451,8 @@ VBFHinvis::VBFHinvis(const edm::ParameterSet& iConfig)
   muonsSrc         = iConfig.getParameter<edm::InputTag>("Muons");
   // raw calo jets
   jetsIDSrc        = iConfig.getParameter<edm::InputTag>("jetsID");
+  // gen jets
+  genjetsSrc       = iConfig.getParameter<edm::InputTag>("genjets");
   // JPT jets raw
   JPTjetsSrc       = iConfig.getParameter<edm::InputTag>("JPTjets");
   // JPT L1L2L3 corrected
@@ -523,6 +539,10 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   elcharge->clear();
   elid->clear();
 
+  EtaGenJet->clear();
+  PhiGenJet->clear();
+  EtGenJet->clear();
+
   EtaRaw->clear();
   PhiRaw->clear();
   EtRaw->clear();
@@ -581,8 +601,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // get jet ID map
   edm::Handle<ValueMap<reco::JetID> > jetsID;
   iEvent.getByLabel(jetsIDSrc,jetsID);
-  // 'ak5JetID'
-  
+
+
   // pf jets
   edm::Handle<PFJetCollection> pfjets;
   iEvent.getByLabel("ak5PFJets", pfjets);
@@ -610,9 +630,8 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   // JES uncertainty
   std::string JEC_PATH("CondFormats/JetMETObjects/data/");
-  edm::FileInPath fip(JEC_PATH+"GR_R_53_V13_Uncertainty_AK5JPT.txt");
+  edm::FileInPath fip(JEC_PATH+"Summer13_V4_MC_Uncertainty_AK5PF.txt");
   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fip.fullPath());
-  //   delete jecUnc;
   
   // Calo jets
   edm::Handle<CaloJetCollection> calojets;
@@ -726,7 +745,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::map<double,float> PuMVApfIndex;
   std::map<double,int> PuIDpfIndex;
   
-    // PU info
+    // PU info, gen jets
   if(DataOrMCSrc == 1) {
     
     edm::InputTag PileupSrc_("addPileupInfo");
@@ -739,8 +758,24 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       //       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getPU_NumInteractions();
       if(PVI->getBunchCrossing() == 0) nsimvertex = PVI->getTrueNumInteractions();
     }
+
+    // parton jets
+    edm::Handle<GenJetCollection> genjets;
+    iEvent.getByLabel(genjetsSrc, genjets);
+    int igj = 0;
+    if ( genjets.isValid()) {
+      for(GenJetCollection::const_iterator genjet = genjets->begin();  genjet != genjets->end(); ++genjet ) {
+	igj += 1;
+	if(igj <= 4) {
+	  EtaGenJet->push_back(genjet->eta());
+	  PhiGenJet->push_back(genjet->phi());
+	  EtGenJet->push_back(genjet->pt());
+	}
+      }
+    }
   }
-   
+
+
   // reco vertex part
   int nvtx = 0;
   unsigned ntrkV = 0;
@@ -1028,6 +1063,14 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     MVAPF->push_back(mva);
     IDPF->push_back(idflag);
     JTypePF->push_back(pfjidtype);
+
+    // JES uncertainy 
+
+    jecUnc->setJetEta(pfjet->eta());
+    jecUnc->setJetPt (pfjet->pt() ); 
+    double unc = jecUnc->getUncertainty(true);
+    jesunc->push_back(unc);
+    //    cout <<" pfjet pT = " << pfjet->pt() <<" eta = " << pfjet->eta() <<" uncert = " << unc << endl;
   }
 
   double mass_twopfjets;
@@ -1203,13 +1246,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     */
     // THE HAPPY END OF MVA PU ID story for JPT
     
-    // JES uncertainy pre jet
-
-    //     jecUnc->setJetEta(jptjet->eta());
-    //     jecUnc->setJetPt (jptjet->pt() ); 
-    //     double unc = jecUnc->getUncertainty(true);
-    
-    double unc = 0.;
     // fill variables for user ntpl
     EtaRaw->push_back(jptjetRef->eta());
     PhiRaw->push_back(jptjetRef->phi());
@@ -1220,7 +1256,6 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     EtJPT->push_back(jptjet->pt());
     MVAJPT->push_back(jptmva);
     Ntrk->push_back(npions);
-    jesunc->push_back(unc);
     beta->push_back(jptjet->getSpecific().Zch);
   }
   
