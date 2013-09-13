@@ -40,6 +40,7 @@
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 //#include "CLHEP/HepPDT/DefaultConfig.hh"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/Vector3D.h"
@@ -154,6 +155,8 @@ private:
   // data or MC
   int DataOrMCSrc;
   // names of modules, producing object collections
+  // LHE format
+  edm::InputTag LHEsourceSrc;
   // raw calo jet ID map
   edm::InputTag muonsSrc;
   // raw calo jet ID map
@@ -187,7 +190,7 @@ private:
   int     L1ETM40, VBF_AllJets, DoubleMu7, Mu13_Mu8, Mu17_Mu8, Mu17_TkMu8;
   // vertex
   double  DZmin, PVx, PVy, PVz;
-  int     nvertex, nsimvertex;
+  int     nvertex, nsimvertex, npartons_from_ME;
   // MET
   double  pfmet, pfmetType1, pfmetType1x, pfmetType1y;
   // di muon pass and di electron mass of two high pT objects
@@ -315,6 +318,7 @@ VBFHinvis::beginJob()
   t1->Branch("event",&event,"event/I");
   t1->Branch("nvertex",&nvertex,"nvertex/I");
   t1->Branch("nsimvertex",&nsimvertex,"nsimvertex/I");
+  t1->Branch("npartons_from_ME",&npartons_from_ME,"npartons_from_ME/I");
 
   t1->Branch("f1",&f1,"f1/I");
   t1->Branch("f2",&f2,"f2/I");
@@ -444,9 +448,11 @@ VBFHinvis::VBFHinvis(const edm::ParameterSet& iConfig)
   using namespace edm;
   // 
   // get name of output file with histogramms
-  fOutputFileName = iConfig.getUntrackedParameter<string>("HistOutFile");
+  fOutputFileName  = iConfig.getUntrackedParameter<string>("HistOutFile");
   // DataOrMC
-  DataOrMCSrc     = iConfig.getUntrackedParameter<int>("DataOrMC");
+  DataOrMCSrc      = iConfig.getUntrackedParameter<int>("DataOrMC");
+  //LHE event source 
+  LHEsourceSrc     = iConfig.getParameter<edm::InputTag>("LHEsource");
   // muons
   muonsSrc         = iConfig.getParameter<edm::InputTag>("Muons");
   // raw calo jets
@@ -497,6 +503,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   nvertex = 0;
   nsimvertex = 0;
+  npartons_from_ME = 0;
 
   f1 = 0;
   f2 = 0;
@@ -745,7 +752,7 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::map<double,float> PuMVApfIndex;
   std::map<double,int> PuIDpfIndex;
   
-    // PU info, gen jets
+    // PU info, gen jets, LHE event
   if(DataOrMCSrc == 1) {
     
     edm::InputTag PileupSrc_("addPileupInfo");
@@ -772,6 +779,27 @@ VBFHinvis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  EtGenJet->push_back(genjet->pt());
 	}
       }
+    }
+    // LHE event
+    Handle<LHEEventProduct> pIn;
+    iEvent.getByLabel(LHEsourceSrc, pIn);
+    if(pIn.isValid()) {
+      const lhef::HEPEUP & hepup = pIn->hepeup();
+      //loop over particles looking for pdgId
+      int npartons = 0;
+      for (int i = 0; i < hepup.NUP; ++i){
+	if(hepup.ISTUP[i] != -1) {
+	  if(abs(hepup.IDUP[i]) == 21 ||
+	     abs(hepup.IDUP[i]) == 1  ||
+	     abs(hepup.IDUP[i]) == 2  ||
+	     abs(hepup.IDUP[i]) == 3  ||
+	     abs(hepup.IDUP[i]) == 4  ||
+	     abs(hepup.IDUP[i]) == 5) {
+	    npartons += 1;
+	  }
+	}
+      }
+      npartons_from_ME = npartons;
     }
   }
 
