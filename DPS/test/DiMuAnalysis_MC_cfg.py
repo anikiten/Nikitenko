@@ -75,7 +75,7 @@ fileNames = cms.untracked.vstring(
 
 
 process.myjetplustrack = cms.EDAnalyzer("VBFHinvis",
-    HistOutFile = cms.untracked.string('VBFHinvis.root'),
+    HistOutFile = cms.untracked.string('VBFHinvisMC.root'),
     DataOrMC = cms.untracked.int32(1),
     Muons               = cms.InputTag("muons"),
     electronsInputTag   = cms.InputTag("gsfElectrons"),
