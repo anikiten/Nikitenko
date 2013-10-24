@@ -81,6 +81,9 @@ void nmssm_wh_4b::Loop()
    int bpteta   = 0;
    int drlb     = 0;
 
+   double nbtot = 0.;
+   double nbhe  = 0.;
+
    double di_b_jet = 0.;
    double single_b_jet = 0.;
 
@@ -171,14 +174,14 @@ void nmssm_wh_4b::Loop()
       // select pt/eta b  
       int b_in_acc = 1;
       for (unsigned int j = 0; j < nbj; j++) {
-	if( (*ptb)[j] < 20 || fabs((*etab)[j]) > 2.4) {b_in_acc = 0;}
+	if( (*ptb)[j] < 0. || fabs((*etab)[j]) > 4.0) {b_in_acc = 0;}
       }
       if(b_in_acc == 0) {continue;}
       bpteta += 1;
 
       for (unsigned int j = 0; j < nbj; j++) {
 	hptb->Fill((*ptb)[j]);
-	hetab->Fill((*etab)[j]);
+	if((*ptb)[j] > 30.) hetab->Fill((*etab)[j]);
       }
 
       // DR l-b > 0.5
@@ -205,7 +208,7 @@ void nmssm_wh_4b::Loop()
      
 
    //TFile efile("nmssm_wh_4b_mh60_histos.root","recreate");
-   TFile efile("nmssm_wh_4b_mh20_histos.root","recreate");
+   TFile efile("nmssm_wh_4b_mh60_histos.root","recreate");
 
    hptl->Write();
    hetal->Write();

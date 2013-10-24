@@ -56,7 +56,7 @@ void mssm_2tau2b::Loop()
    TH1F * hPtMu  = new TH1F( "hPtMu", "PtMu", 20, 0., 100.);
    TH1F * hEtaMu = new TH1F( "hEtaMu", "EtaMu", 50, -5.0, 5.0);
 
-   TH1F * hPtB   = new TH1F( "hPtB", "PtB", 20, 0., 100.);
+   TH1F * hPtB   = new TH1F( "hPtB", "PtB", 30, 0., 150.);
    TH1F * hEtaB  = new TH1F( "hEtaB", "EtaB", 50, -5.0, 5.0);
 
    TH1F * hPtTauH   = new TH1F( "hPtTauH", "PtTauH", 20, 0., 100.);
@@ -90,10 +90,10 @@ void mssm_2tau2b::Loop()
       hEtaMu->Fill(etamu);
       
       hPtB->Fill(ptb1);
-      hEtaB->Fill(etab1);
+      if(ptb1 > 30.) hEtaB->Fill(etab1);
 
-      //      hPtB->Fill(ptb2);
-      //      hEtaB->Fill(etab2);
+      hPtB->Fill(ptb2);
+      if(ptb2 > 30.) hEtaB->Fill(etab2);
 
       hPtTauH->Fill(pttauh);
       hEtaTauH->Fill(etatauh);

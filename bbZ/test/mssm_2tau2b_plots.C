@@ -1,12 +1,4 @@
-#define bbH_cxx
-#include "bbH.h"
-#include <TH2.h>
-#include <TStyle.h>
-#include <TCanvas.h>
-#include <iostream.h>
-
-void bbH::setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
-
+void setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
   TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
 
 // For the canvas:
@@ -115,7 +107,7 @@ void bbH::setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
   tdrStyle->SetLabelColor(1, "XYZ");
   tdrStyle->SetLabelFont(42, "XYZ");
   tdrStyle->SetLabelOffset(0.007, "XYZ");
-  tdrStyle->SetLabelSize(0.05, "XYZ");
+  tdrStyle->SetLabelSize(0.10, "XYZ");
 
 // For the axis:
 
@@ -154,113 +146,63 @@ void bbH::setTDRStyle(Int_t xlog, Int_t ylog, Int_t zlog) {
   tdrStyle->cd();
 }
 
-void bbH::Loop()
+void Draw()
 {
-//   In a ROOT session, you can do:
-//      Root > .L bbH.C
-//      Root > bbH t
-//      Root > t.GetEntry(12); // Fill t data members with entry number 12
-//      Root > t.Show();       // Show values of entry 12
-//      Root > t.Show(16);     // Read and show values of entry 16
-//      Root > t.Loop();       // Loop on all entries
-//
+  // mh = 20 GeV
+  TFile* file = new TFile("mssm_2tau2b_mH300_histos.root");
+  // pT b
+  setTDRStyle(0,0,0);
+  TCanvas* c5 = new TCanvas("X","Y",1);
+  scale = 1./ hPtB->Integral();
+  hPtB->Scale(scale);
+  hPtB->SetTitleSize(0.05, "X");
+  hPtB->GetXaxis()->SetTitle("p_{T}^{b quark}, GeV");
+  hPtB->SetMaximum(0.12);
+  hPtB->SetLineStyle(1);
+  hPtB->SetLineWidth(2);
+  hPtB->Draw("hist");
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  TLatex *t = new TLatex();
+  t->SetTextSize(0.045);
+  t->DrawLatex(5.0, 0.1,"gg#rightarrowH, H#rightarrowhh#rightarrow#tau#taubb, m_{H}=300 GeV");
 
-//     This is the loop skeleton where:
-//    jentry is the global entry number in the chain
-//    ientry is the entry number in the current Tree
-//  Note that the argument to GetEntry must be:
-//    jentry for TChain::GetEntry
-//    ientry for TTree::GetEntry and TBranch::GetEntry
-//
-//       To read only selected branches, Insert statements like:
-// METHOD1:
-//    fChain->SetBranchStatus("*",0);  // disable all branches
-//    fChain->SetBranchStatus("branchname",1);  // activate branchname
-// METHOD2: replace line
-//    fChain->GetEntry(jentry);       //read all branches
-//by  b_branchname->GetEntry(ientry); //read only this branch
-   if (fChain == 0) return;
+  c5->SaveAs("ptb_nmssm_Hhh_tautaubb.pdf");
 
-   Long64_t nentries = fChain->GetEntriesFast();
-
-   TH1F * hpTb500    = new TH1F( "hpTb500", "pTb500", 36, 20., 200.);
-   TH1F * hyb500     = new TH1F( "hyb500 ", "yb500  ", 10, 0., 5.0);
-
-   Long64_t nbytes = 0, nb = 0;
-   for (Long64_t jentry=0; jentry<nentries;jentry++) {
-      Long64_t ientry = LoadTree(jentry);
-      if (ientry < 0) break;
-      nb = fChain->GetEntry(jentry);   nbytes += nb;
-      // if (Cut(ientry) < 0) continue;
-      if(nbjets != 0) {
-	hpTb500->Fill(pTb);
-	hyb500->Fill(fabs(yb));
-      }
-      
-   }
-
-   // pTb
-   setTDRStyle(0,1,0);
-   TCanvas* c3 = new TCanvas("X","Y",1);
-   hpTb500->SetTitleSize(0.05, "X");
-   hpTb500->GetXaxis()->SetTitle("p_{T} of b quark, GeV");
-   hpTb500->GetYaxis()->SetTitle("");
-   scale = 1./ hpTb500->Integral();
-   hpTb500->Scale(scale);
-   hpTb500->SetMaximum(0.500);
-   hpTb500->SetMinimum(0.001);
-   hpTb500->SetLineStyle(1);
-   hpTb500->SetLineWidth(3);
-   hpTb500->Draw("hist");
-
-   TLatex *t = new TLatex();
-   t->SetTextSize(0.045);
-   t->DrawLatex(40.,0.20,"gb #rightarrow H+b, m_{H}=500 GeV");
-
-   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
-   tex->SetNDC();
-   tex->SetTextFont(43);
-   tex->SetTextSize(27);
-   tex->SetLineWidth(2);
-   tex->Draw();
-   tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
-   tex->SetNDC();
-   tex->SetTextFont(43);
-   tex->SetTextSize(27);
-   tex->SetLineWidth(2);
-   tex->Draw();
-
-   c3->SaveAs("bbH500_ptb.pdf");
-
-   // y b
-   setTDRStyle(0,0,0);
-   TCanvas* c4 = new TCanvas("X","Y",1);
-   hyb500->SetTitleSize(0.05, "X");
-   hyb500->GetXaxis()->SetTitle("#eta of b quark");
-   hyb500->GetYaxis()->SetTitle("");
-   scale = 1./ hyb500->Integral();
-   hyb500->Scale(scale);
-   hyb500->SetMaximum(0.25);
-   hyb500->SetMinimum(0.00);
-   hyb500->SetLineStyle(1);
-   hyb500->SetLineWidth(3);
-   hyb500->Draw("hist");
-   TLatex *t = new TLatex();
-   t->SetTextSize(0.045);
-   t->DrawLatex(1.0,0.20,"gb #rightarrow H+b, m_{H}=500 GeV");
-
-   TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
-   tex->SetNDC();
-   tex->SetTextFont(43);
-   tex->SetTextSize(27);
-   tex->SetLineWidth(2);
-   tex->Draw();
-   tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
-   tex->SetNDC();
-   tex->SetTextFont(43);
-   tex->SetTextSize(27);
-   tex->SetLineWidth(2);
-   tex->Draw();
-   
-   c4->SaveAs("bbH500_etab.pdf");
+  // eta b
+  setTDRStyle(0,0,0);
+  TCanvas* c6 = new TCanvas("X","Y",1);
+  scale = 1./ hEtaB->Integral();
+  hEtaB->Scale(scale);
+  hEtaB->SetTitleSize(0.05, "X");
+  hEtaB->GetXaxis()->SetTitle("#eta^{b-quark}");
+  hEtaB->SetMaximum(0.08);
+  //  hEtaB20->SetMinimum(0.001);
+  hEtaB->SetLineStyle(1);
+  hEtaB->SetLineWidth(2);
+  hEtaB->Draw("hist");
+  TLatex *tex = new TLatex(0.65,0.96,"CMS Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
+  tex->SetNDC();
+  tex->SetTextFont(43);
+  tex->SetTextSize(27);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  t->DrawLatex(-4.5, 0.07,"gg#rightarrowH, H#rightarrowhh#rightarrow#tau#taubb, m_{H}=300 GeV");
+  c6->SaveAs("etab_nmssm_Hhh_tautaubb.pdf");
 }

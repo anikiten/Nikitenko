@@ -182,6 +182,7 @@ void Draw()
   TH1F *hdrb1b2_60  = (TH1F*)hdrb1b2->Clone();
   TH1F *hdrb1b3_60  = (TH1F*)hdrb1b3->Clone();
 
+  /*
   // pT lepton
   setTDRStyle(0,0,0);
   TCanvas* c1 = new TCanvas("X","Y",1);
@@ -222,13 +223,13 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c1->SaveAs("ptl_nmssm_wh_bbbb.png");
+  c1->SaveAs("ptl_nmssm_wh_bbbb.pdf");
 
 
   // eta lepton
@@ -271,13 +272,14 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c2->SaveAs("etal_nmssm_wh_bbbb.png");
+  c2->SaveAs("etal_nmssm_wh_bbbb.pdf");
+*/
 
   // pT b
   setTDRStyle(0,0,0);
@@ -288,7 +290,7 @@ void Draw()
   hptb_40->Scale(scale);
   scale = 1./ hptb_60->Integral();
   hptb_60->Scale(scale);
-
+  hptb_20->SetTitleSize(0.05, "X");
   hptb_20->GetXaxis()->SetTitle("p_{T}^{b-quark}, GeV");
   hptb_20->SetMaximum(0.2);
   hptb_20->SetLineStyle(1);
@@ -319,41 +321,41 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c3->SaveAs("ptb_nmssm_wh_bbbb.png");
+  c3->SaveAs("ptb_nmssm_wh_bbbb.pdf");
 
   // eta b
   setTDRStyle(0,0,0);
   TCanvas* c4 = new TCanvas("X","Y",1);
-  Double_t scale = 1./ hetal_20->Integral();
-  hetal_20->Scale(scale);
-  scale = 1./ hetal_40->Integral();
-  hetal_40->Scale(scale);
-  scale = 1./ hetal_60->Integral();
-  hetal_60->Scale(scale);
-
-  hetal_20->GetXaxis()->SetTitle("|#eta|^{b-quark}");
-  hetal_20->SetMaximum(0.10);
-  hetal_20->SetLineStyle(1);
-  hetal_20->SetLineWidth(2);
-  hetal_20->Draw("hist");
-  hetal_40->SetLineStyle(2);
-  hetal_40->SetLineWidth(2);
-  hetal_40->Draw("same");
-  hetal_60->SetLineStyle(3);
-  hetal_60->SetLineWidth(2);
-  hetal_60->Draw("same");
+  Double_t scale = 1./ hetab_20->Integral();
+  hetab_20->Scale(scale);
+  scale = 1./ hetab_40->Integral();
+  hetab_40->Scale(scale);
+  scale = 1./ hetab_60->Integral();
+  hetab_60->Scale(scale);
+  hetab_20->SetTitleSize(0.05, "X");
+  hetab_20->GetXaxis()->SetTitle("|#eta|^{b-quark}");
+  hetab_20->SetMaximum(0.10);
+  hetab_20->SetLineStyle(1);
+  hetab_20->SetLineWidth(2);
+  hetab_20->Draw("hist");
+  hetab_40->SetLineStyle(2);
+  hetab_40->SetLineWidth(2);
+  hetab_40->Draw("same");
+  hetab_60->SetLineStyle(3);
+  hetab_60->SetLineWidth(2);
+  hetab_60->Draw("same");
 
   TLegend *leg = new TLegend(0.5,0.7,0.9,0.9,NULL,"brNDC");
   leg->SetFillColor(10);
-  leg->AddEntry(hetal_20,"m_{H1}=20 GeV","L");
-  leg->AddEntry(hetal_40,"m_{H1}=40 GeV","L");
-  leg->AddEntry(hetal_60,"m_{H1}=60 GeV","L");
+  leg->AddEntry(hetab_20,"m_{H1}=20 GeV","L");
+  leg->AddEntry(hetab_40,"m_{H1}=40 GeV","L");
+  leg->AddEntry(hetab_60,"m_{H1}=60 GeV","L");
   leg->Draw();
 
   TLatex *t = new TLatex();
@@ -367,15 +369,15 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c4->SaveAs("etab_nmssm_wh_bbbb.png");
+  c4->SaveAs("etab_nmssm_wh_bbbb.pdf");
 
-
+  /*
   // DR b1-b3
   setTDRStyle(0,0,0);
   TCanvas* c5 = new TCanvas("X","Y",1);
@@ -416,13 +418,13 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c5->SaveAs("drb1b2_nmssm_wh_bbbb.png");
+  c5->SaveAs("drb1b2_nmssm_wh_bbbb.pdf");
 
   // DR b1-b2
   setTDRStyle(0,0,0);
@@ -464,13 +466,13 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c6->SaveAs("drb1b3_nmssm_wh_bbbb.png");
+  c6->SaveAs("drb1b3_nmssm_wh_bbbb.pdf");
 
   // DR b1-b2
   setTDRStyle(0,0,0);
@@ -512,13 +514,14 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  c7->SaveAs("drlbmin_nmssm_wh_bbbb.png");
+  c7->SaveAs("drlbmin_nmssm_wh_bbbb.pdf");
+  */
 
   /*
   // eta mu
@@ -556,7 +559,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -565,7 +568,7 @@ void Draw()
 
   t->DrawLatex(-4.5, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
-  c2->SaveAs("etamu_nmssm_2tau2b.png");
+  c2->SaveAs("etamu_nmssm_2tau2b.pdf");
 
   // pT tau_h 
   setTDRStyle(0,1,0);
@@ -602,7 +605,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -611,7 +614,7 @@ void Draw()
 
   t->DrawLatex(5.0, 0.5,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
-  c3->SaveAs("pttauh_nmssm_2tau2b.png");
+  c3->SaveAs("pttauh_nmssm_2tau2b.pdf");
 
 
   // eta tauh
@@ -649,7 +652,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -658,7 +661,7 @@ void Draw()
 
   t->DrawLatex(-4.5, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
-  c4->SaveAs("etatauh_nmssm_2tau2b.png");
+  c4->SaveAs("etatauh_nmssm_2tau2b.pdf");
 
 
   // pT b
@@ -696,7 +699,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -705,7 +708,7 @@ void Draw()
 
   t->DrawLatex(5.0, 0.25,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
-  c5->SaveAs("ptb_nmssm_2tau2b.png");
+  c5->SaveAs("ptb_nmssm_2tau2b.pdf");
 
 
   // eta b
@@ -743,7 +746,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -752,7 +755,7 @@ void Draw()
 
   t->DrawLatex(-4.5, 0.06,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
-  c6->SaveAs("etab_nmssm_2tau2b.png");
+  c6->SaveAs("etab_nmssm_2tau2b.pdf");
 
   // dr mu tauh
   setTDRStyle(0,0,0);
@@ -789,7 +792,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -798,7 +801,7 @@ void Draw()
 
   t->DrawLatex(0.2, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb, m_{H1}=125 GeV");
 
-  c7->SaveAs("drmutauh_nmssm_2tau2b.png");
+  c7->SaveAs("drmutauh_nmssm_2tau2b.pdf");
 
   // dr b-b_bar
   setTDRStyle(0,0,0);
@@ -835,7 +838,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -845,7 +848,7 @@ void Draw()
   t->DrawLatex(1.0, 0.26,"gg#rightarrowH1, H1#rightarrowH2H2#rightarrow#tau_{#mu}#tau_{h}bb");
   t->DrawLatex(1.0, 0.22,"m_{H1}=125 GeV");
 
-  c8->SaveAs("drbbbar_nmssm_2tau2b.png");
+  c8->SaveAs("drbbbar_nmssm_2tau2b.pdf");
 
   // dr mu tauh
   setTDRStyle(0,0,0);
@@ -882,7 +885,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -897,7 +900,7 @@ void Draw()
   t->DrawLatex(3.5, 0.10,"p_{T}^{b}>25 GeV");
   t->DrawLatex(3.5, 0.05,"|#eta^{b}|<2.4");
 
-  c9->SaveAs("drmutauhs_nmssm_2tau2b.png");
+  c9->SaveAs("drmutauhs_nmssm_2tau2b.pdf");
 
   // dr b-b_bar S
   setTDRStyle(0,0,0);
@@ -936,7 +939,7 @@ void Draw()
   tex->SetTextSize(27);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2,0.96,"#sqrt{s} = 8 TeV");
+  tex = new TLatex(0.2,0.96,"#sqrt{s} = 14 TeV");
   tex->SetNDC();
   tex->SetTextFont(43);
   tex->SetTextSize(27);
@@ -950,6 +953,6 @@ void Draw()
   t->DrawLatex(3.5, 0.15,"|#eta^{#tau_{h}}|<2.4");
   t->DrawLatex(3.5, 0.10,"p_{T}^{b}>25 GeV");
   t->DrawLatex(3.5, 0.05,"|#eta^{b}|<2.4");
-  c10->SaveAs("drbbbars_nmssm_2tau2b.png");
+  c10->SaveAs("drbbbars_nmssm_2tau2b.pdf");
   */
 }
